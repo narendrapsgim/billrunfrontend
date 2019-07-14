@@ -101,7 +101,7 @@ class ChargeDetails extends Component {
   onChangeFiled = (path, value) => {
     const pathString = path.join('.');
     switch (pathString) {
-      case 'cycles':
+      case 'params.cycles':
         if (value !== '') {
           this.props.onFieldUpdate(path, value);
         } else {
@@ -131,7 +131,7 @@ class ChargeDetails extends Component {
 
   onChangeCycles = (value) => {
     const newValue = isNumber(value) ? parseFloat(value) : value;
-    this.onChangeFiled(['cycles'], newValue);
+    this.onChangeFiled(['params', 'cycles'], newValue);
   }
 
   onChangeSubjectGeneral = (value) => {
@@ -477,7 +477,7 @@ class ChargeDetails extends Component {
                   { getFieldName('cycles', 'charge')}
                 </Col>
                 <Col sm={8} lg={9}>
-                  <Field value={charge.get('cycles', '')} onChange={this.onChangeCycles} fieldType="unlimited" unlimitedValue="" unlimitedLabel="Infinite" editable={editable} />
+                  <Field value={charge.getIn(['params', 'cycles'], '')} onChange={this.onChangeCycles} fieldType="unlimited" unlimitedValue="" unlimitedLabel="Infinite" editable={editable} />
                 </Col>
               </FormGroup>
               <EntityField

@@ -109,7 +109,7 @@ class DiscountDetails extends Component {
     const pathString = path.join('.');
     switch (pathString) {
       case 'limit':
-      case 'cycles':
+      case 'params.cycles':
         if (value !== '') {
           this.props.onFieldUpdate(path, value);
         } else {
@@ -132,7 +132,7 @@ class DiscountDetails extends Component {
 
   onChangeCycles = (value) => {
     const newValue = isNumber(value) ? parseFloat(value) : value;
-    this.onChangeFiled(['cycles'], newValue);
+    this.onChangeFiled(['params', 'cycles'], newValue);
   }
 
   onChangeLimit = (value) => {
@@ -477,7 +477,7 @@ class DiscountDetails extends Component {
                   { getFieldName('cycles', 'discount')}
                 </Col>
                 <Col sm={8} lg={9}>
-                  <Field value={discount.get('cycles', '')} onChange={this.onChangeCycles} fieldType="unlimited" unlimitedValue="" unlimitedLabel="Infinite" editable={editable} />
+                  <Field value={discount.getIn(['params', 'cycles'], '')} onChange={this.onChangeCycles} fieldType="unlimited" unlimitedValue="" unlimitedLabel="Infinite" editable={editable} />
                 </Col>
               </FormGroup>
               <EntityField
