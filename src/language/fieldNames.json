@@ -192,5 +192,7 @@
   },
   "aid": "Customer ID",
   "sid": "Subscriber ID",
+  "from": "From",
+  "to": "To",
   "effective_date": "Effective Date"
 }

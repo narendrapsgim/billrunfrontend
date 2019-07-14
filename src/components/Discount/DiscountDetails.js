@@ -21,6 +21,7 @@ class DiscountDetails extends Component {
 
   static propTypes = {
     discount: PropTypes.instanceOf(Immutable.Map),
+    errors: PropTypes.instanceOf(Immutable.Map),
     mode: PropTypes.string.isRequired,
     currency: PropTypes.string,
     hideKey: PropTypes.bool,
@@ -33,6 +34,7 @@ class DiscountDetails extends Component {
 
   static defaultProps = {
     discount: Immutable.Map(),
+    errors: Immutable.Map(),
     fields: Immutable.Map({
       description: Immutable.Map({
         title: getFieldName('description', 'discount'),
@@ -406,10 +408,9 @@ class DiscountDetails extends Component {
   }
 
   render() {
-    const { errors } = this.state;
-    const { discount, mode, currency, fields, hideKey } = this.props;
+    const { errors:onChangeErrors } = this.state;
+    const { discount, mode, currency, fields, hideKey, errors } = this.props;
     const editable = (mode !== 'view');
-    const isPercentaget = this.isPercentaget();
     const plansOptions = this.createPlansOptions();
     const servicesOptions = this.createServicesOptions();
     const excludeDiscounts = discount.get('excludes', Immutable.List()).join(',');
@@ -439,6 +440,7 @@ class DiscountDetails extends Component {
                 entity={discount}
                 onChange={this.onChangeFiled}
                 editable={editable}
+                error={errors.get('description', onChangeErrors.description)}
               />
             { ['clone', 'create'].includes(mode) && !hideKey && (
                 <EntityField
@@ -447,7 +449,7 @@ class DiscountDetails extends Component {
                   onChange={this.onChangeFiled}
                   editable={editable}
                   disabled={!['clone', 'create'].includes(mode)}
-                  error={errors.name}
+                  error={errors.get('key', onChangeErrors.name)}
                 />
               )}
               <FormGroup >
@@ -459,10 +461,10 @@ class DiscountDetails extends Component {
                     ? (
                       <span>
                         <span style={{ display: 'inline-block', marginRight: 20 }}>
-                          <Field fieldType="radio" onChange={this.onChangeDiscountType} name="type" value="monetary" label={getFieldName('type_monetary', 'discount')} checked={!isPercentaget} />
+                          <Field fieldType="radio" onChange={this.onChangeDiscountType} name="type" value="monetary" label={getFieldName('type_monetary', 'discount')} checked={discount.get('type', '') === 'monetary'} />
                         </span>
                         <span style={{ display: 'inline-block' }}>
-                          <Field fieldType="radio" onChange={this.onChangeDiscountType} name="type" value="percentage" label={percentageLabel} checked={isPercentaget} disabled={includesQuantitative} />
+                          <Field fieldType="radio" onChange={this.onChangeDiscountType} name="type" value="percentage" label={percentageLabel} checked={discount.get('type', '') === 'percentage'} disabled={includesQuantitative} />
                         </span>
                       </span>
                     )
@@ -483,12 +485,14 @@ class DiscountDetails extends Component {
                 entity={discount}
                 onChange={this.onChangeFiled}
                 editable={editable}
+                error={errors.get('proration', onChangeErrors.proration)}
               />
               <EntityField
                 field={fields.get('priority')}
                 entity={discount}
                 onChange={this.onChangeFiled}
                 editable={editable}
+                error={errors.get('priority', onChangeErrors.priority)}
               />
               <FormGroup>
                 <Col componentClass={ControlLabel} sm={3} lg={2}>
@@ -504,12 +508,14 @@ class DiscountDetails extends Component {
                 entity={discount}
                 onChange={this.onChangeFiled}
                 editable={editable}
+                error={errors.get('params.min_subscribers', onChangeErrors.paramsMinSubscribers)}
               />
               <EntityField
                 field={fields.get('paramsMaxSubscribers')}
                 entity={discount}
                 onChange={this.onChangeFiled}
                 editable={editable}
+                error={errors.get('params.max_subscribers', onChangeErrors.paramsMaxSubscribers)}
               />
               <FormGroup>
                 <Col componentClass={ControlLabel} sm={3} lg={2}>
@@ -533,6 +539,7 @@ class DiscountDetails extends Component {
                 onChangeField={this.onChangeAdditionalField}
                 onRemoveField={this.onRemoveAdditionalField}
                 editable={editable}
+                errors={errors}
               />
             </Panel>
 

@@ -33,7 +33,7 @@ const DiscountConditions = ({
       <DiscountCondition
         path={accountConditionsPath}
         conditions={discount.getIn(accountConditionsPath, Immutable.List())}
-        disabled={!editable}
+        editable={editable}
         fields={accountConditionFields}
         operators={conditionsOperators}
         onChangeField={onChangeConditionField}
@@ -47,7 +47,7 @@ const DiscountConditions = ({
       <DiscountCondition
         path={subscriberConditionsPath}
         conditions={discount.getIn(subscriberConditionsPath, Immutable.List())}
-        disabled={!editable}
+        editable={editable}
         fields={subscriberConditionFields}
         operators={conditionsOperators}
         onChangeField={onChangeConditionField}
@@ -61,7 +61,7 @@ const DiscountConditions = ({
       <DiscountCondition
         path={servicesConditionsPath}
         conditions={discount.getIn(servicesConditionsPath, Immutable.List())}
-        disabled={!editable}
+        editable={editable}
         fields={subscriberServicesConditionFields}
         operators={conditionsOperators}
         onChangeField={onChangeConditionField}

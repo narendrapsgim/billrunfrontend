@@ -25,6 +25,7 @@ import {
   setCloneDiscount,
 } from '@/actions/discountsActions';
 import { clearItems, getRevisions, clearRevisions } from '@/actions/entityListActions';
+import { validateEntity } from '@/actions/discountsActions';
 import { modeSelector, itemSelector, idSelector, revisionsSelector } from '@/selectors/entitySelector';
 import { currencySelector } from '@/selectors/settingsSelector';
 
@@ -50,6 +51,7 @@ class DiscountSetup extends Component {
   }
 
   state = {
+    errors: Immutable.Map(),
     progress: false,
   }
 
@@ -136,6 +138,9 @@ class DiscountSetup extends Component {
   }
 
   onChangeFieldValue = (path, value) => {
+    const { errors } = this.state;
+    const pathString = path.join('.');
+    this.setState(() => ({ errors: errors.delete(pathString) }));
     this.props.dispatch(updateDiscount(path, value));
   }
 
@@ -171,35 +176,21 @@ class DiscountSetup extends Component {
   }
 
   validate = () => {
-    // const { item } = this.props;
-    // if (item.getIn(['params', 'service'], Immutable.List()).isEmpty() && item.getIn(['params', 'plan'], '').lenght === 0) {
-    //   this.props.dispatch(showDanger('Please select discount conditions'));
-    //   return false;
-    // }
-    //
-    // const serviceDiscountExist = item
-    //   .getIn(['subject', 'service'], Immutable.Map())
-    //   .some(value => (value !== null && value !== ''));
-    //
-    // const planDiscountExist = item
-    //   .getIn(['subject', 'plan'], Immutable.Map())
-    //   .some(value => (value !== null && value !== ''));
-    //
-    // if (!serviceDiscountExist && !planDiscountExist) {
-    //   this.props.dispatch(showDanger('Please set discount value'));
-    //   return false;
-    // }
-
-    return true;
+    const { item } = this.props;
+    const errors = this.props.dispatch(validateEntity(item));
+    this.setState(() => ({ errors }));
+    if (errors.isEmpty()) {
+      return true;
+    }
+    return false;
   }
 
   render() {
-    const { progress } = this.state;
+    const { progress, errors } = this.state;
     const { item, mode, revisions, currency } = this.props;
     if (mode === 'loading') {
       return (<LoadingItemPlaceholder onClick={this.handleBack} />);
     }
-
     const allowEdit = mode !== 'view';
     return (
       <div className="discount-setup">
@@ -224,6 +215,7 @@ class DiscountSetup extends Component {
             currency={currency}
             onFieldUpdate={this.onChangeFieldValue}
             onFieldRemove={this.onRemoveFieldValue}
+            errors={errors}
           />
         </Panel>
 

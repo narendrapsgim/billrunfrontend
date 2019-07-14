@@ -13,6 +13,7 @@ import { EntityRevisionDetails, EntityFields } from '../Entity';
 import { DiscountPopup } from '@/components/Discount';
 import PlaysSelector from '../Plays/PlaysSelector';
 import { showFormModal, setFormModalError, showConfirmModal } from '@/actions/guiStateActions/pageActions';
+import { validateEntity } from '@/actions/discountsActions';
 import {
   getConfig,
   getItemId,
@@ -20,6 +21,7 @@ import {
   getItemDateValue,
   buildPageTitle,
   toImmutableList,
+  getFieldName,
 } from '@/common/Util';
 
 class Subscription extends Component {
@@ -165,35 +167,55 @@ class Subscription extends Component {
   getDiscountActions = () => {
     const { mode } = this.props;
     const allowEdit = mode !== 'view';
-    return ([
-      { type: 'edit', helpText: 'Edit group', onClick: this.onDiscountEditForm, enable: allowEdit, actionClass: "pl0 pr0" },
-      { type: 'remove', helpText: 'Remove Group', onClick: this.onRemoveDiscount, enable: allowEdit, actionClass: "pl0 pr0" },
-    ]);
+    return ([{
+      type: 'view',
+      helpText: 'view discount',
+      onClick: this.onDiscountEditForm,
+      show: !allowEdit,
+      actionClass: "pl0 pr0"
+    },{
+      type: 'edit',
+      helpText: 'Edit discount',
+      onClick: this.onDiscountEditForm,
+      show: allowEdit,
+      actionClass: "pl0 pr0"
+    }, {
+      type: 'remove',
+      helpText: 'Remove discount',
+      onClick: this.onRemoveDiscount,
+      show: allowEdit,
+      actionClass: "pl0 pr0"
+    }]);
   }
 
   onDiscountEditForm = (idx) => {
-    const { dispatch } = this.props;
+    const { dispatch, mode } = this.props;
     const { subscription } = this.state;
     const discounts = subscription.get('discounts', Immutable.List()) || Immutable.List();
-
+    const isCreate = idx === null;
     const newDiscount = discounts.get(idx, Immutable.Map({
       key: `SUBSCRIBER_DISCOUNT_${uuid.v4().replace(/-/g, '')}`,
+      type: 'monetary',
+      from: subscription.get('from', ''),
+      to: subscription.get('to', ''),
     }))
     const onOk = (newItem) => {
-      if (newItem.get('description', '') === '') {
-        this.props.dispatch(setFormModalError('description', 'Description is required'));
+      this.props.dispatch(setFormModalError());
+      const errors = dispatch(validateEntity(newItem, 'saveInSubscriber'));
+      if (!errors.isEmpty()) {
+        errors.forEach((message, fieldId) => {
+          this.props.dispatch(setFormModalError(fieldId, message));
+        })
         return false;
       }
-      const newDiscounts = (idx === null)
-        ? discounts.push(newItem)
-        : discounts.set(idx, newItem);
+      const newDiscounts = isCreate ? discounts.push(newItem) : discounts.set(idx, newItem);
       this.updateSubscriptionField(['discounts'], newDiscounts);
       return true;
     };
     const config = {
-      title: 'Create Descount',
+      title: isCreate ? 'Create discount' : `Edit ${newDiscount.get('description', 'discount')}`,
       onOk,
-      mode: 'create',
+      mode,
       hideKey: true,
     };
     return dispatch(showFormModal(newDiscount, DiscountPopup, config));
@@ -202,7 +224,6 @@ class Subscription extends Component {
   onRemoveDiscount = (index) => {
     const { dispatch } = this.props;
     const { subscription } = this.state;
-    console.log('onRemoveDiscount index:', index);
 
     const discounts = subscription.get('discounts', Immutable.List()) || Immutable.List();
     const discount = discounts.get(index, null);
@@ -395,14 +416,22 @@ class Subscription extends Component {
     services => (services ? services.map(service => service.delete('ui_flags')) : Immutable.List()),
   );
 
-  renderDiscountRow = (discount, idx) => (
-    <tr className="List" key={discount.get('key', idx)}>
-      <td className="td-ellipsis">{discount.get('description', '')}</td>
-      <td className="text-right row pr0 pl0">
-        <Actions actions={this.getDiscountActions()} data={idx} />
-      </td>
-    </tr>
-  );
+  renderDiscountRow = (discount, idx) => {
+    const dateFormat = getConfig('dateFormat', 'DD/MM/YYYY');
+    return (
+      <tr className="List" key={discount.get('key', idx)}>
+        <td className="td-ellipsis">{discount.get('description', '')}</td>
+        <td className="td-ellipsi text-center">{getItemDateValue(discount, 'from').format(dateFormat)}</td>
+        <td className="td-ellipsis text-center">{getItemDateValue(discount, 'to').format(dateFormat)}</td>
+        <td className="td-ellipsis text-center">{getFieldName(`type_${discount.get('type', 'monetary')}`, 'discount')}</td>
+        <td className="td-ellipsis text-center">{discount.get('cycles', 'Infinite')}</td>
+        <td className="td-ellipsis text-center">{discount.get('priority', '-')}</td>
+        <td className="text-right row pr0 pl0">
+          <Actions actions={this.getDiscountActions()} data={idx} />
+        </td>
+      </tr>
+    );
+  }
 
   renderSystemFields = (editable) => {
     const { subscription } = this.state;
@@ -524,10 +553,16 @@ class Subscription extends Component {
               <p><small>No Discounts</small></p>
             )}
             {!subscription.get('discounts', Immutable.List()).isEmpty() && (
-              <Table style={{ tableLayout: 'fixed' }}>
+              <Table style={{ tableLayout: 'fixed' }} className="mb0">
                 <thead>
                   <tr>
-                    <th>Name</th>
+                    <th>{ getFieldName('description', 'discount')}</th>
+                    <th className="text-center">{ getFieldName('from', 'discount')}</th>
+                    <th className="text-center">{ getFieldName('to', 'discount')}</th>
+                    <th className="text-center">{ getFieldName('type', 'discount')}</th>
+                    <th className="text-center">{ getFieldName('cycles', 'discount')}</th>
+                    <th className="text-center">{ getFieldName('priority', 'discount')}</th>
+                    <th></th>
                   </tr>
                 </thead>
                 <tbody>
@@ -540,7 +575,7 @@ class Subscription extends Component {
             )}
             { allowEdit && (
               <CreateButton
-                buttonStyle={{ marginTop: 5, marginBottom: 10 }}
+                buttonStyle={{}}
                 onClick={this.onDiscountEditForm}
                 action="Add"
                 label=""
