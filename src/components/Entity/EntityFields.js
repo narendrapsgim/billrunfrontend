@@ -22,6 +22,7 @@ class EntityFields extends Component {
       PropTypes.arrayOf(PropTypes.string),
     ]).isRequired,
     fields: PropTypes.instanceOf(Immutable.List),
+    errors: PropTypes.instanceOf(Immutable.Map),
     highlightPramas: PropTypes.instanceOf(Immutable.List),
     fieldsFilter: PropTypes.func,
     editable: PropTypes.bool,
@@ -34,6 +35,7 @@ class EntityFields extends Component {
   static defaultProps = {
     entity: Immutable.Map(),
     fields: Immutable.List(),
+    errors: Immutable.Map(),
     highlightPramas: Immutable.List(),
     fieldsFilter: null,
     editable: true,
@@ -100,7 +102,7 @@ class EntityFields extends Component {
   filterParamsFields = (field) => {
     const { entity } = this.props;
     const fieldPath = field.get('field_name', '').split('.');
-    return !(fieldPath[0] === 'params' && !entity.hasIn(fieldPath));
+    return (!(fieldPath[0] === 'params' && !entity.hasIn(fieldPath))) || field.get('mandatory', false);
   }
 
   filterPlayFields = (field) => {
@@ -116,7 +118,7 @@ class EntityFields extends Component {
   }
 
   renderField = (field, key) => {
-    const { entity, editable, onChangeField } = this.props;
+    const { entity, editable, onChangeField, errors } = this.props;
     return (
       <EntityField
         key={`key_${field.get('field_name', key)}`}
@@ -124,6 +126,7 @@ class EntityFields extends Component {
         entity={entity}
         editable={editable}
         onChange={onChangeField}
+        error={errors.get(field.get('field_name', ''), false)}
       />
     );
   };
