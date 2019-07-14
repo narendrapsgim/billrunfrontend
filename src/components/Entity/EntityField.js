@@ -54,7 +54,7 @@ class EntityField extends Component {
 
   initDefaultValues = () => {
     const { field, entity, fieldPath } = this.props;
-    if (entity.getIn(fieldPath, null) === null) {
+    if ([null, undefined].includes(entity.getIn(fieldPath, null))) {
       const noDefaultValueVal = this.getNoDefaultValueVal();
       const defaultValue = field.get('default_value', noDefaultValueVal);
       if (defaultValue !== null) {
@@ -71,8 +71,8 @@ class EntityField extends Component {
       return false;
     }
     if (isFieldRanges || isFieldDateRange) {
-      // const defaultRangValue = Immutable.Map({ from: '', to: '' });
-      // return Immutable.List([defaultRangValue]);
+      // const defaultRangeValue = Immutable.Map({ from: '', to: '' });
+      // return Immutable.List([defaultRangeValue]);
       return Immutable.List();
     }
     if (!byConfig) {
@@ -166,16 +166,22 @@ class EntityField extends Component {
     }
   }
 
-  renderRemovableField = input => (
-    <InputGroup>
-      {input}
-      <InputGroup.Button>
-        <Button onClick={this.onClickRemoveInput}>
-          <i className="fa fa-fw fa-trash-o danger-red" />
-        </Button>
-      </InputGroup.Button>
-    </InputGroup>
-  );
+  renderRemovableField = (input) => {
+    const { field } = this.props;
+    return (
+      <InputGroup>
+        {input}
+        <InputGroup.Button>
+          <Button onClick={this.onClickRemoveInput}>
+            <i
+              className="fa fa-fw fa-trash-o danger-red"
+              title={`Remove ${field.get('title', field.get('field_name', ''))} field`}
+            />
+          </Button>
+        </InputGroup.Button>
+      </InputGroup>
+    );
+  }
 
   renderField = () => {
     const {
@@ -303,7 +309,7 @@ class EntityField extends Component {
           { description !== '' && (<Help contents={description} />) }
         </Col>
         <Col sm={8} lg={9}>
-          { isRemoveField && editable ? this.renderRemovableField(fieldInput) : fieldInput }
+          { isRemoveField && editable && !field.get('mandatory', false) ? this.renderRemovableField(fieldInput) : fieldInput }
           { error && (<HelpBlock><small>{error}</small></HelpBlock>)}
           { help !== '' && (<HelpBlock><small>{help}</small></HelpBlock>)}
         </Col>
