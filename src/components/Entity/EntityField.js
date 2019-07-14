@@ -136,7 +136,7 @@ class EntityField extends Component {
     } = this.props;
     if (isFieldDate) {
       const value = entity.getIn(fieldPath, '');
-      return (value === '') ? undefined : moment(value);
+      return ([undefined, null, ''].includes(value)) ? undefined : moment(value);
     }
     if (isFieldDateRange) {
       const value = entity.getIn(fieldPath, undefined);
