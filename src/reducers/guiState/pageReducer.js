@@ -81,7 +81,10 @@ const pageReducer = (state = defaultState, action) => {
     }
 
     case EDIT_FORM_SET_ERROR: {
-      const { fieldId, message = null } = action;
+      const { fieldId = null, message = null } = action;
+      if (fieldId === null) {
+        return state.deleteIn(['formModalData', 'errors']);
+      }
       if (message === null) {
         return state.deleteIn(['formModalData', 'errors', fieldId]);
       }
