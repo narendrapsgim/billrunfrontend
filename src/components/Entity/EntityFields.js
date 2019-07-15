@@ -36,7 +36,7 @@ class EntityFields extends Component {
     entity: Immutable.Map(),
     fields: Immutable.List(),
     errors: Immutable.Map(),
-    highlightPramas: Immutable.List(),
+    highlightPramas: null,
     fieldsFilter: null,
     editable: true,
     isPlaysEnabled: false,
@@ -85,7 +85,10 @@ class EntityFields extends Component {
         label: titleCase(field.get('title', '')),
         value: field.get('field_name', '').split('.')[1],
       }))
-      .sort(a => (highlightPramas.includes(`params.${a.value}`) ? -1 : 1));
+      .sortBy(field => field.label)
+      .sortBy(field =>
+        (highlightPramas !== null && highlightPramas.includes(`params.${field.value}`) ? 0 : 1)
+      )
   }
 
   onAddParam = (key) => {
@@ -143,8 +146,9 @@ class EntityFields extends Component {
 
   renderAddParamButton = (options) => {
     const { highlightPramas } = this.props;
+    const highlightAll = highlightPramas === null;
     const menuItems = options.map((option) => {
-      const highlight = highlightPramas.includes(`params.${option.value}`);
+      const highlight = highlightAll || highlightPramas.includes(`params.${option.value}`);
       const menuItemClass = classNames({
         'disable-label': !highlight,
       });
