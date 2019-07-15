@@ -12,7 +12,7 @@
     "@svgr/webpack": "4.3.1",
     "babel-core": "7.0.0-bridge.0",
     "babel-eslint": "10.0.2",
-    "babel-jest": "23.6.0",
+    "babel-jest": "24.8.0",
     "babel-loader": "8.0.6",
     "babel-plugin-named-asset-import": "^0.3.2",
     "babel-preset-react-app": "^9.0.0",
@@ -42,10 +42,10 @@
     "identity-obj-proxy": "3.0.0",
     "immutable": "^4.0.0-rc.12",
     "is-number": "^7.0.0",
-    "jest": "23.6.0",
-    "jest-pnp-resolver": "1.0.2",
-    "jest-resolve": "23.6.0",
-    "jest-watch-typeahead": "^0.2.1",
+    "jest": "24.8.0",
+    "jest-pnp-resolver": "1.2.1",
+    "jest-resolve": "24.8.0",
+    "jest-watch-typeahead": "^0.3.1",
     "lodash.debounce": "^4.0.8",
     "lodash.flattendeep": "^4.4.0",
     "lodash.result": "^4.5.2",
@@ -130,6 +130,7 @@
       "^.+\\.module\\.(css|sass|scss)$"
     ],
     "moduleNameMapper": {
+      "@/(.*)$": "<rootDir>/src/$1",
       "^react-native$": "react-native-web",
       "^.+\\.module\\.(css|sass|scss)$": "identity-obj-proxy"
     },
