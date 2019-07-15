@@ -3,28 +3,18 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import Immutable from 'immutable';
 import moment from 'moment';
+import isNumber from 'is-number';
 import { InputGroup } from 'react-bootstrap';
 import Field from '@/components/Field';
 import {
   formatSelectOptions,
   getConfig,
+  toImmutableList,
 } from '@/common/Util';
 import {
   selectOptionSelector,
 } from '@/selectors/conditionSelectors';
-import {
-  getCyclesOptions,
-  getProductsOptions,
-  getPlansOptions,
-  getServicesOptions,
-  getGroupsOptions,
-  getUsageTypesOptions,
-  getBucketsOptions,
-  getFileTypesOptions,
-  getEventCodeOptions,
-  getPlayTypeOptions,
-  getTaxesOptions,
-} from '@/actions/reportsActions';
+import { optionsLoaders } from '@/actions/conditionActions';
 
 
 class ConditionValue extends Component {
@@ -53,13 +43,6 @@ class ConditionValue extends Component {
     this.initFieldOptions(config, selectOptions);
   }
 
-  componentWillReceiveProps(nextProps) {
-    const { config } = this.props;
-    if (!Immutable.is(config, nextProps.config)) {
-      this.initFieldOptions(nextProps.config, nextProps.selectOptions);
-    }
-  }
-
   shouldComponentUpdate(nextProps) {
     const { field, config, operator, selectOptions, disabled } = this.props;
     return (
@@ -71,39 +54,26 @@ class ConditionValue extends Component {
     );
   }
 
+  componentDidUpdate(prevProps) {
+    const { config, selectOptions } = this.props;
+    if (!Immutable.is(prevProps.config, config)) {
+      this.initFieldOptions(config, selectOptions);
+    }
+    // If type of value changed or select options, reset the value
+    if (prevProps.config.get('type', '') !== config.get('type', '') || !Immutable.is(selectOptions, prevProps.selectOptions)) {
+      this.props.onChange('');
+    }
+  }
+
   initFieldOptions = (config, selectOptions) => {
     if (config.hasIn(['inputConfig', 'callback']) && selectOptions.isEmpty()) {
       const callback = config.getIn(['inputConfig', 'callback']);
-      switch (callback) {
-        case 'getCyclesOptions': this.props.dispatch(getCyclesOptions());
-          break;
-        case 'getPlansOptions': this.props.dispatch(getPlansOptions());
-          break;
-        case 'getProductsOptions': this.props.dispatch(getProductsOptions(
-          config.getIn(['inputConfig', 'callbackArgument'], Immutable.Map())),
-        );
-          break;
-        case 'getServicesOptions': this.props.dispatch(getServicesOptions());
-          break;
-        case 'getGroupsOptions': this.props.dispatch(getGroupsOptions());
-          break;
-        case 'getUsageTypesOptions': this.props.dispatch(getUsageTypesOptions());
-          break;
-        case 'getBucketsOptions':
-        case 'getBucketsExternalIdsOptions':
-          this.props.dispatch(getBucketsOptions());
-          break;
-        case 'getFileTypeOptions': this.props.dispatch(getFileTypesOptions());
-          break;
-        case 'getPlayTypeOptions': this.props.dispatch(getPlayTypeOptions());
-          break;
-        case 'getEventCodeOptions': this.props.dispatch(getEventCodeOptions());
-          break;
-        case 'getTaxesOptions': this.props.dispatch(getTaxesOptions());
-          break;
-        default: console.log('unsuported select options callback');
-          break;
+      const args = config.getIn(['inputConfig', 'callbackArgument'], Immutable.Map());
+      if (optionsLoaders.hasOwnProperty(callback)) {
+        return this.props.dispatch(optionsLoaders[callback](args));
       }
+      const callbackArgs = { callback, args };
+      return optionsLoaders['unknownCallback'](callbackArgs);
     }
   }
 
@@ -113,7 +83,15 @@ class ConditionValue extends Component {
   };
 
   onChangeSelect = (value) => {
-    this.props.onChange(value);
+    const { field } = this.props;
+    const multi = ['nin', 'in', '$nin', '$in'].includes(field.get('op', ''));
+    if (value && value.length > 0) {
+      const newValue = multi ? toImmutableList(value.split(',')) : value;
+      this.props.onChange(newValue);
+    } else {
+      const emptyValue = multi ? Immutable.List() : '';
+      this.props.onChange(emptyValue);
+    }
   };
 
   onChangeBoolean = (value) => {
@@ -132,11 +110,28 @@ class ConditionValue extends Component {
     }
   };
 
-  onChangeMultiValues = (e) => {
-    if (Array.isArray(e)) {
-      this.props.onChange(e.join(','));
+  onChangePercentage = (e) => {
+    const { value } = e.target;
+    const number = isNumber(value) ? parseFloat(value) / 100 : value;
+    if (!isNaN(number)) {
+      this.props.onChange(number);
     } else {
-      this.props.onChange('');
+      this.props.onChange(value);
+    }
+  };
+
+  onChangeMultiValues = (values) => {
+    const { config, operator } = this.props;
+    if (Array.isArray(values)) {
+      if ([config.get('type', ''), operator.get('type', '')].includes('number')) {
+        this.props.onChange(Immutable.List(values).map(val => (
+          isNumber(val) ? parseFloat(val) : val
+        )));
+      } else {
+        this.props.onChange(Immutable.List(values));
+      }
+    } else {
+      this.props.onChange(Immutable.List());
     }
   };
 
@@ -164,6 +159,8 @@ class ConditionValue extends Component {
     .toArray();
 
   formatValueTagDateTime = value => moment(value).format(getConfig('apiDateTimeFormat', 'YYYY-MM-DD[T]HH:mm:ss.SSS[Z]'));
+
+  formatValueTagPercentage = value => isNumber(value) ? `${parseFloat((parseFloat(value) * 100).toFixed(3))}%` : value;
 
   formatValueTagDate = value => moment(value).format(getConfig('dateFormat', 'DD/MM/YYYY'));
 
@@ -202,7 +199,11 @@ class ConditionValue extends Component {
   }
 
   renderCustomInputNumber =({ addTag, onChange, value, ...other }) => (
-    <input type="number" onChange={onChange} value={value} {...other} />
+    <Field fieldType="number" onChange={onChange} value={value} {...other} />
+  );
+
+  renderCustomInputPercentage =({ addTag, onChange, value, ...other }) => (
+    <Field fieldType="percentage" onChange={onChange} value={value} {...other} />
   );
 
   renderInputBoolean = () => {
@@ -249,14 +250,14 @@ class ConditionValue extends Component {
       .map(formatSelectOptions)
       .toArray();
 
-    const multi = ['nin', 'in'].includes(field.get('op', ''));
+    const multi = ['nin', 'in', '$nin', '$in'].includes(field.get('op', ''));
     return (
       <Field
         fieldType="select"
         clearable={false}
         multi={multi}
         options={options}
-        value={field.get('value', '')}
+        value={toImmutableList(field.get('value', [])).join(',')}
         onChange={this.onChangeSelect}
         disabled={disabled}
       />
@@ -265,8 +266,8 @@ class ConditionValue extends Component {
 
   renderInputNumber = () => {
     const { field, disabled } = this.props;
-    if (['nin', 'in'].includes(field.get('op', ''))) {
-      const value = field.get('value', '').split(',').filter(val => val !== '');
+    if (['nin', 'in', '$nin', '$in'].includes(field.get('op', ''))) {
+      const value = toImmutableList(field.get('value', [])).toArray();
       return (
         <Field
           fieldType="tags"
@@ -287,10 +288,35 @@ class ConditionValue extends Component {
     );
   }
 
+  renderInputPercentage = () => {
+    const { field, disabled } = this.props;
+    if (['nin', 'in', '$nin', '$in'].includes(field.get('op', ''))) {
+      const value = toImmutableList(field.get('value', [])).toArray();
+      return (
+        <Field
+          fieldType="tags"
+          value={value}
+          onChange={this.onChangeMultiValues}
+          disabled={disabled}
+          renderInput={this.renderCustomInputPercentage}
+          getTagDisplayValue={this.formatValueTagPercentage}
+        />
+      );
+    }
+    return (
+      <Field
+        fieldType="percentage"
+        value={field.get('value', '')}
+        onChange={this.onChangeNumber}
+        disabled={disabled}
+      />
+    );
+  }
+
   renderInputDate = () => {
     const { field, disabled } = this.props;
-    if (['nin', 'in'].includes(field.get('op', ''))) {
-      const value = field.get('value', '').split(',').filter(val => val !== '');
+    if (['nin', 'in', '$nin', '$in'].includes(field.get('op', ''))) {
+      const value = toImmutableList(field.get('value', [])).toArray();
       return (
         <Field
           fieldType="tags"
@@ -315,8 +341,8 @@ class ConditionValue extends Component {
 
   renderInputDateTime = () => {
     const { field, disabled } = this.props;
-    if (['nin', 'in'].includes(field.get('op', ''))) {
-      const value = field.get('value', '').split(',').filter(val => val !== '');
+    if (['nin', 'in', '$nin', '$in'].includes(field.get('op', ''))) {
+      const value = toImmutableList(field.get('value', [])).toArray();
       return (
         <Field
           fieldType="tags"
@@ -341,8 +367,8 @@ class ConditionValue extends Component {
 
   renderInputString = () => {
     const { field, disabled } = this.props;
-    if (['nin', 'in'].includes(field.get('op', ''))) {
-      const value = field.get('value', '').split(',').filter(val => val !== '');
+    if (['nin', 'in', '$nin', '$in'].includes(field.get('op', ''))) {
+      const value = toImmutableList(field.get('value', [])).toArray();
       return (
         <Field
           fieldType="tags"
@@ -363,7 +389,6 @@ class ConditionValue extends Component {
 
   renderInput = () => {
     const { field, config, operator } = this.props;
-
     //  Boolean + operator 'EXIST'
     if ([config.get('type', ''), operator.get('type', '')].includes('boolean')) {
       return this.renderInputBoolean();
@@ -372,7 +397,7 @@ class ConditionValue extends Component {
     // String-select
     if ([config.get('type', 'string'), operator.get('type', '')].includes('string')
       && (config.getIn(['inputConfig', 'inputType']) === 'select' || operator.has('options'))
-      && ['eq', 'ne', 'nin', 'in'].includes(field.get('op', ''))
+      && ['eq', 'ne', 'nin', 'in', '$eq', '$ne', '$nin', '$in', 'is', '$is'].includes(field.get('op', ''))
     ) {
       return this.renderInputSelect();
     }
@@ -382,8 +407,13 @@ class ConditionValue extends Component {
       return this.renderInputNumber();
     }
 
+    // 'percentage'
+    if ([config.get('type', ''), operator.get('type', '')].includes('percentage')) {
+      return this.renderInputPercentage();
+    }
+
     // 'Date'
-    if ([config.get('type', ''), operator.get('type', '')].includes('date') || [config.get('type', ''), operator.get('type', '')].includes('daterange')) {
+    if ([config.get('type', ''), operator.get('type', '')].includes('date')) {
       return this.renderInputDate();
     }
 

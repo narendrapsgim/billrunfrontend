@@ -1,5 +1,8 @@
 import { connect } from 'react-redux';
 import EntityField from './EntityField';
+import {
+  isEditableFiledProperty,
+} from '@/common/Util';
 
 
 const mapStateToProps = (state, props) => ({
@@ -9,7 +12,7 @@ const mapStateToProps = (state, props) => ({
   isFieldRanges: props.field && props.field.get('type', '') === 'ranges',
   isFieldDate: props.field && props.field.get('type', '') === 'date',
   isFieldDateRange: props.field && props.field.get('type', '') === 'daterange',
-  isRemoveField: props.field && ['params'].includes(props.field.get('field_name', '').split('.')[0]),
+  isRemoveField: props.field && ['params'].includes(props.field.get('field_name', '').split('.')[0]) && isEditableFiledProperty(props.field, true, 'delete'),
   fieldPath: props.field ? props.field.get('field_name', '').split('.') : [],
 });
 

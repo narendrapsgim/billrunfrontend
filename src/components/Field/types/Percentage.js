@@ -9,9 +9,9 @@ const Percentage = ({
 }) => {
 
   const onChangePercentage = (e) => {
-    const val = e.target.value;
-    const convertedVal = isNumber(val) ? parseFloat(val) / 100 : val;
-    const convertedEvent = { target: { value:convertedVal } };
+    const { value:targetValue , id:targetId } = e.target;
+    const convertedVal = isNumber(targetValue) ? parseFloat(targetValue) / 100 : targetValue;
+    const convertedEvent = { target: { value:convertedVal, id: targetId} };
     onChange(convertedEvent);
   }
 
@@ -53,7 +53,6 @@ Percentage.defaultProps = {
   editable: true,
   placeholder: '',
   tooltip: '',
-  suffix: null,
   preffix: null,
   onChange: () => {},
 };
@@ -68,7 +67,6 @@ Percentage.propTypes = {
   editable: PropTypes.bool,
   placeholder: PropTypes.string,
   tooltip: PropTypes.string,
-  suffix: PropTypes.node,
   preffix: PropTypes.node,
   onChange: PropTypes.func,
 };

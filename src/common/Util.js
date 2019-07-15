@@ -12,6 +12,7 @@ import ratesConfig from '../config/rates.json';
 import importConfig from '../config/import.json';
 import collectionsConfig from '../config/collections.json';
 import customFieldsConfig from '../config/customFields.json';
+import discountConfig from '../config/discount.json';
 
 /**
  * Get data from config files
@@ -68,6 +69,8 @@ export const getConfig = (key, defaultValue = null) => {
         break;
       case 'customFields': configCache = configCache.set('customFields', Immutable.fromJS(customFieldsConfig));
         break;
+      case 'discount': configCache = configCache.set('discount', Immutable.fromJS(discountConfig));
+        break;
       default: console.log(`Config caregory not exists ${path}`);
     }
   }
@@ -95,6 +98,7 @@ export const getFieldName = (field, category, defaultValue = null) => {
 export const getFieldNameType = (type) => {
   switch (type) {
     case 'account':
+    case 'accounts':
     case 'customer':
       return 'account';
     case 'subscription':
@@ -606,7 +610,7 @@ export const addPlayToFieldTitle = (field, plays = Immutable.Map()) => {
 };
 
 export const toImmutableList = (value) => {
-  if ([undefined, null].includes(value)) {
+  if ([undefined, null, ''].includes(value)) {
     return Immutable.List();
   }
   if (Array.isArray(value)) {

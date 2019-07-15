@@ -36,6 +36,14 @@ const getProductsOptions = state => state.list.get('all_rates', null);
 
 const getOptionsByListName = (state, props, listName = '') => state.list.get(listName, null);
 
+const getEntitiesOptions = (state, props, entities = []) =>
+  Immutable.Map().withMutations((optionsWithMutations) => {
+    entities.forEach((entity) => {
+      const entitiesName = getConfig(['systemItems', entity, 'itemsType'], '');
+      optionsWithMutations.set(entity, state.list.get(`available_${entitiesName}`, Immutable.List()));
+  });
+});
+
 const formatSelectOptions = (options, key) => {
   if (options === null) {
     return undefined;
@@ -128,6 +136,11 @@ const selectBucketsExternalIds = (options) => {
 export const cyclesOptionsSelector = createSelector(
   getCyclesOptions,
   selectCyclesOptions,
+);
+
+export const entitiesOptionsSelector = createSelector(
+  getEntitiesOptions,
+  options => options,
 );
 
 export const eventRatesSelector = createSelector(

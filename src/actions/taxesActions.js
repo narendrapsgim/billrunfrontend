@@ -1,4 +1,4 @@
-import { getEntityByIdQuery } from '../common/ApiQueries';
+import { fetchtaxeByIdQuery } from '../common/ApiQueries';
 import {
   saveEntity,
   getEntity,
@@ -14,7 +14,7 @@ import {
 } from '@/actions/entityListActions';
 
 
-export const getTax = id => getEntity('tax', getEntityByIdQuery('taxes', id));
+export const getTax = id => getEntity('tax', fetchtaxeByIdQuery(id));
 export const saveTax = (item, action) => saveEntity('taxes', item, action)
 export const updateTax = (path, value) => updateEntityField('tax', path, value);
 export const setCloneTax = () => setCloneEntity('tax', 'tax');
