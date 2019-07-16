@@ -12,6 +12,7 @@ class Conditions extends Component {
     conditions: PropTypes.instanceOf(Immutable.List),
     fields: PropTypes.instanceOf(Immutable.List),
     operators: PropTypes.instanceOf(Immutable.List),
+    customValueOptions: PropTypes.instanceOf(Immutable.List),
     disabled: PropTypes.bool,
     editable: PropTypes.bool,
     addConditionLabel: PropTypes.string,
@@ -27,6 +28,7 @@ class Conditions extends Component {
     conditions: Immutable.List(),
     fields: Immutable.List(),
     operators: Immutable.List(),
+    customValueOptions: Immutable.List(),
     disabled: false,
     editable: true,
     addConditionLabel: 'Add Condition',
@@ -62,7 +64,7 @@ class Conditions extends Component {
   }
 
   renderRow = (filter, index) => {
-    const { operators, fields, disabled, editable } = this.props;
+    const { operators, fields, customValueOptions, disabled, editable } = this.props;
     return (
       <Condition
         key={index}
@@ -70,6 +72,7 @@ class Conditions extends Component {
         index={index}
         fields={fields}
         operators={operators}
+        customValueOptions={customValueOptions}
         disabled={disabled}
         editable={editable}
         onChangeField={this.props.onChangeField}

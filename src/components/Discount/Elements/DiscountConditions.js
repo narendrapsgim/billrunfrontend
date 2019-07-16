@@ -16,6 +16,7 @@ const DiscountConditions = ({
   discount,
   editable,
   conditionsOperators,
+  valueOptions,
   onChangeConditionField,
   onChangeConditionOp,
   onChangeConditionValue,
@@ -36,6 +37,7 @@ const DiscountConditions = ({
         editable={editable}
         fields={accountConditionFields}
         operators={conditionsOperators}
+        valueOptions={valueOptions}
         onChangeField={onChangeConditionField}
         onChangeOp={onChangeConditionOp}
         onChangeValue={onChangeConditionValue}
@@ -50,6 +52,7 @@ const DiscountConditions = ({
         editable={editable}
         fields={subscriberConditionFields}
         operators={conditionsOperators}
+        valueOptions={valueOptions}
         onChangeField={onChangeConditionField}
         onChangeOp={onChangeConditionOp}
         onChangeValue={onChangeConditionValue}
@@ -77,6 +80,7 @@ const DiscountConditions = ({
 DiscountConditions.propTypes = {
   discount: PropTypes.instanceOf(Immutable.Map),
   conditionsOperators: PropTypes.instanceOf(Immutable.List),
+  valueOptions: PropTypes.instanceOf(Immutable.List),
   editable: PropTypes.bool,
   accountConditionsPath: PropTypes.array,
   subscriberConditionFields: PropTypes.instanceOf(Immutable.List),
@@ -99,6 +103,7 @@ DiscountConditions.defaultProps = {
   subscriberConditionsPath: ['params', 'conditions', 0, 'subscriber', 0, 'fields'],
   servicesConditionsPath: ['params', 'conditions', 0, 'subscriber', 0, 'service', 'any', 0, 'fields'],
   conditionsOperators: getConfig(['discount', 'conditions', 'operators'], Immutable.List()),
+  valueOptions: getConfig(['discount', 'conditions', 'valueOptions'], Immutable.List()),
   subscriberConditionFields: Immutable.List(),
   accountConditionFields: Immutable.List(),
   subscriberServicesConditionFields: Immutable.List(),

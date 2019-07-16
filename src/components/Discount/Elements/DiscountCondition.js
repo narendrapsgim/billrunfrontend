@@ -4,12 +4,12 @@ import Immutable from 'immutable';
 import { Conditions } from '@/components/Elements';
 
 const DiscountCondition = ({
-  label,
   conditions,
   path,
   editable,
   fields,
   operators,
+  valueOptions,
   onChangeField,
   onChangeOp,
   onChangeValue,
@@ -41,6 +41,7 @@ const DiscountCondition = ({
       editable={editable}
       fields={fields}
       operators={operators}
+      customValueOptions={valueOptions}
       onChangeField={onChangeConditionField}
       onChangeOperator={onChangeConditionOp}
       onChangeValue={onChangeConditionValue}
@@ -56,6 +57,7 @@ DiscountCondition.propTypes = {
   editable: PropTypes.bool,
   fields: PropTypes.instanceOf(Immutable.List),
   operators: PropTypes.instanceOf(Immutable.List),
+  valueOptions: PropTypes.instanceOf(Immutable.List),
   onChangeField: PropTypes.func.isRequired,
   onChangeOp: PropTypes.func.isRequired,
   onChangeValue: PropTypes.func.isRequired,
@@ -68,6 +70,7 @@ DiscountCondition.defaultProps = {
   editable: true,
   fields: Immutable.List(),
   operators: Immutable.List(),
+  valueOptions: Immutable.List(),
 };
 
 export default DiscountCondition;

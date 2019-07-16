@@ -5,8 +5,10 @@
         { "id": "aid", "type": "number" },
         { "id": "sid", "type": "number" },
         { "id": "plan", "inputConfig": { "inputType": "select", "callback": "getPlansOptions" } },
-        { "id": "services", "inputConfig": { "inputType": "select", "callback": "getServicesOptions" } },
+        { "id": "services", "show": false },
         { "id": "plan_activation", "type": "date" },
+        { "id": "plan_deactivation", "type": "date" },
+        { "id": "activation_date", "type": "date" },
         { "id": "deactivation_date", "type": "date" },
         { "id": "play", "inputConfig": {
           "inputType": "select",
@@ -23,6 +25,14 @@
         { "id": "quantity", "title": "Quantity", "type": "number" }
       ]
     },
+    "valueOptions": [
+      { "id": "@cycle_start_date@", "title": "Cycle Start Date", "include": ["date"], "exclude": [] },
+      { "id": "@cycle_end_date@", "title": "Cycle End Date", "include": ["date"], "exclude": [] },
+      { "id": "@plan_activation@", "title": "Plan Activation Date", "include": ["date"], "exclude": ["fieldid:plan_activation"] },
+      { "id": "@plan_deactivation@", "title": "Plan Deactivatio Date", "include": ["date"], "exclude": ["fieldid:plan_deactivation"] },
+      { "id": "@activation_date@", "title": "Activation Date", "include": ["date"], "exclude": ["fieldid:activation_date"] },
+      { "id": "@deactivation_date@", "title": "Deactivatio Date", "include": ["date"], "exclude": ["fieldid:deactivation_date"] }
+    ],
     "operators" : [
       { "id": "eq", "title": "Equals", "include": ["date", "datetime"] },
       { "id": "ne", "title": "Does not equal", "include": [], "exclude": [] },
@@ -36,7 +46,8 @@
       { "id": "is", "title": "Equals", "type": "boolean",
         "include": ["boolean"],
         "exclude": [],
-        "options": ["yes", "no"]
+        "trueLabel": "True",
+        "falseLabel": "False"
       },
       { "id": "is", "title": "Is", "type": "string",
         "include": ["daterange"],
@@ -45,8 +56,7 @@
       },
       { "id": "exists", "title": "Exists", "type": "boolean",
         "include": ["string", "textarea", "number", "percentage", "boolean", "date", "datetime", "ranges", "range"],
-        "exclude": [],
-        "options": ["yes", "no"]
+        "exclude": []
       }
     ]
   }

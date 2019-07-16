@@ -133,6 +133,8 @@ const mergeEntityAndReportConfigFields = (billrunConfigFields, type, isPlayEnabl
   .filter(field => (
     field.get('id') !== 'play' || (field.get('id') === 'play' && isPlayEnabled)
   ))
+  // filter hidden fields
+  .filter(field => field.get('show', true))
   .sort(sortFieldOption);
 };
 

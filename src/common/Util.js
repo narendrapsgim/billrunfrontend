@@ -359,18 +359,8 @@ export const createReportColumnLabel = (label, fieldsOptions, opOptions, oldFiel
   return label;
 };
 
-export const getEntitySettingsName = (entityName) => {
-  if (entityName === 'account') {
-    return 'customer';
-  }
-  if (entityName === 'subscriber') {
-    return 'subscription';
-  }
-  return entityName;
-};
-
 export const getSettingsKey = (entityName, asArray = false) => {
-  const key = getConfig(['systemItems', getEntitySettingsName(entityName), 'settingsKey'], entityName);
+  const key = getConfig(['systemItems', getFieldEntityKey(entityName), 'settingsKey'], entityName);
   if (asArray) {
     return key.split('.');
   }

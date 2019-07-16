@@ -4,12 +4,13 @@ import { connect } from 'react-redux';
 import Immutable from 'immutable';
 import moment from 'moment';
 import isNumber from 'is-number';
-import { InputGroup } from 'react-bootstrap';
+import { InputGroup, DropdownButton, MenuItem } from 'react-bootstrap';
 import Field from '@/components/Field';
 import {
   formatSelectOptions,
   getConfig,
   toImmutableList,
+  parseConfigSelectOptions,
 } from '@/common/Util';
 import {
   selectOptionSelector,
@@ -23,7 +24,8 @@ class ConditionValue extends Component {
     field: PropTypes.instanceOf(Immutable.Map),
     config: PropTypes.instanceOf(Immutable.Map),
     operator: PropTypes.instanceOf(Immutable.Map),
-    selectOptions: PropTypes.instanceOf(Immutable.List),
+    dynamicSelectOptions: PropTypes.instanceOf(Immutable.List),
+    customValueOptions: PropTypes.instanceOf(Immutable.List),
     disabled: PropTypes.bool,
     editable: PropTypes.bool,
     onChange: PropTypes.func,
@@ -34,23 +36,24 @@ class ConditionValue extends Component {
     field: Immutable.Map(),
     config: Immutable.Map(),
     operator: Immutable.Map(),
-    selectOptions: Immutable.List(),
+    dynamicSelectOptions: Immutable.List(),
+    customValueOptions: Immutable.List(),
     disabled: false,
     editable: true,
     onChange: () => {},
   }
 
   componentDidMount() {
-    const { config, selectOptions } = this.props;
-    this.initFieldOptions(config, selectOptions);
+    const { config, dynamicSelectOptions } = this.props;
+    this.initFieldOptions(config, dynamicSelectOptions);
   }
 
   shouldComponentUpdate(nextProps) {
-    const { field, config, operator, selectOptions, disabled, editable } = this.props;
+    const { field, config, operator, dynamicSelectOptions, disabled, editable } = this.props;
     return (
       !Immutable.is(field, nextProps.field)
       || !Immutable.is(config, nextProps.config)
-      || !Immutable.is(selectOptions, nextProps.selectOptions)
+      || !Immutable.is(dynamicSelectOptions, nextProps.dynamicSelectOptions)
       || !Immutable.is(operator, nextProps.operator)
       || disabled !== nextProps.disabled
       || editable !== nextProps.editable
@@ -58,18 +61,26 @@ class ConditionValue extends Component {
   }
 
   componentDidUpdate(prevProps) {
-    const { config, selectOptions } = this.props;
+    const { config, dynamicSelectOptions, operator, customValueOptions } = this.props;
     if (!Immutable.is(prevProps.config, config)) {
-      this.initFieldOptions(config, selectOptions);
+      this.initFieldOptions(config, dynamicSelectOptions);
     }
-
-    const isSelectOptionsChanged = !prevProps.selectOptions.isEmpty()
-      && !selectOptions
-        .map(selectOption => selectOption.get('value'))
+    const newOptions = Immutable.fromJS(this.getOptionsValues({
+      config, operator, dynamicSelectOptions, customValueOptions
+    }));
+    const oldOptions = Immutable.fromJS(this.getOptionsValues({
+      config: prevProps.config,
+      operator: prevProps.operator,
+      dynamicSelectOptions: prevProps.dynamicSelectOptions,
+      customValueOptions: prevProps.customValueOptions
+    }));
+    const isSelectOptionsChanged = !oldOptions.isEmpty()
+      && !newOptions
+        .map(option => option.get('value'))
         .sort()
         .equals(
-          prevProps.selectOptions
-          .map(selectOption => selectOption.get('value'))
+          oldOptions
+          .map(option => option.get('value'))
           .sort()
         );
 
@@ -82,8 +93,8 @@ class ConditionValue extends Component {
     }
   }
 
-  initFieldOptions = (config, selectOptions) => {
-    if (config.hasIn(['inputConfig', 'callback']) && selectOptions.isEmpty()) {
+  initFieldOptions = (config, dynamicSelectOptions) => {
+    if (config.hasIn(['inputConfig', 'callback']) && dynamicSelectOptions.isEmpty()) {
       const callback = config.getIn(['inputConfig', 'callback']);
       const args = config.getIn(['inputConfig', 'callbackArgument'], Immutable.Map());
       if (optionsLoaders.hasOwnProperty(callback)) {
@@ -170,10 +181,35 @@ class ConditionValue extends Component {
     }
   }
 
-  getOptionsValues = (defaultOptions = Immutable.List()) => this.props.operator
-    .get('options', defaultOptions)
-    .map(formatSelectOptions)
-    .toArray();
+  onChangeDateOption = (value) => {
+    if (value === 'date') {
+      this.props.onChange(null);
+    } else {
+      this.props.onChange(value);
+    }
+  }
+
+  getOptionsValues = ({config, operator, dynamicSelectOptions, customValueOptions}) => {
+    return Immutable.List()
+      .withMutations((optionsWithMutations) => {
+        if (dynamicSelectOptions) {
+          optionsWithMutations.concat(dynamicSelectOptions);
+        }
+        if (config) {
+          optionsWithMutations.concat(config.getIn(['inputConfig', 'options'], Immutable.List()));
+        }
+        if (operator) {
+            optionsWithMutations.concat(operator.get('options', Immutable.List()));
+        }
+        if (customValueOptions) {
+          customValueOptions.forEach((selectOption) => {
+            optionsWithMutations.push(Immutable.fromJS(parseConfigSelectOptions(selectOption)));
+          });
+        }
+      })
+      .map(formatSelectOptions)
+      .toArray();
+  }
 
   formatValueTagDateTime = value => moment(value).format(getConfig('apiDateTimeFormat', 'YYYY-MM-DD[T]HH:mm:ss.SSS[Z]'));
 
@@ -224,14 +260,16 @@ class ConditionValue extends Component {
   );
 
   renderInputBoolean = () => {
-    const { field, disabled, editable } = this.props;
-    let value = '';
-    if (field.get('value', false) === true) {
-      value = 'yes';
-    } else if (field.get('value', true) === false) {
-      value = 'no';
+    const { field, disabled, editable, operator } = this.props;
+    const trueValues = [1, '1', 'true', true, 'yes', 'on'];
+    let value = field.get('value', '');
+    if (value !== '') {
+      value = trueValues.includes(field.get('value', '')) ? 1 : 0;
     }
-    const booleanOptions = this.getOptionsValues(Immutable.List(['yes', 'no']));
+    const booleanOptions = [
+      { value: 1, label: operator.get('trueLabel', 'Yes')},
+      { value: 0, label: operator.get('falseLabel', 'No')},
+    ];
     return (
       <Field
         fieldType="select"
@@ -246,28 +284,8 @@ class ConditionValue extends Component {
   }
 
   renderInputSelect = () => {
-    const { field, disabled, editable, config, selectOptions, operator } = this.props;
-    const options = Immutable.List()
-      .withMutations((optionsWithMutations) => {
-        if (config.hasIn(['inputConfig', 'callback'])) {
-          selectOptions.forEach((selectOption) => {
-            optionsWithMutations.push(selectOption);
-          });
-        }
-        if (config.hasIn(['inputConfig', 'options'])) {
-          config.getIn(['inputConfig', 'options'], Immutable.List()).forEach((selectOption) => {
-            optionsWithMutations.push(selectOption);
-          });
-        }
-        if (operator.has('options')) {
-          operator.get('options', Immutable.List()).forEach((selectOption) => {
-            optionsWithMutations.push(selectOption);
-          });
-        }
-      })
-      .map(formatSelectOptions)
-      .toArray();
-
+    const { field, disabled, editable, config, operator, dynamicSelectOptions, customValueOptions } = this.props;
+    const options = this.getOptionsValues({config, operator, dynamicSelectOptions, customValueOptions});
     const multi = ['nin', 'in', '$nin', '$in'].includes(field.get('op', ''));
     return (
       <Field
@@ -337,7 +355,7 @@ class ConditionValue extends Component {
   }
 
   renderInputDate = () => {
-    const { field, disabled, editable } = this.props;
+    const { field, disabled, editable, config, operator, dynamicSelectOptions, customValueOptions } = this.props;
     if (['nin', 'in', '$nin', '$in'].includes(field.get('op', ''))) {
       const value = toImmutableList(field.get('value', [])).toArray();
       return (
@@ -352,11 +370,44 @@ class ConditionValue extends Component {
         />
       );
     }
-    const value = moment(field.get('value', null));
+    const value = field.get('value', null);
+    const options = this.getOptionsValues({config, operator, dynamicSelectOptions, customValueOptions});
+    if (options.length > 0) {
+      const selectedOptionIdx = options
+        .findIndex(option => option.value === value)
+      const actionTitle = selectedOptionIdx === -1 ? 'Date' : options[selectedOptionIdx].label;
+      return (
+        <InputGroup>
+          <DropdownButton
+            disabled={disabled}
+            onSelect={this.onChangeDateOption}
+            componentClass={InputGroup.Button}
+            id="date-select-options"
+            title={actionTitle}
+            className="full-width"
+          >
+            <MenuItem key="date" eventKey="date">Select Date:</MenuItem>
+            <MenuItem divider />
+            { options.map(option => (
+                <MenuItem key={option.value} eventKey={option.value}>{option.label}</MenuItem>
+            )) }
+          </DropdownButton>
+          {selectedOptionIdx === -1 && (
+            <Field
+              fieldType="date"
+              value={moment(value)}
+              onChange={this.onChangeDateTime}
+              disabled={disabled}
+              editable={editable}
+              />
+          )}
+        </InputGroup>
+      );
+    }
     return (
       <Field
         fieldType="date"
-        value={value}
+        value={moment(value)}
         onChange={this.onChangeDateTime}
         disabled={disabled}
         editable={editable}
@@ -479,7 +530,7 @@ class ConditionValue extends Component {
 }
 
 const mapStateToProps = (state, props) => ({
-  selectOptions: selectOptionSelector(state, props),
+  dynamicSelectOptions: selectOptionSelector(state, props),
 });
 
 export default connect(mapStateToProps)(ConditionValue);
