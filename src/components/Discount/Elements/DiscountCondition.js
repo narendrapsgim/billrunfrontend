@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useCallback, memo } from 'react';
 import PropTypes from 'prop-types';
 import Immutable from 'immutable';
 import { Conditions } from '@/components/Elements';
@@ -16,24 +16,25 @@ const DiscountCondition = ({
   onAdd,
   onRemove,
 }) => {
-  const onChangeConditionField = (index, value) => {
+  const onChangeConditionField = useCallback((index, value) => {
     onChangeField(path, index, value);
-  }
+  }, [onChangeField, path]);
 
-  const onChangeConditionOp = (index, value) => {
+  const onChangeConditionOp = useCallback((index, value) => {
     onChangeOp(path, index, value);
-  }
+  }, [onChangeOp, path]);
 
-  const onChangeConditionValue = (index, value) => {
+  const onChangeConditionValue = useCallback((index, value) => {
     onChangeValue(path, index, value);
-  }
+  }, [onChangeValue, path]);
 
-  const addCondition = (condition) => {
+  const addCondition = useCallback((condition) => {
     onAdd(path, condition);
-  }
-  const removeCondition = (index) => {
+  }, [onAdd, path]);
+
+  const removeCondition = useCallback((index) => {
     onRemove(path, index);
-  }
+  }, [onRemove, path]);
 
   return (
     <Conditions
@@ -73,4 +74,4 @@ DiscountCondition.defaultProps = {
   valueOptions: Immutable.List(),
 };
 
-export default DiscountCondition;
+export default memo(DiscountCondition);
