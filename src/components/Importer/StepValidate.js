@@ -165,7 +165,7 @@ const StepValidate = ({ fields, rows, selectedMapper, defaultMappedName, saveMap
               style={{ height: 28, fontSize: 13 }}
             />
             <InputGroup.Button>
-              <Actions actions={mapperActions} data={mapperName} isGroup={true}/>
+              <Actions actions={mapperActions} data={mapperName} type="group"/>
             </InputGroup.Button>
           </InputGroup>
         </div>
