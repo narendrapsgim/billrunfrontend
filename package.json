@@ -63,7 +63,7 @@
     "prop-types": "^15.7.2",
     "react": "^16.8.6",
     "react-app-polyfill": "^1.0.1",
-    "react-bootstrap": "^0.31.x",
+    "react-bootstrap": "0.31.5",
     "react-bootstrap-multiselect": "^2.4.1",
     "react-close-on-escape": "^3.0.0",
     "react-csv": "^1.1.1",
