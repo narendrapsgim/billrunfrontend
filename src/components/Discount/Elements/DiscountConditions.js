@@ -87,7 +87,7 @@ const DiscountConditions = ({
       removeCondition(conditionsPath, idx);
     } else {
       const confirm = {
-        message: `Are you sure you want to remove conditoin group ${idx+1} ?`,
+        message: `Are you sure you want to remove conditions group ${idx+1} ?`,
         onOk: () => removeCondition(conditionsPath, idx),
         labelOk: 'Delete',
         type: 'delete',
