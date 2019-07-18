@@ -10,6 +10,7 @@ const DiscountCondition = ({
   fields,
   operators,
   valueOptions,
+  errors,
   onChangeField,
   onChangeOp,
   onChangeValue,
@@ -36,6 +37,15 @@ const DiscountCondition = ({
     onRemove(path, index);
   }, [onRemove, path]);
 
+  const conditionErrors = errors.reduce((acc, error, fieldPath) => {
+    const stringPath = fieldPath.split('.');
+    const fieldIndex = stringPath.pop();
+    if (path.join('.') === stringPath.join('.')) {
+      return acc.set(fieldIndex, error);
+    }
+    return acc;
+  }, Immutable.Map());
+
   return (
     <Conditions
       conditions={conditions}
@@ -43,6 +53,7 @@ const DiscountCondition = ({
       fields={fields}
       operators={operators}
       customValueOptions={valueOptions}
+      errors={conditionErrors}
       onChangeField={onChangeConditionField}
       onChangeOperator={onChangeConditionOp}
       onChangeValue={onChangeConditionValue}
@@ -59,6 +70,7 @@ DiscountCondition.propTypes = {
   fields: PropTypes.instanceOf(Immutable.List),
   operators: PropTypes.instanceOf(Immutable.List),
   valueOptions: PropTypes.instanceOf(Immutable.List),
+  errors: PropTypes.instanceOf(Immutable.Map),
   onChangeField: PropTypes.func.isRequired,
   onChangeOp: PropTypes.func.isRequired,
   onChangeValue: PropTypes.func.isRequired,
@@ -72,6 +84,7 @@ DiscountCondition.defaultProps = {
   fields: Immutable.List(),
   operators: Immutable.List(),
   valueOptions: Immutable.List(),
+  errors: Immutable.Map(),
 };
 
 export default memo(DiscountCondition);

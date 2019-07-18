@@ -15,7 +15,7 @@ import { DiscountDescription } from '../../language/FieldDescriptions';
 import { entitiesOptionsSelector } from '@/selectors/listSelectors';
 import { getSettings } from '@/actions/settingsActions';
 import { getEntitiesOptions, clearEntitiesOptions } from '@/actions/listActions';
-
+import { formModalErrosSelector } from '@/selectors/guiSelectors';
 
 class DiscountDetails extends Component {
 
@@ -551,6 +551,7 @@ class DiscountDetails extends Component {
               onChangeConditionValue={this.onChangeConditionValue}
               addCondition={this.onAddCondition}
               removeCondition={this.onRemoveCondition}
+              errors={errors}
             />
 
             <Panel header={<h3>{getFieldName('panle_plan_discount', 'discount')}</h3>}>
@@ -599,8 +600,12 @@ class DiscountDetails extends Component {
 
 }
 
-const mapStateToProps = (state, props) => ({
+const mapStateToProps = (state, props) => {
+  const parentErrors = typeof props.errors !== 'undefined' ? props.errors : Immutable.Map();
+  const reduxErrors = formModalErrosSelector(state) || Immutable.Map();
+  return ({
   availableEntities: entitiesOptionsSelector(state, props, ['discount', 'plan', 'service']),
-});
+  errors: Immutable.merge(parentErrors, reduxErrors),
+})};
 
 export default connect(mapStateToProps)(DiscountDetails);
