@@ -13,6 +13,7 @@ class Condition extends Component {
     item: PropTypes.instanceOf(Immutable.Map),
     index: PropTypes.number,
     disabled: PropTypes.bool,
+    editable: PropTypes.bool,
     operators: PropTypes.instanceOf(Immutable.List),
     fields: PropTypes.instanceOf(Immutable.List),
     error: PropTypes.oneOfType([
@@ -29,6 +30,7 @@ class Condition extends Component {
     item: Immutable.Map(),
     index: 0,
     disabled: false,
+    editable: true,
     fields: Immutable.List(),
     operators: Immutable.List(),
     error: false,
@@ -39,13 +41,15 @@ class Condition extends Component {
   }
 
   shouldComponentUpdate(nextProps) {
-    const { item, index, disabled, fields, operators } = this.props;
+    const { item, index, disabled, fields, operators, editable, error } = this.props;
     return (
       !Immutable.is(item, nextProps.item)
       || !Immutable.is(fields, nextProps.fields)
       || !Immutable.is(operators, nextProps.operators)
       || index !== nextProps.index
       || disabled !== nextProps.disabled
+      || editable !== nextProps.editable
+      || error !== nextProps.error
     );
   }
 
@@ -134,7 +138,7 @@ class Condition extends Component {
   }
 
   render() {
-    const { item, disabled, error } = this.props;
+    const { item, disabled, editable, error } = this.props;
     const config = this.getConfig();
     const operator = this.getOperator();
     const fieldOptions = this.getFieldOptions();
@@ -154,6 +158,7 @@ class Condition extends Component {
             value={item.get('field', '')}
             onChange={this.onChangeField}
             disabled={disabled}
+            editable={editable}
           />
         </Col>
 
@@ -168,6 +173,7 @@ class Condition extends Component {
             value={item.get('op', '')}
             onChange={this.onChangeOperator}
             disabled={disableOp}
+            editable={editable}
           />
         </Col>
 
@@ -180,15 +186,17 @@ class Condition extends Component {
             config={config}
             operator={operator}
             disabled={disableVal}
+            editable={editable}
             onChange={this.onChangeValue}
           />
         </Col>
-
-        <Col sm={1} className="actions">
-          <Button onClick={this.onRemove} bsSize="small" className="pull-left" disabled={disabled}>
-            <i className="fa fa-trash-o danger-red" />
-          </Button>
-        </Col>
+        {editable && (
+          <Col sm={1} className="actions">
+            <Button onClick={this.onRemove} bsSize="small" className="pull-left" disabled={disabled}>
+              <i className="fa fa-trash-o danger-red" />
+            </Button>
+          </Col>
+        )}
         { error && (
           <Col sm={12}>
             <HelpBlock>

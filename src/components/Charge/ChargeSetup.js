@@ -7,7 +7,7 @@ import moment from 'moment';
 import { Panel } from 'react-bootstrap';
 import { ActionButtons, LoadingItemPlaceholder } from '@/components/Elements';
 import { EntityRevisionDetails } from '../Entity';
-import DiscountDetails from './DiscountDetails';
+import ChargeDetails from './ChargeDetails';
 import {
   buildPageTitle,
   getConfig,
@@ -17,20 +17,19 @@ import {
 import { showSuccess } from '@/actions/alertsActions';
 import { setPageTitle } from '@/actions/guiStateActions/pageActions';
 import {
-  saveDiscount,
-  getDiscount,
-  clearDiscount,
-  updateDiscount,
-  deleteDiscountValue,
-  setCloneDiscount,
-} from '@/actions/discountsActions';
+  save,
+  get,
+  clear,
+  update,
+  deleteValue,
+  setClone,
+} from '@/actions/chargesActions';
 import { clearItems, getRevisions, clearRevisions } from '@/actions/entityListActions';
-import { validateEntity } from '@/actions/discountsActions';
 import { modeSelector, itemSelector, idSelector, revisionsSelector } from '@/selectors/entitySelector';
 import { currencySelector } from '@/selectors/settingsSelector';
 
 
-class DiscountSetup extends Component {
+class ChargeSetup extends Component {
 
   static propTypes = {
     itemId: PropTypes.string,
@@ -51,7 +50,6 @@ class DiscountSetup extends Component {
   }
 
   state = {
-    errors: Immutable.Map(),
     progress: false,
   }
 
@@ -62,7 +60,7 @@ class DiscountSetup extends Component {
   componentDidMount() {
     const { mode } = this.props;
     if (mode === 'create') {
-      const pageTitle = buildPageTitle(mode, 'discount');
+      const pageTitle = buildPageTitle(mode, 'charge');
       this.props.dispatch(setPageTitle(pageTitle));
     }
     this.initDefaultValues();
@@ -72,7 +70,7 @@ class DiscountSetup extends Component {
     const { item, mode, itemId } = nextProps;
     const { item: oldItem, itemId: oldItemId, mode: oldMode } = this.props;
     if (mode !== oldMode || getItemId(item) !== getItemId(oldItem)) {
-      const pageTitle = buildPageTitle(mode, 'discount', item);
+      const pageTitle = buildPageTitle(mode, 'charge', item);
       this.props.dispatch(setPageTitle(pageTitle));
     }
     if (itemId !== oldItemId || (mode !== oldMode && mode === 'clone')) {
@@ -81,7 +79,7 @@ class DiscountSetup extends Component {
   }
 
   componentWillUnmount() {
-    this.props.dispatch(clearDiscount());
+    this.props.dispatch(clear());
   }
 
   initDefaultValues = () => {
@@ -95,7 +93,7 @@ class DiscountSetup extends Component {
     }
 
     if (mode === 'clone') {
-      this.props.dispatch(setCloneDiscount());
+      this.props.dispatch(setClone());
     }
   }
 
@@ -103,24 +101,24 @@ class DiscountSetup extends Component {
     const { item, revisions } = this.props;
     if (revisions.isEmpty() && getItemId(item, false)) {
       const key = item.get('key', '');
-      this.props.dispatch(getRevisions('discounts', 'key', key));
+      this.props.dispatch(getRevisions('charges', 'key', key));
     }
   }
 
   fetchItem = (itemId = this.props.itemId) => {
     if (itemId) {
-      this.props.dispatch(getDiscount(itemId)).then(this.afterItemReceived);
+      this.props.dispatch(get(itemId)).then(this.afterItemReceived);
     }
   }
 
   clearRevisions = () => {
     const { item } = this.props;
     const key = item.get('key', '');
-    this.props.dispatch(clearRevisions('discounts', key)); // refetch items list because item was (changed in / added to) list
+    this.props.dispatch(clearRevisions('charges', key)); // refetch items list because item was (changed in / added to) list
   }
 
   clearItemsList = () => {
-    const itemsType = getConfig(['systemItems', 'discount', 'itemsType'], '');
+    const itemsType = getConfig(['systemItems', 'charge', 'itemsType'], '');
     this.props.dispatch(clearItems(itemsType));
   }
 
@@ -134,14 +132,11 @@ class DiscountSetup extends Component {
   }
 
   onRemoveFieldValue = (path) => {
-    this.props.dispatch(deleteDiscountValue(path));
+    this.props.dispatch(deleteValue(path));
   }
 
   onChangeFieldValue = (path, value) => {
-    const { errors } = this.state;
-    const pathString = path.join('.');
-    this.setState(() => ({ errors: errors.delete(pathString) }));
-    this.props.dispatch(updateDiscount(path, value));
+    this.props.dispatch(update(path, value));
   }
 
   afterSave = (response) => {
@@ -149,7 +144,7 @@ class DiscountSetup extends Component {
     const { mode } = this.props;
     if (response.status) {
       const action = (['clone', 'create'].includes(mode)) ? 'created' : 'updated';
-      this.props.dispatch(showSuccess(`The discount was ${action}`));
+      this.props.dispatch(showSuccess(`The charge was ${action}`));
       this.clearRevisions();
       this.handleBack(true);
     }
@@ -159,12 +154,12 @@ class DiscountSetup extends Component {
     const { item, mode } = this.props;
     if (this.validate()) {
       this.setState({ progress: true });
-      this.props.dispatch(saveDiscount(item, mode)).then(this.afterSave);
+      this.props.dispatch(save(item, mode)).then(this.afterSave);
     }
   }
 
   handleBack = (itemWasChanged = false) => {
-    const itemsType = getConfig(['systemItems', 'discount', 'itemsType'], '');
+    const itemsType = getConfig(['systemItems', 'charge', 'itemsType'], '');
     if (itemWasChanged) {
       this.clearItemsList(); // refetch items list because item was (changed in / added to) list
     }
@@ -176,27 +171,41 @@ class DiscountSetup extends Component {
   }
 
   validate = () => {
-    const { item } = this.props;
-    const errors = this.props.dispatch(validateEntity(item));
-    this.setState(() => ({ errors }));
-    if (errors.isEmpty()) {
-      return true;
-    }
-    return false;
+    // const { item } = this.props;
+    // if (item.getIn(['params', 'service'], Immutable.List()).isEmpty() && item.getIn(['params', 'plan'], '').lenght === 0) {
+    //   this.props.dispatch(showDanger('Please select charge conditions'));
+    //   return false;
+    // }
+    //
+    // const serviceDiscountExist = item
+    //   .getIn(['subject', 'service'], Immutable.Map())
+    //   .some(value => (value !== null && value !== ''));
+    //
+    // const planDiscountExist = item
+    //   .getIn(['subject', 'plan'], Immutable.Map())
+    //   .some(value => (value !== null && value !== ''));
+    //
+    // if (!serviceDiscountExist && !planDiscountExist) {
+    //   this.props.dispatch(showDanger('Please set charge value'));
+    //   return false;
+    // }
+
+    return true;
   }
 
   render() {
-    const { progress, errors } = this.state;
+    const { progress } = this.state;
     const { item, mode, revisions, currency } = this.props;
     if (mode === 'loading') {
       return (<LoadingItemPlaceholder onClick={this.handleBack} />);
     }
+
     const allowEdit = mode !== 'view';
     return (
-      <div className="discount-setup">
+      <div className="charge-setup">
         <Panel>
           <EntityRevisionDetails
-            itemName="discount"
+            itemName="charge"
             revisions={revisions}
             item={item}
             mode={mode}
@@ -209,13 +218,12 @@ class DiscountSetup extends Component {
         </Panel>
 
         <Panel>
-          <DiscountDetails
-            discount={item}
+          <ChargeDetails
+            charge={item}
             mode={mode}
             currency={currency}
             onFieldUpdate={this.onChangeFieldValue}
             onFieldRemove={this.onRemoveFieldValue}
-            errors={errors}
           />
         </Panel>
 
@@ -233,11 +241,11 @@ class DiscountSetup extends Component {
 
 
 const mapStateToProps = (state, props) => ({
-  itemId: idSelector(state, props, 'discount'),
-  item: itemSelector(state, props, 'discount'),
-  mode: modeSelector(state, props, 'discount'),
-  revisions: revisionsSelector(state, props, 'discount'),
+  itemId: idSelector(state, props, 'charge'),
+  item: itemSelector(state, props, 'charge'),
+  mode: modeSelector(state, props, 'charge'),
+  revisions: revisionsSelector(state, props, 'charge'),
   currency: currencySelector(state, props) || undefined,
 });
 
-export default withRouter(connect(mapStateToProps)(DiscountSetup));
+export default withRouter(connect(mapStateToProps)(ChargeSetup));

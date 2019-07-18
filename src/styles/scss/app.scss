@@ -33,6 +33,13 @@
 
 }
 
+.form-horizontal .radio,
+.form-horizontal .checkbox,
+.form-horizontal .radio-inline,
+.form-horizontal .checkbox-inline {
+  padding-top: 0;
+}
+
 // $baseZIndex: 2000;
 // $modalsDepth: 5;
 // @for $i from 1 through $modalsDepth {

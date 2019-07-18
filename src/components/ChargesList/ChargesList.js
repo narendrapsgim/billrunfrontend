@@ -3,7 +3,7 @@ import EntityList from '../EntityList';
 import { getFieldName } from '@/common/Util';
 
 
-const DiscountsList = () => {
+const ChargesList = () => {
   const filterFields = [
     { id: 'description', placeholder: 'Title' },
     { id: 'key', placeholder: 'Key' },
@@ -11,8 +11,8 @@ const DiscountsList = () => {
 
   const parseType = (item) => {
     return item.get('type', '') === 'percentage'
-      ? getFieldName('type_percentage', 'discount')
-      : getFieldName('type_monetary', 'discount');
+      ? getFieldName('type_percentage', 'charge')
+      : getFieldName('type_monetary', 'charge');
   }
 
   const tableFields = [
@@ -33,7 +33,7 @@ const DiscountsList = () => {
 
   return (
     <EntityList
-      entityKey="discount"
+      entityKey="charge"
       filterFields={filterFields}
       tableFields={tableFields}
       projectFields={projectFields}
@@ -42,4 +42,4 @@ const DiscountsList = () => {
   );
 };
 
-export default DiscountsList;
+export default ChargesList;

@@ -20,6 +20,19 @@ const Select = ({
   }
   /* Support old existing Select fileds from v0.9.x*/
   const legacyValues = ((multi) ? value.split(',').map(fixBoolValues) : [value]).filter(val => val !== '');
+
+  if (!editable) {
+    const displayValue = options
+    .filter(option => legacyValues.includes(option.value))
+    .map(option => option.label)
+    .join(', ');
+    return (
+      <div className="non-editable-field">
+        {displayValue}
+      </div>
+    );
+  }
+
   const isDisabled = disabled;
   const isMulti = multi;
   const isClearable = clearable;
@@ -32,17 +45,6 @@ const Select = ({
     formatCreateLabel = (label) => addLabelText.replace('{label}', label);
   }
 
-  if (!editable) {
-    const displayValue = options
-      .filter(option => legacyValues.includes(option.value))
-      .map(option => option.label)
-      .join(', ');
-    return (
-      <div className="non-editable-field">
-        {displayValue}
-      </div>
-    );
-  }
 
   const onChangeValue = (option, { action, removedValue, name }) => {
     let newValue = '';
@@ -67,7 +69,6 @@ const Select = ({
     }
   }
 
-
   if (allowCreate) {
     return (
       <CreatableSelect
@@ -85,6 +86,7 @@ const Select = ({
       />
     );
   }
+
   return (
     <ReactSelect
       {...otherProps}

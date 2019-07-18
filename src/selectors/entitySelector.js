@@ -81,6 +81,7 @@ const getItem = (state, props, entityName) => {
     case 'customer':
     case 'subscription':
     case 'discount':
+    case 'charge':
     case 'reports':
     case 'importer':
     case 'tax':

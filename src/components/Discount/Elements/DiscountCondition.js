@@ -38,7 +38,7 @@ const DiscountCondition = ({
   return (
     <Conditions
       conditions={conditions}
-      disabled={!editable}
+      editable={editable}
       fields={fields}
       operators={operators}
       onChangeField={onChangeConditionField}

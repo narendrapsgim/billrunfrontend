@@ -6,25 +6,22 @@ import { Form, FormGroup, ControlLabel, Col, Row, Panel, Label } from 'react-boo
 import getSymbolFromCurrency from 'currency-symbol-map';
 import { titleCase, paramCase } from 'change-case';
 import isNumber from 'is-number';
-import DiscountServiceValue from './Elements/DiscountServiceValue';
-import DiscountConditions from './Elements/DiscountConditions';
+import DiscountServiceValue from '@/components/Discount/Elements/DiscountServiceValue';
+import DiscountConditions from '@/components/Discount/Elements/DiscountConditions';
 import Field from '@/components/Field';
 import { EntityFields, EntityField } from '@/components/Entity';
 import { getFieldName, getConfig } from '@/common/Util';
-import { DiscountDescription } from '../../language/FieldDescriptions';
 import { entitiesOptionsSelector } from '@/selectors/listSelectors';
 import { getSettings } from '@/actions/settingsActions';
 import { getEntitiesOptions, clearEntitiesOptions } from '@/actions/listActions';
 
 
-class DiscountDetails extends Component {
+class ChargeDetails extends Component {
 
   static propTypes = {
-    discount: PropTypes.instanceOf(Immutable.Map),
-    errors: PropTypes.instanceOf(Immutable.Map),
+    charge: PropTypes.instanceOf(Immutable.Map),
     mode: PropTypes.string.isRequired,
     currency: PropTypes.string,
-    hideKey: PropTypes.bool,
     errorMessages: PropTypes.object,
     onFieldUpdate: PropTypes.func.isRequired,
     onFieldRemove: PropTypes.func.isRequired,
@@ -33,52 +30,48 @@ class DiscountDetails extends Component {
   }
 
   static defaultProps = {
-    discount: Immutable.Map(),
-    errors: Immutable.Map(),
+    charge: Immutable.Map(),
     fields: Immutable.Map({
       description: Immutable.Map({
-        title: getFieldName('description', 'discount'),
+        title: getFieldName('description', 'charge'),
         field_name: 'description',
         mandatory: true,
-        description: DiscountDescription.description
       }),
       key: Immutable.Map({
-        title: getFieldName('key', 'discount'),
+        title: getFieldName('key', 'charge'),
         field_name: 'key',
         mandatory: true,
-        description: DiscountDescription.key
       }),
       priority: Immutable.Map({
-        title: getFieldName('priority', 'discount'),
+        title: getFieldName('priority', 'charge'),
         field_name: 'priority',
         system: true,
         type: 'number'
       }),
       paramsMinSubscribers: Immutable.Map({
-        title: getFieldName('min_subscribers', 'discount'),
+        title: getFieldName('min_subscribers', 'charge'),
         field_name: 'params.min_subscribers',
         system: true,
         type: 'number'
       }),
       paramsMaxSubscribers: Immutable.Map({
-        title: getFieldName('max_subscribers', 'discount'),
+        title: getFieldName('max_subscribers', 'charge'),
         field_name: 'params.max_subscribers',
         system: true,
         type: 'number'
       }),
       proration: Immutable.Map({
         field_name: 'proration',
-        title:  getFieldName('proration', 'discount'),
+        title:  getFieldName('proration', 'charge'),
         select_list: true,
         select_options: [
-          Immutable.Map({value: 'inherited', label: getFieldName('proration_inherited', 'discount')}),
-          Immutable.Map({value: 'no', label: getFieldName('proration_no', 'discount')})
+          Immutable.Map({value: 'inherited', label: getFieldName('proration_inherited', 'charge')}),
+          Immutable.Map({value: 'no', label: getFieldName('proration_no', 'charge')})
         ],
         default_value: 'inherited',
       }),
     }),
     currency: '',
-    hideKey: false,
     availableEntities: Immutable.Map(),
     errorMessages: {
       name: {
@@ -98,19 +91,25 @@ class DiscountDetails extends Component {
       'subscribers.subscriber',
       'subscribers.account',
     ]));
-    this.props.dispatch(getEntitiesOptions(['discount', 'plan', 'service']));
+    this.props.dispatch(getEntitiesOptions(['charge', 'plan', 'service']));
   }
 
   componentWillUnmount() {
-    this.props.dispatch(clearEntitiesOptions(['discount', 'plan', 'service']));
+    this.props.dispatch(clearEntitiesOptions(['charge', 'plan', 'service']));
   }
 
   onChangeFiled = (path, value) => {
     const pathString = path.join('.');
     switch (pathString) {
-      case 'limit':
       case 'params.cycles':
         if (value !== '') {
+          this.props.onFieldUpdate(path, value);
+        } else {
+          this.props.onFieldRemove(path);
+        }
+      break;
+      case 'subject.general.value':
+        if (value !== null) {
           this.props.onFieldUpdate(path, value);
         } else {
           this.props.onFieldRemove(path);
@@ -135,9 +134,9 @@ class DiscountDetails extends Component {
     this.onChangeFiled(['params', 'cycles'], newValue);
   }
 
-  onChangeLimit = (value) => {
+  onChangeSubjectGeneral = (value) => {
     const newValue = isNumber(value) ? parseFloat(value) : value;
-    this.onChangeFiled(['limit'], newValue);
+    this.onChangeFiled(['subject', 'general', 'value'], newValue);
   }
 
   onChangeDiscountType = (e) => {
@@ -149,12 +148,8 @@ class DiscountDetails extends Component {
     this.onChangeFiled(field, value);
   }
 
-  onRemoveAdditionalField = (field) => {
-    this.props.onFieldRemove(field);
-  }
-
-  onChangeExcludes = (excludeDiscounts) => {
-    const newValuesArray = Immutable.List((excludeDiscounts.length) ? excludeDiscounts.split(',') : []);
+  onChangeExcludes = (excludes) => {
+    const newValuesArray = Immutable.List((excludes.length) ? excludes.split(',') : []);
     if (newValuesArray.isEmpty()) {
       this.props.onFieldRemove(['excludes']);
     } else {
@@ -163,14 +158,14 @@ class DiscountDetails extends Component {
   }
 
   onChangeService = (services) => {
-    const { discount } = this.props;
+    const { charge } = this.props;
     const newValuesArray = Immutable.List((services.length) ? services.split(',') : []);
     const defaultNewValue = Immutable.Map({ value: '' });
     if (newValuesArray.isEmpty()) {
       this.props.onFieldRemove(['subject', 'service']);
       this.props.onFieldRemove(['subject', 'matched_services']);
     } else {
-      const existsServices = discount.getIn(['subject', 'service'], Immutable.Map());
+      const existsServices = charge.getIn(['subject', 'service'], Immutable.Map());
       const updatedServicesList = Immutable.Map().withMutations((plansWithMutations) => {
         newValuesArray.forEach((newServiceName) => {
           if (newServiceName !== 'matched_services') {
@@ -184,7 +179,7 @@ class DiscountDetails extends Component {
         this.props.onFieldRemove(['subject', 'service']);
       }
       if (newValuesArray.includes('matched_services')) {
-        this.onChangeFiled(['subject', 'matched_services'], discount.getIn(['subject', 'matched_services'], defaultNewValue));
+        this.onChangeFiled(['subject', 'matched_services'], charge.getIn(['subject', 'matched_services'], defaultNewValue));
       } else {
         this.props.onFieldRemove(['subject', 'matched_services']);
       }
@@ -192,7 +187,7 @@ class DiscountDetails extends Component {
   }
 
   onChangePlan = (plans) => {
-    const { discount } = this.props;
+    const { charge } = this.props;
     const newValuesArray = Immutable.List((plans.length) ? plans.split(',') : []);
     const defaultNewValue = Immutable.Map({ value: '' });
     if (newValuesArray.isEmpty()) {
@@ -214,12 +209,12 @@ class DiscountDetails extends Component {
         this.props.onFieldRemove(['subject', 'plan']);
       }
       if (newValuesArray.includes('matched_plans')) {
-        this.onChangeFiled(['subject', 'matched_plans'], discount.getIn(['subject', 'matched_plans'], defaultNewValue));
+        this.onChangeFiled(['subject', 'matched_plans'], charge.getIn(['subject', 'matched_plans'], defaultNewValue));
       } else {
         this.props.onFieldRemove(['subject', 'matched_plans']);
       }
       if (newValuesArray.includes('monthly_fees')) {
-        this.onChangeFiled(['subject', 'monthly_fees'], discount.getIn(['subject', 'monthly_fees'], defaultNewValue));
+        this.onChangeFiled(['subject', 'monthly_fees'], charge.getIn(['subject', 'monthly_fees'], defaultNewValue));
       } else {
         this.props.onFieldRemove(['subject', 'monthly_fees']);
       }
@@ -256,29 +251,33 @@ class DiscountDetails extends Component {
   }
 
   onAddCondition = (path, condition) => {
-    const { discount } = this.props;
-    const conditions = discount.getIn(path, Immutable.List());
+    const { charge } = this.props;
+    const conditions = charge.getIn(path, Immutable.List());
     this.onChangeFiled(path, conditions.push(condition));
   }
 
+  onRemoveAdditionalField = (field) => {
+    this.props.onFieldRemove(field);
+  }
+
   onRemoveCondition = (path, index) => {
-    const { discount } = this.props;
-    const conditions = discount.getIn(path, Immutable.List());
+    const { charge } = this.props;
+    const conditions = charge.getIn(path, Immutable.List());
     this.onChangeFiled(path, conditions.delete(index));
   }
 
   createPlansOptions = () => this.props.availableEntities
     .get('plan', Immutable.List())
-    .push(Immutable.Map({name: 'matched_plans', description: getFieldName('matched_plans', 'discount')}))
-    .push(Immutable.Map({name: 'monthly_fees', description: getFieldName('monthly_fees', 'discount')}))
+    .push(Immutable.Map({name: 'matched_plans', description: getFieldName('matched_plans', 'charge')}))
+    .push(Immutable.Map({name: 'monthly_fees', description: getFieldName('monthly_fees', 'charge')}))
     .map(this.createOption)
     .toArray();
 
   createExcludeDiscountOptions = () => {
-    const { discount, availableEntities } = this.props;
+    const { charge, availableEntities } = this.props;
     return availableEntities
-     .get('discount', Immutable.List())
-     .filter(option => option.get('key', '') !== discount.get('key', ''))
+     .get('charge', Immutable.List())
+     .filter(option => option.get('key', '') !== charge.get('key', ''))
      .map(this.createOption)
      .toArray();
   }
@@ -289,7 +288,7 @@ class DiscountDetails extends Component {
     return availableEntities
       .get('service', Immutable.List())
       .filter(availableService => !(isPercentaget && availableService.get('quantitative', false)))
-      .push(Immutable.Map({name: 'matched_services', description: getFieldName('matched_services', 'discount')}))
+      .push(Immutable.Map({name: 'matched_services', description: getFieldName('matched_services', 'charge')}))
       .map(this.createOption)
       .toArray();
   }
@@ -301,7 +300,7 @@ class DiscountDetails extends Component {
 
   getLabel = (items, key) => {
     if (['matched_services', 'matched_plans', 'monthly_fees'].includes(key)) {
-      return getFieldName(key, 'discount');
+      return getFieldName(key, 'charge');
     }
     return items
       .find(item => item.get('name') === key, null, Immutable.Map())
@@ -309,24 +308,24 @@ class DiscountDetails extends Component {
   }
 
   getSelectedServices = () => {
-    const { discount } = this.props;
+    const { charge } = this.props;
     const defaultNewValue = Immutable.Map({ value: '' });
-    let services = discount.getIn(['subject', 'service'], Immutable.Map());
-    if (discount.hasIn(['subject', 'matched_services'])) {
-      services = services.set('matched_services', discount.getIn(['subject', 'matched_services'], defaultNewValue));
+    let services = charge.getIn(['subject', 'service'], Immutable.Map());
+    if (charge.hasIn(['subject', 'matched_services'])) {
+      services = services.set('matched_services', charge.getIn(['subject', 'matched_services'], defaultNewValue));
     }
     return services;
   }
 
   getSelectedPlans = () => {
-    const { discount } = this.props;
+    const { charge } = this.props;
     const defaultNewValue = Immutable.Map({ value: '' });
-    let plans = discount.getIn(['subject', 'plan'], Immutable.Map());
-    if (discount.hasIn(['subject', 'matched_plans'])) {
-      plans = plans.set('matched_plans', discount.getIn(['subject', 'matched_plans'], defaultNewValue));
+    let plans = charge.getIn(['subject', 'plan'], Immutable.Map());
+    if (charge.hasIn(['subject', 'matched_plans'])) {
+      plans = plans.set('matched_plans', charge.getIn(['subject', 'matched_plans'], defaultNewValue));
     }
-    if (discount.hasIn(['subject', 'monthly_fees'])) {
-      plans = plans.set('monthly_fees', discount.getIn(['subject', 'monthly_fees'], defaultNewValue));
+    if (charge.hasIn(['subject', 'monthly_fees'])) {
+      plans = plans.set('monthly_fees', charge.getIn(['subject', 'monthly_fees'], defaultNewValue));
     }
     return plans;
   }
@@ -341,8 +340,8 @@ class DiscountDetails extends Component {
   }
 
   isPercentaget = () => {
-    const { discount } = this.props;
-    return discount.get('type', '') === 'percentage'
+    const { charge } = this.props;
+    return charge.get('type', '') === 'percentage'
   }
 
   renderServivesDiscountValues = () => {
@@ -357,7 +356,7 @@ class DiscountDetails extends Component {
       const isQuantitative = this.isServiceQuantitative(serviceName);
       return (
         <DiscountServiceValue
-          key={`${paramCase(serviceName)}-discount-value`}
+          key={`${paramCase(serviceName)}-charge-value`}
           mode={mode}
           service={service}
           name={serviceName}
@@ -387,7 +386,7 @@ class DiscountDetails extends Component {
         editable || (!editable && Immutable.Map.isMap(value) && value.get('value', '') !== '')
       ))
       .map((value, planName) =>(
-        <FormGroup key={`${paramCase(planName)}-discount-value`}>
+        <FormGroup key={`${paramCase(planName)}-charge-value`}>
           <Col componentClass={ControlLabel} sm={3} lg={2}>
             { this.getLabel(availableEntities.get('plan', Immutable.List()), planName) }
           </Col>
@@ -408,24 +407,26 @@ class DiscountDetails extends Component {
   }
 
   render() {
-    const { errors:onChangeErrors } = this.state;
-    const { discount, mode, currency, fields, hideKey, errors } = this.props;
+    const { errors } = this.state;
+    const { charge, mode, currency, fields } = this.props;
     const editable = (mode !== 'view');
+    const isPercentaget = this.isPercentaget();
     const plansOptions = this.createPlansOptions();
     const servicesOptions = this.createServicesOptions();
-    const excludeDiscounts = discount.get('excludes', Immutable.List()).join(',');
+    const excludeDiscounts = charge.get('excludes', Immutable.List()).join(',');
     const excludeDiscountsOptions = this.createExcludeDiscountOptions();
     const services = this.getSelectedServices().keySeq().toList().join(',');
     const plans = this.getSelectedPlans().keySeq().toList().join(',');
-    const includesQuantitative = discount
+    const suffix = isPercentaget ? undefined : getSymbolFromCurrency(currency);
+    const includesQuantitative = charge
       .getIn(['subject', 'service'], Immutable.Map())
       .keySeq().toList()
       .reduce((acc, serviceName) => (this.isServiceQuantitative(serviceName) ? true : acc), false);
-    const percentageLabel = (!includesQuantitative) ? getFieldName('type_percentage', 'discount') : (
+    const percentageLabel = (!includesQuantitative) ? getFieldName('type_percentage', 'charge') : (
       <span>
-        {getFieldName('type_percentage', 'discount')}&nbsp;&nbsp;
+        {getFieldName('type_percentage', 'charge')}&nbsp;&nbsp;
         <Label bsStyle="warning">
-          {getFieldName('quantitative_not_compatible', 'discount')}
+          {getFieldName('quantitative_not_compatible', 'charge')}
         </Label>
       </span>
     );
@@ -437,85 +438,71 @@ class DiscountDetails extends Component {
             <Panel>
               <EntityField
                 field={fields.get('description')}
-                entity={discount}
+                entity={charge}
                 onChange={this.onChangeFiled}
                 editable={editable}
-                error={errors.get('description', onChangeErrors.description)}
               />
-            { ['clone', 'create'].includes(mode) && !hideKey && (
+              { ['clone', 'create'].includes(mode) &&
                 <EntityField
                   field={fields.get('key')}
-                  entity={discount}
+                  entity={charge}
                   onChange={this.onChangeFiled}
                   editable={editable}
                   disabled={!['clone', 'create'].includes(mode)}
-                  error={errors.get('key', onChangeErrors.name)}
+                  error={errors.name}
                 />
-              )}
+              }
               <FormGroup >
                 <Col componentClass={ControlLabel} sm={3} lg={2}>
-                  { getFieldName('type', 'discount')}
+                  { getFieldName('type', 'charge')}
                 </Col>
                 <Col sm={8} lg={9}>
                   { editable
                     ? (
                       <span>
                         <span style={{ display: 'inline-block', marginRight: 20 }}>
-                          <Field fieldType="radio" onChange={this.onChangeDiscountType} name="type" value="monetary" label={getFieldName('type_monetary', 'discount')} checked={discount.get('type', '') === 'monetary'} />
+                          <Field fieldType="radio" onChange={this.onChangeDiscountType} name="type" value="monetary" label={getFieldName('type_monetary', 'charge')} checked={!isPercentaget} />
                         </span>
                         <span style={{ display: 'inline-block' }}>
-                          <Field fieldType="radio" onChange={this.onChangeDiscountType} name="type" value="percentage" label={percentageLabel} checked={discount.get('type', '') === 'percentage'} disabled={includesQuantitative} />
+                          <Field fieldType="radio" onChange={this.onChangeDiscountType} name="type" value="percentage" label={percentageLabel} checked={isPercentaget} disabled={includesQuantitative} />
                         </span>
                       </span>
                     )
-                  : <div className="non-editable-field">{ titleCase(discount.get('type', '')) }</div>
+                  : <div className="non-editable-field">{ titleCase(charge.get('type', '')) }</div>
                   }
                 </Col>
               </FormGroup>
               <FormGroup>
                 <Col componentClass={ControlLabel} sm={3} lg={2}>
-                  { getFieldName('cycles', 'discount')}
+                  { getFieldName('cycles', 'charge')}
                 </Col>
                 <Col sm={8} lg={9}>
-                  <Field value={discount.getIn(['params', 'cycles'], '')} onChange={this.onChangeCycles} fieldType="unlimited" unlimitedValue="" unlimitedLabel="Infinite" editable={editable} />
+                  <Field value={charge.getIn(['params', 'cycles'], '')} onChange={this.onChangeCycles} fieldType="unlimited" unlimitedValue="" unlimitedLabel="Infinite" editable={editable} />
                 </Col>
               </FormGroup>
               <EntityField
                 field={fields.get('proration')}
-                entity={discount}
+                entity={charge}
                 onChange={this.onChangeFiled}
                 editable={editable}
-                error={errors.get('proration', onChangeErrors.proration)}
               />
               <EntityField
                 field={fields.get('priority')}
-                entity={discount}
+                entity={charge}
                 onChange={this.onChangeFiled}
                 editable={editable}
-                error={errors.get('priority', onChangeErrors.priority)}
               />
-              <FormGroup>
-                <Col componentClass={ControlLabel} sm={3} lg={2}>
-                  { getFieldName('discount_overall_limit', 'discount')}
-                </Col>
-                <Col sm={8} lg={9}>
-                  <Field suffix={getSymbolFromCurrency(currency)} value={discount.get('limit', '')} onChange={this.onChangeLimit} fieldType="unlimited" unlimitedValue="" editable={editable} />
-                </Col>
-              </FormGroup>
-
               <EntityField
                 field={fields.get('paramsMinSubscribers')}
-                entity={discount}
+                entity={charge}
                 onChange={this.onChangeFiled}
                 editable={editable}
-                error={errors.get('params.min_subscribers', onChangeErrors.paramsMinSubscribers)}
               />
               <EntityField
                 field={fields.get('paramsMaxSubscribers')}
-                entity={discount}
+                entity={charge}
                 onChange={this.onChangeFiled}
                 editable={editable}
-                error={errors.get('params.max_subscribers', onChangeErrors.paramsMaxSubscribers)}
               />
               <FormGroup>
                 <Col componentClass={ControlLabel} sm={3} lg={2}>
@@ -534,17 +521,16 @@ class DiscountDetails extends Component {
               </FormGroup>
 
               <EntityFields
-                entityName="discounts"
-                entity={discount}
+                entityName="charges"
+                entity={charge}
                 onChangeField={this.onChangeAdditionalField}
                 onRemoveField={this.onRemoveAdditionalField}
                 editable={editable}
-                errors={errors}
               />
             </Panel>
 
             <DiscountConditions
-              discount={discount}
+              discount={charge}
               editable={editable}
               onChangeConditionField={this.onChangeConditionField}
               onChangeConditionOp={this.onChangeConditionOp}
@@ -553,10 +539,10 @@ class DiscountDetails extends Component {
               removeCondition={this.onRemoveCondition}
             />
 
-            <Panel header={<h3>{getFieldName('panle_plan_discount', 'discount')}</h3>}>
+            <Panel header={<h3>{getFieldName('panle_plan_discount', 'charge')}</h3>}>
               <FormGroup>
                 <Col componentClass={ControlLabel} sm={3} lg={2}>
-                  {getFieldName('select_plans', 'discount')}
+                  {getFieldName('select_plans', 'charge')}
                 </Col>
                 <Col sm={8} lg={9}>
                   <Field
@@ -572,10 +558,10 @@ class DiscountDetails extends Component {
               { (!this.getSelectedPlans().isEmpty()) && <hr /> }
               { this.renderPlanDiscountValue() }
               </Panel>
-              <Panel header={<h3>{getFieldName('panle_service_discount', 'discount')}</h3>}>
+              <Panel header={<h3>{getFieldName('panle_service_discount', 'charge')}</h3>}>
               <FormGroup>
                 <Col componentClass={ControlLabel} sm={3} lg={2}>
-                  {getFieldName('select_services', 'discount')}
+                  {getFieldName('select_services', 'charge')}
                 </Col>
                 <Col sm={8} lg={9}>
                   <Field
@@ -591,6 +577,25 @@ class DiscountDetails extends Component {
               { (!this.getSelectedServices().isEmpty()) && <hr /> }
               { this.renderServivesDiscountValues() }
             </Panel>
+
+            <Panel header={<h3>{getFieldName('charge_values', 'charge')}</h3>}>
+              <FormGroup>
+                <Col componentClass={ControlLabel} sm={3} lg={2}>
+                  { getFieldName('subject_general', 'charge')}
+                </Col>
+                <Col sm={8} lg={9}>
+                  <Field
+                    fieldType="toggeledInput"
+                    value={charge.getIn(['subject', 'general', 'value'], null)}
+                    onChange={this.onChangeSubjectGeneral}
+                    label="Discount by"
+                    editable={editable}
+                    suffix={suffix}
+                    inputProps={{ fieldType: isPercentaget ? 'percentage' : 'number' }}
+                  />
+                </Col>
+              </FormGroup>
+            </Panel>
           </Form>
         </Col>
       </Row>
@@ -600,7 +605,7 @@ class DiscountDetails extends Component {
 }
 
 const mapStateToProps = (state, props) => ({
-  availableEntities: entitiesOptionsSelector(state, props, ['discount', 'plan', 'service']),
+  availableEntities: entitiesOptionsSelector(state, props, ['charge', 'plan', 'service']),
 });
 
-export default connect(mapStateToProps)(DiscountDetails);
+export default connect(mapStateToProps)(ChargeDetails);

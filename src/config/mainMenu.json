@@ -90,6 +90,15 @@
     "order": 2,
     "parent": "postpaid"
   },
+  "charges": {
+    "title": "Conditional Charges",
+    "icon": "",
+    "route": "charges",
+    "show": true,
+    "roles": [],
+    "order": 2,
+    "parent": "postpaid"
+  },
   "customers": {
     "title": "Customers",
     "icon": "fa-users",

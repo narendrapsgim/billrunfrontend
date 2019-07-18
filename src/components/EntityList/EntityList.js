@@ -31,6 +31,7 @@ class EntityList extends Component {
     itemType: PropTypes.string.isRequired,
     itemsType: PropTypes.string.isRequired,
     collection: PropTypes.string.isRequired,
+    entityKey: PropTypes.string,
     api: PropTypes.string,
     items: PropTypes.instanceOf(Immutable.List),
     tableFields: PropTypes.array,
@@ -65,6 +66,7 @@ class EntityList extends Component {
   }
 
   static defaultProps = {
+    entityKey: undefined,
     items: null,
     api: 'uniqueget',
     page: 0,
@@ -365,15 +367,34 @@ class EntityList extends Component {
   }
 }
 
-const mapStateToProps = (state, props) => ({
-  collection: props.collection || props.itemsType,
-  items: state.entityList.items.get(props.itemsType),
-  page: state.entityList.page.get(props.itemsType),
-  state: state.entityList.state.get(props.itemsType),
-  nextPage: state.entityList.nextPage.get(props.itemsType),
-  sort: state.entityList.sort.get(props.itemsType),
-  filter: state.entityList.filter.get(props.itemsType),
-  size: state.entityList.size.get(props.itemsType),
-  inProgress: state.progressIndicator > 0,
-});
+const mapStateToProps = (state, props) => {
+  let itemType = props.itemType;
+  let itemsType = props.itemsType;
+  let collection = props.collection || props.itemsType;
+  let showRevisionBy = props.showRevisionBy;
+  if (typeof props.entityKey !== 'undefined') {
+    const config = getConfig(['systemItems', props.entityKey], Immutable.Map());
+    itemType = config.get('itemType', itemType);
+    itemsType = config.get('itemsType', itemsType);
+    collection = config.get('collection', itemsType);
+    // Allow to disable revisions by passing FALSE
+    if (props.showRevisionBy !== false) {
+      showRevisionBy = config.get('uniqueField', props.showRevisionBy);
+    }
+  }
+  return ({
+    collection,
+    itemType,
+    itemsType,
+    showRevisionBy,
+    items: state.entityList.items.get(itemsType),
+    page: state.entityList.page.get(itemsType),
+    state: state.entityList.state.get(itemsType),
+    nextPage: state.entityList.nextPage.get(itemsType),
+    sort: state.entityList.sort.get(itemsType),
+    filter: state.entityList.filter.get(itemsType),
+    size: state.entityList.size.get(itemsType),
+    inProgress: state.progressIndicator > 0,
+  })
+}
 export default withRouter(connect(mapStateToProps)(EntityList));
