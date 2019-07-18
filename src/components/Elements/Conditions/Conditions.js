@@ -13,6 +13,7 @@ class Conditions extends Component {
     fields: PropTypes.instanceOf(Immutable.List),
     operators: PropTypes.instanceOf(Immutable.List),
     customValueOptions: PropTypes.instanceOf(Immutable.List),
+    errors: PropTypes.instanceOf(Immutable.Map),
     disabled: PropTypes.bool,
     editable: PropTypes.bool,
     addConditionLabel: PropTypes.string,
@@ -29,6 +30,7 @@ class Conditions extends Component {
     fields: Immutable.List(),
     operators: Immutable.List(),
     customValueOptions: Immutable.List(),
+    errors: Immutable.Map(),
     disabled: false,
     editable: true,
     addConditionLabel: 'Add Condition',
@@ -47,11 +49,21 @@ class Conditions extends Component {
   });
 
   shouldComponentUpdate(nextProps) {
-    const { conditions, fields, disabled, editable, operators, addConditionLabel, noConditionsLabel } = this.props;
+    const {
+      conditions,
+      fields,
+      disabled,
+      editable,
+      operators,
+      addConditionLabel,
+      noConditionsLabel,
+      errors,
+    } = this.props;
     return (
       !Immutable.is(conditions, nextProps.conditions)
       || !Immutable.is(fields, nextProps.fields)
       || !Immutable.is(operators, nextProps.operators)
+      || !Immutable.is(errors, nextProps.errors)
       || disabled !== nextProps.disabled
       || editable !== nextProps.editable
       || addConditionLabel !== nextProps.addConditionLabel
@@ -64,7 +76,7 @@ class Conditions extends Component {
   }
 
   renderRow = (filter, index) => {
-    const { operators, fields, customValueOptions, disabled, editable } = this.props;
+    const { operators, fields, customValueOptions, disabled, editable, errors } = this.props;
     return (
       <Condition
         key={index}
@@ -75,6 +87,7 @@ class Conditions extends Component {
         customValueOptions={customValueOptions}
         disabled={disabled}
         editable={editable}
+        error={errors.get(`${index}`, false)}
         onChangeField={this.props.onChangeField}
         onChangeOperator={this.props.onChangeOperator}
         onChangeValue={this.props.onChangeValue}
