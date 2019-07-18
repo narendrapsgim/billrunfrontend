@@ -1,7 +1,7 @@
 import Immutable from 'immutable';
 import moment from 'moment';
 import isNumber from 'is-number';
-import { titleCase, sentenceCase, upperCaseFirst } from 'change-case';
+import { titleCase, sentenceCase } from 'change-case';
 import systemConfig from '../config/system';
 import fieldNamesConfig from '../language/fieldNames.json';
 import reportConfig from '../config/report';
@@ -77,8 +77,6 @@ export const getConfig = (key, defaultValue = null) => {
   return configCache.getIn(path, defaultValue);
 };
 
-export const titlize = str => upperCaseFirst(str);
-
 export const getFieldName = (field, category, defaultValue = null) => {
   const categoryName = getConfig(['fieldNames', category, field], false);
   if (typeof categoryName === 'string' && categoryName.length > 0) {
@@ -130,6 +128,7 @@ export const getFieldNameType = (type) => {
 export const getFieldEntityKey = (type) => {
   switch (type) {
     case 'account':
+    case 'accounts':
     case 'customer':
       return 'customer';
     case 'lines':
@@ -360,18 +359,8 @@ export const createReportColumnLabel = (label, fieldsOptions, opOptions, oldFiel
   return label;
 };
 
-export const getEntitySettingsName = (entityName) => {
-  if (entityName === 'account') {
-    return 'customer';
-  }
-  if (entityName === 'subscriber') {
-    return 'subscription';
-  }
-  return entityName;
-};
-
 export const getSettingsKey = (entityName, asArray = false) => {
-  const key = getConfig(['systemItems', getEntitySettingsName(entityName), 'settingsKey'], entityName);
+  const key = getConfig(['systemItems', getFieldEntityKey(entityName), 'settingsKey'], entityName);
   if (asArray) {
     return key.split('.');
   }

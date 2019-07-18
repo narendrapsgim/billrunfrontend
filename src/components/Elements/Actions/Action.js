@@ -1,6 +1,6 @@
 import React, { memo, useCallback, useMemo } from 'react';
 import PropTypes from 'prop-types';
-import { Button } from 'react-bootstrap';
+import { Button, MenuItem } from 'react-bootstrap';
 import classNames from 'classnames';
 import { WithTooltip } from '@/components/Elements';
 
@@ -19,6 +19,9 @@ const Action = (props) => {
     helpText,
     renderFunc,
     onClick,
+    index,
+    isDropdown,
+    ...otherProps
   } = props;
 
   const showAction = useMemo(() => (
@@ -64,6 +67,28 @@ const Action = (props) => {
   if (!showAction) {
     return null;
   }
+
+  if (isDropdown) {
+    const {onKeyDown, onSelect} = otherProps;
+    return (
+      <MenuItem
+        eventKey={index}
+        onKeyDown={onKeyDown}
+        onSelect={onSelect}
+        onClick={onClickActino}
+        disabled={!isEnable}
+        bsStyle={actionStyle === 'default' ? undefined : actionStyle}
+        bsSize={actionSize}
+        className={actionClass}
+      >
+        { showIcon && <i className={iconClass} /> }
+        { showIcon && label.length > 0 && <span>&nbsp;</span> }
+        { label.length > 0 && label}
+      </MenuItem>
+    );
+  }
+
+
   return (
     <span className="action-button">
       <WithTooltip helpText={isHelpText}>
@@ -90,6 +115,7 @@ const Action = (props) => {
 Action.defaultProps = {
   type: '',
   data: null,
+  index: '',
   label: '',
   helpText: '',
   actionStyle: 'link',
@@ -98,6 +124,7 @@ Action.defaultProps = {
   showIcon: true,
   enable: true,
   show: true,
+  isDropdown: false,
   renderFunc: null,
   onClick: () => {},
 };
@@ -105,6 +132,7 @@ Action.defaultProps = {
 Action.propTypes = {
   type: PropTypes.string,
   data: PropTypes.any,
+  index: PropTypes.any,
   label: PropTypes.string,
   showIcon: PropTypes.bool,
   actionStyle: PropTypes.oneOf(['primary', 'success', 'info', 'warning', 'danger', 'link', 'default']),
@@ -122,6 +150,7 @@ Action.propTypes = {
     PropTypes.bool,
     PropTypes.func,
   ]),
+  isDropdown: PropTypes.bool,
   renderFunc: PropTypes.func,
   onClick: PropTypes.func,
 };

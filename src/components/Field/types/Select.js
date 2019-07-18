@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import ReactSelect from 'react-select';
-import CreatableSelect from 'react-select/lib/Creatable';
+import Creatable from 'react-select/creatable';
 
 
 const Select = ({
@@ -48,7 +48,7 @@ const Select = ({
 
   const onChangeValue = (option, { action, removedValue, name }) => {
     let newValue = '';
-    if (action !== 'clear') {
+    if (action !== 'clear' && option !== null) {
       newValue = (multi) ? option.map(opt => opt.value).join(',') : option.value;
     }
     return onChange(newValue, {option, action, removedValue, name});
@@ -71,7 +71,7 @@ const Select = ({
 
   if (allowCreate) {
     return (
-      <CreatableSelect
+      <Creatable
         {...otherProps}
         options={options}
         placeholder={placeholder}

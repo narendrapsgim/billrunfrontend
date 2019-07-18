@@ -15,6 +15,7 @@ class Condition extends Component {
     disabled: PropTypes.bool,
     editable: PropTypes.bool,
     operators: PropTypes.instanceOf(Immutable.List),
+    customValueOptions: PropTypes.instanceOf(Immutable.List),
     fields: PropTypes.instanceOf(Immutable.List),
     error: PropTypes.oneOfType([
       PropTypes.string,
@@ -33,6 +34,7 @@ class Condition extends Component {
     editable: true,
     fields: Immutable.List(),
     operators: Immutable.List(),
+    customValueOptions: Immutable.List(),
     error: false,
     onChangeField: () => {},
     onChangeOperator: () => {},
@@ -115,17 +117,21 @@ class Condition extends Component {
   }
 
   isInBlackList = (option, config) => {
+    const { item } = this.props;
     const blackList = option.get('exclude', Immutable.List());
     const fieldKey = `fieldid:${config.get('id', '')}`;
     const fieldType = config.get('type', 'string');
-    return blackList.includes(fieldKey) || blackList.includes(fieldType);
+    const fieldOp = `op:${item.get('op', '')}`;
+    return blackList.includes(fieldKey) || blackList.includes(fieldType) || blackList.includes(fieldOp);
   }
 
   isInWhiteList = (option, config) => {
+    const { item } = this.props;
     const whiteList = option.get('include', Immutable.List());
     const fieldKey = `fieldid:${config.get('id', '')}`;
     const fieldType = config.get('type', 'string');
-    return whiteList.includes(fieldType) || whiteList.includes(fieldKey);
+    const fieldOp = `op:${item.get('op', '')}`;
+    return whiteList.includes(fieldType) || whiteList.includes(fieldKey) || whiteList.includes(fieldOp);
   }
 
   getOpOptions = () => {
@@ -137,12 +143,20 @@ class Condition extends Component {
       .toArray();
   }
 
+  getCustomValueOptions = () => {
+    const { customValueOptions } = this.props;
+    const config = this.getConfig();
+    return customValueOptions
+      .filter(option => (!this.isInBlackList(option, config) && this.isInWhiteList(option, config)))
+  }
+
   render() {
     const { item, disabled, editable, error } = this.props;
     const config = this.getConfig();
     const operator = this.getOperator();
     const fieldOptions = this.getFieldOptions();
     const opOptions = this.getOpOptions();
+    const customValueOptions = this.getCustomValueOptions();
     const disableOp = disabled || item.get('field', '') === '';
     const disableVal = disabled || item.get('op', '') === '' || disableOp;
     return (
@@ -185,6 +199,7 @@ class Condition extends Component {
             field={item}
             config={config}
             operator={operator}
+            customValueOptions={customValueOptions}
             disabled={disableVal}
             editable={editable}
             onChange={this.onChangeValue}

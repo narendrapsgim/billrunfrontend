@@ -210,9 +210,8 @@ export default class PlanProduct extends Component {
           </FormGroup>
         )}
         { !isPercentage && prices.map((price, i) => (
-          <Col sm={12}>
+          <Col sm={12} key={item.get('key', i)}>
             <ProductPrice
-              key={`${item.get('key')}_${i}`}
               item={price}
               index={i}
               mode={mode}
