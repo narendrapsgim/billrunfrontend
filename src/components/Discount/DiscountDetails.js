@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import Immutable from 'immutable';
-import { Form, FormGroup, ControlLabel, Col, Row, Panel, Label } from 'react-bootstrap';
+import { Form, FormGroup, ControlLabel, Col, Row, Panel, Label, HelpBlock } from 'react-bootstrap';
 import getSymbolFromCurrency from 'currency-symbol-map';
 import { titleCase, paramCase } from 'change-case';
 import isNumber from 'is-number';
@@ -16,6 +16,7 @@ import { entitiesOptionsSelector } from '@/selectors/listSelectors';
 import { getSettings } from '@/actions/settingsActions';
 import { getEntitiesOptions, clearEntitiesOptions } from '@/actions/listActions';
 import { formModalErrosSelector } from '@/selectors/guiSelectors';
+import { setFormModalError } from '@/actions/guiStateActions/pageActions';
 
 class DiscountDetails extends Component {
 
@@ -131,6 +132,7 @@ class DiscountDetails extends Component {
   }
 
   onChangeCycles = (value) => {
+    this.props.dispatch(setFormModalError('params.cycles'));
     const newValue = isNumber(value) ? parseFloat(value) : value;
     this.onChangeFiled(['params', 'cycles'], newValue);
   }
@@ -472,12 +474,13 @@ class DiscountDetails extends Component {
                   }
                 </Col>
               </FormGroup>
-              <FormGroup>
+              <FormGroup validationState={errors.has('params.cycles') ? 'error' : null}>
                 <Col componentClass={ControlLabel} sm={3} lg={2}>
                   { getFieldName('cycles', 'discount')}
                 </Col>
                 <Col sm={8} lg={9}>
                   <Field value={discount.getIn(['params', 'cycles'], '')} onChange={this.onChangeCycles} fieldType="unlimited" unlimitedValue="" unlimitedLabel="Infinite" editable={editable} />
+                  { errors.has('params.cycles') && (<HelpBlock><small>{errors.get('params.cycles', '')}</small></HelpBlock>)}
                 </Col>
               </FormGroup>
               <EntityField

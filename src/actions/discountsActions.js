@@ -27,7 +27,16 @@ export const getDiscount = id => getEntity('discount', fetchDiscountByIdQuery(id
 
 const validateConditions = (entity, dispatch) => {
   let hasErros = false;
+  let hasCycleSupportedFields = false;
+  const cycleSupportedFields = [
+  //'service.*', // all fields from service condition block are supported (not used)
+  'subscriber.plan',
+  'subscriber.plan_activation',
+  'subscriber.plan_deactivation',
+];
   const emptyConditionError = 'Conditions can not be empty';
+  const unlimitedCucleError = 'Limited by cycles must include at least one condition on Plan or Service';
+  const cycles = entity.getIn(['params', 'cycles'], '');
   const conditionsPath = ['params', 'conditions'];
   entity.getIn(conditionsPath, Immutable.List()).forEach((conditionsGroups, conditionsGroupsIdx) => {
     conditionsGroups.forEach((conditionsTypeGroup, type) => {
@@ -50,11 +59,15 @@ const validateConditions = (entity, dispatch) => {
                   dispatch(setFormModalError(path.join('.'), emptyConditionError));
                   hasErros = true;
                 }
+                if (cycles !== '') {
+                  hasCycleSupportedFields = cycleSupportedFields.includes(`subscriber.${condition.get('field', '')}`);
+                }
               })
             } else if (subscriberConditionsGroupType === 'service') {
               subscriberConditionsGroup.get('any', Immutable.List()).forEach((serviceConditionGroups, serviceConditionGroupsIdx) => {
                 serviceConditionGroups.forEach((conditions) => {
                   conditions.forEach((condition, conditionIdx) => {
+                    hasCycleSupportedFields = true;
                     if (condition.isEmpty() || condition.some(field => ([], '').includes(field))) {
                       const path = [...conditionsPath, conditionsGroupsIdx, type, subscriberConditionsGroupsIdx, subscriberConditionsGroupType, 'any', serviceConditionGroupsIdx, 'fields', conditionIdx];
                       dispatch(setFormModalError(path.join('.'), emptyConditionError));
@@ -69,6 +82,12 @@ const validateConditions = (entity, dispatch) => {
       }
     })
   })
+  if (cycles !== '' && !hasCycleSupportedFields) {
+    hasErros = true;
+    dispatch(setFormModalError('params.cycles', unlimitedCucleError));
+  } else {
+    dispatch(setFormModalError('params.cycles'));
+  }
   return hasErros;
 }
 
