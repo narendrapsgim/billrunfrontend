@@ -16,6 +16,11 @@ import { showConfirmModal } from '@/actions/guiStateActions/pageActions';
 
 const createBtnStyle = { marginTop: 0 };
 const defaultNewConditionsGroup = Immutable.Map();
+const defaultNewServiceConditionsGroup = Immutable.Map({
+  fields: Immutable.List([
+    defaultNewConditionsGroup
+  ])
+});
 const defaultNewCondition = Immutable.Map({
   field: '',
   op: '',
@@ -57,7 +62,7 @@ const DiscountConditions = ({
 
   const addServiceConditionsGroup = useCallback((idx) => {
     const path = [...conditionsPath, idx, ...servicesConditionsPath];
-    addCondition(path, defaultNewConditionsGroup);
+    addCondition(path, defaultNewServiceConditionsGroup);
   }, [addCondition, conditionsPath, servicesConditionsPath]);
 
   const removeServiceConditionsGroup = useCallback(({idx, anyIdx}) => {
@@ -76,6 +81,17 @@ const DiscountConditions = ({
       dispatch(showConfirmModal(confirm));
     }
   }, [discount, removeCondition, conditionsPath, servicesConditionsPath, servicesAnyConditionsPath, dispatch]);
+
+  const removeServiceCondition = useCallback((path, idx) => {
+    if (discount.getIn(path, Immutable.List()).size === 1) {
+      const tmpPath = [...path];
+      tmpPath.pop(); // remove 'field'
+      const index = tmpPath.pop();
+      removeCondition(tmpPath, index);
+    } else {
+      removeCondition(path, idx);
+    }
+  }, [removeCondition, discount]);
 
   const removeConditionsGroup = useCallback((idx) => {
     const path = [...conditionsPath, idx];
@@ -172,6 +188,12 @@ const DiscountConditions = ({
     onClick: addServiceConditionsGroup,
   }], [addServiceConditionsGroup]);
 
+  const isConditoinsExists = useMemo(() => !discount.getIn(conditionsPath, Immutable.List())
+    .every(groupConditions => !groupConditions.getIn(accountConditionsPath, Immutable.List()).isEmpty()
+      && !groupConditions.getIn(subscriberConditionsPath, Immutable.List()).isEmpty()
+      && !groupConditions.getIn(servicesConditionsPath, Immutable.List()).isEmpty()
+  ), [discount, conditionsPath, accountConditionsPath, subscriberConditionsPath, servicesConditionsPath]);
+
   const getConditionHeader = useCallback((idx) => (
     <div>
       {`Condition Group ${idx+1}`}
@@ -211,12 +233,17 @@ const DiscountConditions = ({
     />
   ), [addConditions]);
 
+  const conditionsHeaderDescription = useMemo(() => (isConditoinsExists
+    ? "Any of the following conditions must be fulfilled"
+    : "No conditions"
+  ), [isConditoinsExists]);
+
   const conditionsHeader = useMemo(() => (
     <div>
-      <h4 className="inline mt0 mb0">Conditions<small> | Any of the following conditions must be fulfilled</small></h4>
+      <h4 className="inline mt0 mb0">Conditions<small> | {conditionsHeaderDescription}</small></h4>
       <div className="pull-right">{addNewConditionsBtn}</div>
     </div>
-  ), [addNewConditionsBtn]);
+  ), [addNewConditionsBtn, conditionsHeaderDescription]);
 
   return (
     <Panel header={conditionsHeader}>
@@ -268,18 +295,20 @@ const DiscountConditions = ({
             <Panel header={getConditionServicesHeader(idx)}>
               {conditions.getIn(servicesConditionsPath, Immutable.List()).map((anyConditions, anyIdx) => (
                 <Panel header={getConditionServiceGroupHeader({idx, anyIdx})} key={`service_condition_${idx}_any_${anyIdx}`}>
-                  <DiscountCondition
-                    path={[...conditionsPath, idx, ...servicesConditionsPath, anyIdx, ...servicesAnyConditionsPath]}
-                    conditions={anyConditions.getIn(servicesAnyConditionsPath, Immutable.List())}
-                    editable={editable}
-                    fields={subscriberServicesConditionFields}
-                    operators={conditionsOperators}
-                    onChangeField={onChangeConditionField}
-                    onChangeOp={onChangeConditionOp}
-                    onChangeValue={onChangeConditionValue}
-                    onAdd={addCondition}
-                    onRemove={removeCondition}
-                  />
+                  {!anyConditions.getIn(servicesAnyConditionsPath, Immutable.List()).isEmpty() && (
+                    <DiscountCondition
+                      path={[...conditionsPath, idx, ...servicesConditionsPath, anyIdx, ...servicesAnyConditionsPath]}
+                      conditions={anyConditions.getIn(servicesAnyConditionsPath, Immutable.List())}
+                      editable={editable}
+                      fields={subscriberServicesConditionFields}
+                      operators={conditionsOperators}
+                      onChangeField={onChangeConditionField}
+                      onChangeOp={onChangeConditionOp}
+                      onChangeValue={onChangeConditionValue}
+                      onAdd={addCondition}
+                      onRemove={removeServiceCondition}
+                    />
+                  )}
                 </Panel>
               ))}
             </Panel>
