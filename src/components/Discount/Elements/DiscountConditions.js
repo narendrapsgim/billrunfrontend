@@ -16,7 +16,6 @@ import { showConfirmModal } from '@/actions/guiStateActions/pageActions';
 
 const createBtnStyle = { marginTop: 0 };
 const defaultNewConditionsGroup = Immutable.Map();
-const defaultNewServiceConditionsGroup = Immutable.Map({fields: Immutable.Map()});
 const defaultNewCondition = Immutable.Map({
   field: '',
   op: '',
@@ -69,7 +68,7 @@ const DiscountConditions = ({
       removeCondition(path, anyIdx);
     } else {
       const confirm = {
-        message: `Are you sure you want to remove service conditoin group ${anyIdx + 1} from condition group ${idx+1} ?`,
+        message: `Are you sure you want to remove service conditions group ${anyIdx + 1} from condition group ${idx+1} ?`,
         onOk: () => removeCondition(path, anyIdx),
         labelOk: 'Delete',
         type: 'delete',
