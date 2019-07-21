@@ -7,11 +7,10 @@ import {
   updateEntityField,
   deleteEntityField,
   setCloneEntity,
+  validateMandatoryField,
 } from './entityActions';
 import { setFormModalError } from '@/actions/guiStateActions/pageActions';
-import {
-  discountFieldsSelector,
-} from '@/selectors/settingsSelector';
+
 
 export const setCloneDiscount = () => setCloneEntity('discount', 'discount');
 
@@ -29,11 +28,11 @@ const validateConditions = (entity, dispatch) => {
   let hasErros = false;
   let hasCycleSupportedFields = false;
   const cycleSupportedFields = [
-  //'service.*', // all fields from service condition block are supported (not used)
-  'subscriber.plan',
-  'subscriber.plan_activation',
-  'subscriber.plan_deactivation',
-];
+    //'service.*', // all fields from service condition block are supported (not used)
+    'subscriber.plan',
+    'subscriber.plan_activation',
+    'subscriber.plan_deactivation',
+  ];
   const emptyConditionError = 'Conditions can not be empty';
   const unlimitedCucleError = 'Limited by cycles must include at least one condition on Plan or Service';
   const cycles = entity.getIn(['params', 'cycles'], '');
@@ -91,13 +90,14 @@ const validateConditions = (entity, dispatch) => {
   return hasErros;
 }
 
-export const validateEntity = (entity, type = 'save') => (dispatch, getState) => {
-
-  let fields = discountFieldsSelector(getState());
+export const validateEntity = (entity, fieldsConfig, mode) => (dispatch) => {
   // To field is not mandatory and will be set by BE
-  if (type === 'save') {
-    fields = fields.filter(field => field.get('field_name', '') !== 'to')
-  }
+  const fields = fieldsConfig.map(field => {
+    if (field.get('field_name', '') === 'to' && !['saveInSubscriber'].includes(mode)) {
+      return field.set('mandatory', false);
+    }
+    return field;
+  });
   return Immutable.Map().withMutations((errorsWithMutations) => {
     if (validateConditions(entity, dispatch)) {
       errorsWithMutations.set('conditions', true);
@@ -105,24 +105,10 @@ export const validateEntity = (entity, type = 'save') => (dispatch, getState) =>
     fields.forEach((field) => {
       const fieldName = field.get('field_name', '');
       const fieldValue = entity.getIn(fieldName.split('.'));
-      const hasError = validateField(field, fieldValue);
-      if (hasError !== false) {
+      const hasError = validateMandatoryField(fieldValue, field);
+      if (hasError !== true) {
         errorsWithMutations.set(fieldName, hasError);
       }
     });
   });
 };
-
-export const validateField = (fieldConfig, value) => {
-  // validate mandaroty
-  if (fieldConfig.get('mandatory', false)) {
-    switch (fieldConfig.get('type', false)) {
-      default: {
-        if (['', null, undefined].includes(value)) {
-          return `Field ${fieldConfig.get('title', fieldConfig.get('field_name', ''))} is required.`;
-        }
-      }
-    }
-  }
-  return false;
-}

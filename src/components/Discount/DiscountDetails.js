@@ -600,15 +600,15 @@ class DiscountDetails extends Component {
       </Row>
     );
   }
-
 }
+
 
 const mapStateToProps = (state, props) => {
   const parentErrors = typeof props.errors !== 'undefined' ? props.errors : Immutable.Map();
   const reduxErrors = formModalErrosSelector(state) || Immutable.Map();
   return ({
-  availableEntities: entitiesOptionsSelector(state, props, ['discount', 'plan', 'service']),
-  errors: Immutable.merge(parentErrors, reduxErrors),
+    availableEntities: entitiesOptionsSelector(state, props, ['discount', 'plan', 'service']),
+    errors: Immutable.merge(parentErrors, reduxErrors),
 })};
 
 export default connect(mapStateToProps)(DiscountDetails);

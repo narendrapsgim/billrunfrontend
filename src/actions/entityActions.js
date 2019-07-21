@@ -227,3 +227,16 @@ export const reopenEntity = (collection, item, from) => (dispatch) => {
   });
   return dispatch(saveEntity(collection, itemToReopen, 'reopen'));
 };
+
+export const validateMandatoryField = (value, fieldConfig) => {
+  if (fieldConfig.get('mandatory', false)) {
+    switch (fieldConfig.get('type', false)) {
+      default: {
+        if (['', null, undefined].includes(value)) {
+          return `Field ${fieldConfig.get('title', fieldConfig.get('field_name', ''))} is required.`;
+        }
+      }
+    }
+  }
+  return true;
+}

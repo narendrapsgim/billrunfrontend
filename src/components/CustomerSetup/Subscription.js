@@ -12,6 +12,7 @@ import Field from '@/components/Field';
 import { EntityRevisionDetails, EntityFields } from '../Entity';
 import { DiscountPopup } from '@/components/Discount';
 import PlaysSelector from '../Plays/PlaysSelector';
+import { discountFieldsSelector } from '@/selectors/settingsSelector';
 import { showFormModal, setFormModalError, showConfirmModal } from '@/actions/guiStateActions/pageActions';
 import { validateEntity } from '@/actions/discountsActions';
 import {
@@ -31,6 +32,7 @@ class Subscription extends Component {
     subscription: PropTypes.instanceOf(Immutable.Map),
     revisions: PropTypes.instanceOf(Immutable.List),
     settings: PropTypes.instanceOf(Immutable.List), // Subscriptions Fields
+    discountFields: PropTypes.instanceOf(Immutable.List), // Subscriptions Fields
     allPlans: PropTypes.instanceOf(Immutable.List),
     allServices: PropTypes.instanceOf(Immutable.List),
     mode: PropTypes.string,
@@ -46,6 +48,7 @@ class Subscription extends Component {
     mode: 'create',
     revisions: Immutable.List(),
     settings: Immutable.List(),
+    discountFields: Immutable.List(),
     allPlans: Immutable.List(),
     allServices: Immutable.List(),
   }
@@ -189,7 +192,7 @@ class Subscription extends Component {
   }
 
   onDiscountEditForm = (idx) => {
-    const { dispatch, mode } = this.props;
+    const { dispatch, mode, discountFields } = this.props;
     const { subscription } = this.state;
     const discounts = subscription.get('discounts', Immutable.List()) || Immutable.List();
     const isCreate = idx === null;
@@ -201,7 +204,7 @@ class Subscription extends Component {
     }))
     const onOk = (newItem) => {
       this.props.dispatch(setFormModalError());
-      const errors = dispatch(validateEntity(newItem, 'saveInSubscriber'));
+      const errors = dispatch(validateEntity(newItem, discountFields, 'saveInSubscriber'));
       if (!errors.isEmpty()) {
         errors.forEach((message, fieldId) => {
           this.props.dispatch(setFormModalError(fieldId, message));
@@ -606,6 +609,7 @@ const mapStateToProps = (state, props) => {
   const revisions = state.entityList.revisions.getIn([collection, key]);
   const mode = (!subscription || !getItemId(subscription, false)) ? 'create' : getItemMode(subscription);
   return ({
+    discountFields: discountFieldsSelector(state, props),
     revisions,
     mode,
   });

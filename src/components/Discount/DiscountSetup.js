@@ -27,7 +27,7 @@ import {
 import { clearItems, getRevisions, clearRevisions } from '@/actions/entityListActions';
 import { validateEntity } from '@/actions/discountsActions';
 import { modeSelector, itemSelector, idSelector, revisionsSelector } from '@/selectors/entitySelector';
-import { currencySelector } from '@/selectors/settingsSelector';
+import { currencySelector, discountFieldsSelector } from '@/selectors/settingsSelector';
 
 
 class DiscountSetup extends Component {
@@ -36,6 +36,7 @@ class DiscountSetup extends Component {
     itemId: PropTypes.string,
     item: PropTypes.instanceOf(Immutable.Map),
     revisions: PropTypes.instanceOf(Immutable.List),
+    fields: PropTypes.instanceOf(Immutable.List),
     mode: PropTypes.string,
     currency: PropTypes.string,
     router: PropTypes.shape({
@@ -48,6 +49,7 @@ class DiscountSetup extends Component {
     item: Immutable.Map(),
     currency: '',
     revisions: Immutable.List(),
+    fields: Immutable.List(),
   }
 
   state = {
@@ -176,8 +178,8 @@ class DiscountSetup extends Component {
   }
 
   validate = () => {
-    const { item } = this.props;
-    const errors = this.props.dispatch(validateEntity(item));
+    const { item, fields, mode} = this.props;
+    const errors = this.props.dispatch(validateEntity(item, fields, mode));
     this.setState(() => ({ errors }));
     if (errors.isEmpty()) {
       return true;
@@ -238,6 +240,7 @@ const mapStateToProps = (state, props) => ({
   mode: modeSelector(state, props, 'discount'),
   revisions: revisionsSelector(state, props, 'discount'),
   currency: currencySelector(state, props) || undefined,
+  fields: discountFieldsSelector(state, props),
 });
 
 export default withRouter(connect(mapStateToProps)(DiscountSetup));
