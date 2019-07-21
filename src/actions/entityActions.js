@@ -233,7 +233,7 @@ export const validateMandatoryField = (value, fieldConfig) => {
     switch (fieldConfig.get('type', false)) {
       default: {
         if (['', null, undefined].includes(value)) {
-          return `Field ${fieldConfig.get('title', fieldConfig.get('field_name', ''))} is required.`;
+          return `${fieldConfig.get('title', fieldConfig.get('field_name', ''))} field is required.`;
         }
       }
     }

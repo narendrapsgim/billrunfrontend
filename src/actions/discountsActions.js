@@ -34,7 +34,7 @@ const validateConditions = (entity, dispatch) => {
     'subscriber.plan_deactivation',
   ];
   const emptyConditionError = 'Conditions can not be empty';
-  const unlimitedCucleError = 'Limited by cycles must include at least one condition on Plan or Service';
+  const unlimitedCucleError = 'When limiting by cycles, please include at least one condition on Plan or Service';
   const cycles = entity.getIn(['params', 'cycles'], '');
   const conditionsPath = ['params', 'conditions'];
   entity.getIn(conditionsPath, Immutable.List()).forEach((conditionsGroups, conditionsGroupsIdx) => {
