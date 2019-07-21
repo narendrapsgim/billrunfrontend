@@ -125,7 +125,7 @@ const DiscountConditions = ({
       onOk();
     } else {
       const confirm = {
-        message: `Are you sure you want to remove service conditions group ${anyIdx + 1} from condition group ${idx+1} ?`,
+        message: `Are you sure you want to remove service conditions set ${anyIdx + 1} from condition set ${idx+1} ?`,
         onOk,
         labelOk: 'Delete',
         type: 'delete',
@@ -161,7 +161,7 @@ const DiscountConditions = ({
       removeConditionWithClearError(conditionsPath, idx);
     } else {
       const confirm = {
-        message: `Are you sure you want to remove conditions group ${idx+1} ?`,
+        message: `Are you sure you want to remove conditions set ${idx+1} ?`,
         onOk: () => removeConditionWithClearError(conditionsPath, idx),
         labelOk: 'Delete',
         type: 'delete',
@@ -190,7 +190,7 @@ const DiscountConditions = ({
     onClick: addSubscriberConditions,
   }, {
     type: 'add',
-    label: 'Service group',
+    label: 'Service set',
     showIcon: false,
     onClick: addServiceConditionsGroup,
   }], [addAccountConditions, addSubscriberConditions, addServiceConditionsGroup]);
@@ -209,13 +209,13 @@ const DiscountConditions = ({
     onClick: addSubscriberConditions,
   }, {
     type: 'add',
-    label: 'Add Service condition group',
+    label: 'Add Service condition set',
     actionSize: 'xsmall',
     actionStyle: 'primary',
     onClick: addServiceConditionsGroup,
   }], [addAccountConditions, addSubscriberConditions, addServiceConditionsGroup]);
 
-  const removeGroupHelpText = idx => `Remove conditions group ${idx + 1}`;
+  const removeGroupHelpText = idx => `Remove conditions set ${idx + 1}`;
 
   const conditionActions = useMemo(() => [{
     type: 'remove',
@@ -226,7 +226,7 @@ const DiscountConditions = ({
     onClick: removeConditionsGroup,
   }], [removeConditionsGroup]);
 
-  const removeServiceGroupHelpText = ({idx, anyIdx}) => `Remove Service group ${anyIdx + 1} from condition group ${idx + 1}`;
+  const removeServiceGroupHelpText = ({idx, anyIdx}) => `Remove Service set ${anyIdx + 1} from condition set ${idx + 1}`;
 
   const conditionServiceGroupActions = useMemo(() => [{
     type: 'remove',
@@ -239,8 +239,8 @@ const DiscountConditions = ({
 
   const conditionServicesActions = useMemo(() => [{
     type: 'add',
-    label: 'Add group',
-    helpText: 'Add Service group',
+    label: 'Add set',
+    helpText: 'Add Service set',
     showIcon: true,
     actionStyle: 'primary',
     actionSize: 'xsmall',
@@ -255,7 +255,7 @@ const DiscountConditions = ({
 
   const getConditionHeader = useCallback((idx) => (
     <div>
-      {`Condition Group ${idx+1}`}
+      {`Condition Set ${idx+1}`}
       <div className="pull-right">
         <Actions actions={conditionAddActions} data={idx} type='dropdown' doropDownLabel="Add condition" />
         <div className="inline ml5">
@@ -276,7 +276,7 @@ const DiscountConditions = ({
 
   const getConditionServiceGroupHeader = useCallback(({idx, anyIdx}) => (
     <div>
-      {`Service Group ${anyIdx+1}`}
+      {`Service Set ${anyIdx+1}`}
       <div className="pull-right">
         <Actions actions={conditionServiceGroupActions} data={{idx, anyIdx}} />
       </div>
@@ -287,14 +287,14 @@ const DiscountConditions = ({
     <CreateButton
       onClick={addConditions}
       data={defaultNewConditionsGroup}
-      label="Add conditions group"
+      label="Add conditions set"
       buttonStyle={createBtnStyle}
     />
   ), [addConditions]);
 
   const conditionsHeaderDescription = useMemo(() => (isConditoinsExists
-    ? "Any of the following conditions must be fulfilled"
-    : "No conditions"
+    ? 'At least one set of conditions must be fulfilled'
+    : 'No conditions'
   ), [isConditoinsExists]);
 
   const conditionsHeader = useMemo(() => (
