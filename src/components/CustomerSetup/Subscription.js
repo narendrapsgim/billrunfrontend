@@ -58,6 +58,7 @@ class Subscription extends Component {
     this.state = {
       subscription: props.subscription,
       progress: false,
+      discountsHiddenFields: ['key', 'params.min_subscribers', 'params.max_subscribers']
     };
   }
 
@@ -193,7 +194,7 @@ class Subscription extends Component {
 
   onDiscountEditForm = (idx) => {
     const { dispatch, mode, discountFields } = this.props;
-    const { subscription } = this.state;
+    const { subscription, discountsHiddenFields } = this.state;
     const discounts = subscription.get('discounts', Immutable.List()) || Immutable.List();
     const isCreate = idx === null;
     const newDiscount = discounts.get(idx, Immutable.Map({
@@ -219,7 +220,7 @@ class Subscription extends Component {
       title: isCreate ? 'Create discount' : `Edit ${newDiscount.get('description', 'discount')}`,
       onOk,
       mode,
-      hideKey: true,
+      hideFields: discountsHiddenFields,
     };
     return dispatch(showFormModal(newDiscount, DiscountPopup, config));
   }

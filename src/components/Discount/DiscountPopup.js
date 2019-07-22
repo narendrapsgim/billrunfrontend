@@ -6,6 +6,10 @@ import DiscountDetails from './DiscountDetails';
 import { currencySelector } from '@/selectors/settingsSelector';
 import { FormGroup, InputGroup, HelpBlock } from 'react-bootstrap';
 import Field from '@/components/Field';
+import {
+  getConfig,
+  getItemDateValue,
+} from '@/common/Util';
 
 
 class DiscountPopup extends Component {
@@ -14,7 +18,7 @@ class DiscountPopup extends Component {
     item: PropTypes.instanceOf(Immutable.Map),
     errors: PropTypes.instanceOf(Immutable.Map),
     mode: PropTypes.string.isRequired,
-    hideKey: PropTypes.bool,
+    hideFields: PropTypes.array,
     currency: PropTypes.string,
     dispatch: PropTypes.func.isRequired,
   }
@@ -22,17 +26,17 @@ class DiscountPopup extends Component {
   static defaultProps = {
     item: Immutable.Map(),
     errors: Immutable.Map(),
-    hideKey: false,
+    hideFields: false,
     currency: '',
   }
 
   shouldComponentUpdate(nextProps) {
-    const { item, mode, hideKey, currency, errors } = this.props;
+    const { item, mode, hideFields, currency, errors } = this.props;
     return (
       !Immutable.is(item, nextProps.item)
       || !Immutable.is(errors, nextProps.errors)
       || mode !== nextProps.mode
-      || hideKey !== nextProps.hideKey
+      || hideFields !== nextProps.hideFields
       || currency !== nextProps.currency
     );
   }
@@ -62,13 +66,14 @@ class DiscountPopup extends Component {
   }
 
   render() {
-    const { item, mode, currency, hideKey, errors } = this.props;
+    const { item, mode, currency, hideFields, errors } = this.props;
+    const apiDateTimeFormat = getConfig('apiDateTimeFormat', 'YYYY-MM-DD[T]HH:mm:ss.SSS[Z]');
     const rangeValue = Immutable.Map({
-      from: item.get('from', ''),
-      to: item.get('to', ''),
+      from: getItemDateValue(item, 'from').format(apiDateTimeFormat),
+      to: getItemDateValue(item, 'to').format(apiDateTimeFormat),
     });
     const editable = !['view'].includes(mode);
-    const fromToError = errors.get('from', errors.get('to', false))
+    const fromToError = errors.get('from', errors.get('to', false));
     return (
       <div className="discount-setup">
 
@@ -90,7 +95,7 @@ class DiscountPopup extends Component {
         <DiscountDetails
           discount={item}
           mode={mode}
-          hideKey={hideKey}
+          hideFields={hideFields}
           currency={currency}
           onFieldUpdate={this.onChangeFieldValue}
           onFieldRemove={this.onRemoveFieldValue}

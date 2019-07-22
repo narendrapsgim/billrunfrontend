@@ -601,7 +601,7 @@ class ChargeDetails extends Component {
                     fieldType="toggeledInput"
                     value={charge.getIn(['subject', 'general', 'value'], null)}
                     onChange={this.onChangeSubjectGeneral}
-                    label="Discount by"
+                    label="Charge by"
                     editable={editable}
                     suffix={suffix}
                     inputProps={{ fieldType: isPercentaget ? 'percentage' : 'number' }}
