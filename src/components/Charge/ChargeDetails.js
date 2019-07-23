@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import Immutable from 'immutable';
-import { Form, FormGroup, ControlLabel, Col, Row, Panel, Label } from 'react-bootstrap';
+import { Form, FormGroup, ControlLabel, Col, Row, Panel, Label, HelpBlock } from 'react-bootstrap';
 import getSymbolFromCurrency from 'currency-symbol-map';
 import { titleCase, paramCase } from 'change-case';
 import isNumber from 'is-number';
@@ -14,6 +14,8 @@ import { getFieldName, getConfig } from '@/common/Util';
 import { entitiesOptionsSelector } from '@/selectors/listSelectors';
 import { getSettings } from '@/actions/settingsActions';
 import { getEntitiesOptions, clearEntitiesOptions } from '@/actions/listActions';
+import { formModalErrosSelector } from '@/selectors/guiSelectors';
+import { setFormModalError } from '@/actions/guiStateActions/pageActions';
 
 
 class ChargeDetails extends Component {
@@ -21,6 +23,7 @@ class ChargeDetails extends Component {
   static propTypes = {
     charge: PropTypes.instanceOf(Immutable.Map),
     mode: PropTypes.string.isRequired,
+    errors: PropTypes.instanceOf(Immutable.Map),
     currency: PropTypes.string,
     errorMessages: PropTypes.object,
     onFieldUpdate: PropTypes.func.isRequired,
@@ -31,6 +34,7 @@ class ChargeDetails extends Component {
 
   static defaultProps = {
     charge: Immutable.Map(),
+    errors: Immutable.Map(),
     fields: Immutable.Map({
       description: Immutable.Map({
         title: getFieldName('description', 'charge'),
@@ -130,6 +134,7 @@ class ChargeDetails extends Component {
   }
 
   onChangeCycles = (value) => {
+    this.props.dispatch(setFormModalError('params.cycles'));
     const newValue = isNumber(value) ? parseFloat(value) : value;
     this.onChangeFiled(['params', 'cycles'], newValue);
   }
@@ -407,8 +412,8 @@ class ChargeDetails extends Component {
   }
 
   render() {
-    const { errors } = this.state;
-    const { charge, mode, currency, fields } = this.props;
+    const { errors:onChangeErrors } = this.state;
+    const { charge, mode, currency, fields, errors } = this.props;
     const editable = (mode !== 'view');
     const isPercentaget = this.isPercentaget();
     const plansOptions = this.createPlansOptions();
@@ -441,6 +446,7 @@ class ChargeDetails extends Component {
                 entity={charge}
                 onChange={this.onChangeFiled}
                 editable={editable}
+                error={errors.get('description', onChangeErrors.description)}
               />
               { ['clone', 'create'].includes(mode) &&
                 <EntityField
@@ -449,7 +455,7 @@ class ChargeDetails extends Component {
                   onChange={this.onChangeFiled}
                   editable={editable}
                   disabled={!['clone', 'create'].includes(mode)}
-                  error={errors.name}
+                  error={errors.get('key', onChangeErrors.name)}
                 />
               }
               <FormGroup >
@@ -472,12 +478,13 @@ class ChargeDetails extends Component {
                   }
                 </Col>
               </FormGroup>
-              <FormGroup>
+              <FormGroup validationState={errors.has('params.cycles') ? 'error' : null}>
                 <Col componentClass={ControlLabel} sm={3} lg={2}>
                   { getFieldName('cycles', 'charge')}
                 </Col>
                 <Col sm={8} lg={9}>
                   <Field value={charge.getIn(['params', 'cycles'], '')} onChange={this.onChangeCycles} fieldType="unlimited" unlimitedValue="" unlimitedLabel="Infinite" editable={editable} />
+                  { errors.has('params.cycles') && (<HelpBlock><small>{errors.get('params.cycles', '')}</small></HelpBlock>)}
                 </Col>
               </FormGroup>
               <EntityField
@@ -485,24 +492,28 @@ class ChargeDetails extends Component {
                 entity={charge}
                 onChange={this.onChangeFiled}
                 editable={editable}
+                error={errors.get('proration', onChangeErrors.proration)}
               />
               <EntityField
                 field={fields.get('priority')}
                 entity={charge}
                 onChange={this.onChangeFiled}
                 editable={editable}
+                error={errors.get('priority', onChangeErrors.priority)}
               />
               <EntityField
                 field={fields.get('paramsMinSubscribers')}
                 entity={charge}
                 onChange={this.onChangeFiled}
                 editable={editable}
+                error={errors.get('params.min_subscribers', onChangeErrors.paramsMinSubscribers)}
               />
               <EntityField
                 field={fields.get('paramsMaxSubscribers')}
                 entity={charge}
                 onChange={this.onChangeFiled}
                 editable={editable}
+                error={errors.get('params.max_subscribers', onChangeErrors.paramsMaxSubscribers)}
               />
               <FormGroup>
                 <Col componentClass={ControlLabel} sm={3} lg={2}>
@@ -526,6 +537,7 @@ class ChargeDetails extends Component {
                 onChangeField={this.onChangeAdditionalField}
                 onRemoveField={this.onRemoveAdditionalField}
                 editable={editable}
+                errors={errors}
               />
             </Panel>
 
@@ -537,6 +549,7 @@ class ChargeDetails extends Component {
               onChangeConditionValue={this.onChangeConditionValue}
               addCondition={this.onAddCondition}
               removeCondition={this.onRemoveCondition}
+              errors={errors}
             />
 
             <Panel header={<h3>{getFieldName('panle_plan_discount', 'charge')}</h3>}>
@@ -588,7 +601,7 @@ class ChargeDetails extends Component {
                     fieldType="toggeledInput"
                     value={charge.getIn(['subject', 'general', 'value'], null)}
                     onChange={this.onChangeSubjectGeneral}
-                    label="Discount by"
+                    label="Charge by"
                     editable={editable}
                     suffix={suffix}
                     inputProps={{ fieldType: isPercentaget ? 'percentage' : 'number' }}
@@ -601,11 +614,15 @@ class ChargeDetails extends Component {
       </Row>
     );
   }
-
 }
 
-const mapStateToProps = (state, props) => ({
-  availableEntities: entitiesOptionsSelector(state, props, ['charge', 'plan', 'service']),
-});
+
+const mapStateToProps = (state, props) => {
+  const parentErrors = typeof props.errors !== 'undefined' ? props.errors : Immutable.Map();
+  const reduxErrors = formModalErrosSelector(state) || Immutable.Map();
+  return ({
+    availableEntities: entitiesOptionsSelector(state, props, ['charge', 'plan', 'service']),
+    errors: Immutable.merge(parentErrors, reduxErrors),
+})};
 
 export default connect(mapStateToProps)(ChargeDetails);

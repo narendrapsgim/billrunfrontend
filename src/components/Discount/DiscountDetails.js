@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import Immutable from 'immutable';
-import { Form, FormGroup, ControlLabel, Col, Row, Panel, Label } from 'react-bootstrap';
+import { Form, FormGroup, ControlLabel, Col, Row, Panel, Label, HelpBlock } from 'react-bootstrap';
 import getSymbolFromCurrency from 'currency-symbol-map';
 import { titleCase, paramCase } from 'change-case';
 import isNumber from 'is-number';
@@ -15,7 +15,8 @@ import { DiscountDescription } from '../../language/FieldDescriptions';
 import { entitiesOptionsSelector } from '@/selectors/listSelectors';
 import { getSettings } from '@/actions/settingsActions';
 import { getEntitiesOptions, clearEntitiesOptions } from '@/actions/listActions';
-
+import { formModalErrosSelector } from '@/selectors/guiSelectors';
+import { setFormModalError } from '@/actions/guiStateActions/pageActions';
 
 class DiscountDetails extends Component {
 
@@ -24,7 +25,7 @@ class DiscountDetails extends Component {
     errors: PropTypes.instanceOf(Immutable.Map),
     mode: PropTypes.string.isRequired,
     currency: PropTypes.string,
-    hideKey: PropTypes.bool,
+    hideFields: PropTypes.array,
     errorMessages: PropTypes.object,
     onFieldUpdate: PropTypes.func.isRequired,
     onFieldRemove: PropTypes.func.isRequired,
@@ -78,7 +79,7 @@ class DiscountDetails extends Component {
       }),
     }),
     currency: '',
-    hideKey: false,
+    hideFields: [],
     availableEntities: Immutable.Map(),
     errorMessages: {
       name: {
@@ -131,6 +132,7 @@ class DiscountDetails extends Component {
   }
 
   onChangeCycles = (value) => {
+    this.props.dispatch(setFormModalError('params.cycles'));
     const newValue = isNumber(value) ? parseFloat(value) : value;
     this.onChangeFiled(['params', 'cycles'], newValue);
   }
@@ -409,7 +411,7 @@ class DiscountDetails extends Component {
 
   render() {
     const { errors:onChangeErrors } = this.state;
-    const { discount, mode, currency, fields, hideKey, errors } = this.props;
+    const { discount, mode, currency, fields, hideFields, errors } = this.props;
     const editable = (mode !== 'view');
     const plansOptions = this.createPlansOptions();
     const servicesOptions = this.createServicesOptions();
@@ -442,7 +444,7 @@ class DiscountDetails extends Component {
                 editable={editable}
                 error={errors.get('description', onChangeErrors.description)}
               />
-            { ['clone', 'create'].includes(mode) && !hideKey && (
+            { ['clone', 'create'].includes(mode) && !hideFields.includes('key') && (
                 <EntityField
                   field={fields.get('key')}
                   entity={discount}
@@ -452,87 +454,102 @@ class DiscountDetails extends Component {
                   error={errors.get('key', onChangeErrors.name)}
                 />
               )}
-              <FormGroup >
-                <Col componentClass={ControlLabel} sm={3} lg={2}>
-                  { getFieldName('type', 'discount')}
-                </Col>
-                <Col sm={8} lg={9}>
-                  { editable
-                    ? (
-                      <span>
-                        <span style={{ display: 'inline-block', marginRight: 20 }}>
-                          <Field fieldType="radio" onChange={this.onChangeDiscountType} name="type" value="monetary" label={getFieldName('type_monetary', 'discount')} checked={discount.get('type', '') === 'monetary'} />
+              { !hideFields.includes('type') && (
+                <FormGroup >
+                  <Col componentClass={ControlLabel} sm={3} lg={2}>
+                    { getFieldName('type', 'discount')}
+                  </Col>
+                  <Col sm={8} lg={9}>
+                    { editable
+                      ? (
+                        <span>
+                          <span style={{ display: 'inline-block', marginRight: 20 }}>
+                            <Field fieldType="radio" onChange={this.onChangeDiscountType} name="type" value="monetary" label={getFieldName('type_monetary', 'discount')} checked={discount.get('type', '') === 'monetary'} />
+                          </span>
+                          <span style={{ display: 'inline-block' }}>
+                            <Field fieldType="radio" onChange={this.onChangeDiscountType} name="type" value="percentage" label={percentageLabel} checked={discount.get('type', '') === 'percentage'} disabled={includesQuantitative} />
+                          </span>
                         </span>
-                        <span style={{ display: 'inline-block' }}>
-                          <Field fieldType="radio" onChange={this.onChangeDiscountType} name="type" value="percentage" label={percentageLabel} checked={discount.get('type', '') === 'percentage'} disabled={includesQuantitative} />
-                        </span>
-                      </span>
-                    )
-                  : <div className="non-editable-field">{ titleCase(discount.get('type', '')) }</div>
-                  }
-                </Col>
-              </FormGroup>
-              <FormGroup>
-                <Col componentClass={ControlLabel} sm={3} lg={2}>
-                  { getFieldName('cycles', 'discount')}
-                </Col>
-                <Col sm={8} lg={9}>
-                  <Field value={discount.getIn(['params', 'cycles'], '')} onChange={this.onChangeCycles} fieldType="unlimited" unlimitedValue="" unlimitedLabel="Infinite" editable={editable} />
-                </Col>
-              </FormGroup>
-              <EntityField
-                field={fields.get('proration')}
-                entity={discount}
-                onChange={this.onChangeFiled}
-                editable={editable}
-                error={errors.get('proration', onChangeErrors.proration)}
-              />
-              <EntityField
-                field={fields.get('priority')}
-                entity={discount}
-                onChange={this.onChangeFiled}
-                editable={editable}
-                error={errors.get('priority', onChangeErrors.priority)}
-              />
-              <FormGroup>
-                <Col componentClass={ControlLabel} sm={3} lg={2}>
-                  { getFieldName('discount_overall_limit', 'discount')}
-                </Col>
-                <Col sm={8} lg={9}>
-                  <Field suffix={getSymbolFromCurrency(currency)} value={discount.get('limit', '')} onChange={this.onChangeLimit} fieldType="unlimited" unlimitedValue="" editable={editable} />
-                </Col>
-              </FormGroup>
-
-              <EntityField
-                field={fields.get('paramsMinSubscribers')}
-                entity={discount}
-                onChange={this.onChangeFiled}
-                editable={editable}
-                error={errors.get('params.min_subscribers', onChangeErrors.paramsMinSubscribers)}
-              />
-              <EntityField
-                field={fields.get('paramsMaxSubscribers')}
-                entity={discount}
-                onChange={this.onChangeFiled}
-                editable={editable}
-                error={errors.get('params.max_subscribers', onChangeErrors.paramsMaxSubscribers)}
-              />
-              <FormGroup>
-                <Col componentClass={ControlLabel} sm={3} lg={2}>
-                  Excludes
-                </Col>
-                <Col sm={8} lg={9}>
-                  <Field
-                    fieldType="select"
-                    multi={true}
-                    value={excludeDiscounts}
-                    options={excludeDiscountsOptions}
-                    onChange={this.onChangeExcludes}
-                    editable={editable}
-                  />
-                </Col>
-              </FormGroup>
-
+                      )
+                    : <div className="non-editable-field">{ titleCase(discount.get('type', '')) }</div>
+                    }
+                  </Col>
+                </FormGroup>
+              )}
+              { !hideFields.includes('params.cycles') && (
+                <FormGroup validationState={errors.has('params.cycles') ? 'error' : null}>
+                  <Col componentClass={ControlLabel} sm={3} lg={2}>
+                    { getFieldName('cycles', 'discount')}
+                  </Col>
+                  <Col sm={8} lg={9}>
+                    <Field value={discount.getIn(['params', 'cycles'], '')} onChange={this.onChangeCycles} fieldType="unlimited" unlimitedValue="" unlimitedLabel="Infinite" editable={editable} />
+                    { errors.has('params.cycles') && (<HelpBlock><small>{errors.get('params.cycles', '')}</small></HelpBlock>)}
+                  </Col>
+                </FormGroup>
+              )}
+              { !hideFields.includes('proration') && (
+                <EntityField
+                  field={fields.get('proration')}
+                  entity={discount}
+                  onChange={this.onChangeFiled}
+                  editable={editable}
+                  error={errors.get('proration', onChangeErrors.proration)}
+                />
+              )}
+              { !hideFields.includes('priority') && (
+                <EntityField
+                  field={fields.get('priority')}
+                  entity={discount}
+                  onChange={this.onChangeFiled}
+                  editable={editable}
+                  error={errors.get('priority', onChangeErrors.priority)}
+                />
+              )}
+              { !hideFields.includes('limit') && (
+                <FormGroup>
+                  <Col componentClass={ControlLabel} sm={3} lg={2}>
+                    { getFieldName('discount_overall_limit', 'discount')}
+                  </Col>
+                  <Col sm={8} lg={9}>
+                    <Field suffix={getSymbolFromCurrency(currency)} value={discount.get('limit', '')} onChange={this.onChangeLimit} fieldType="unlimited" unlimitedValue="" editable={editable} />
+                  </Col>
+                </FormGroup>
+              )}
+              { !hideFields.includes('params.min_subscribers') && (
+                <EntityField
+                  field={fields.get('paramsMinSubscribers')}
+                  entity={discount}
+                  onChange={this.onChangeFiled}
+                  editable={editable}
+                  error={errors.get('params.min_subscribers', onChangeErrors.paramsMinSubscribers)}
+                />
+              )}
+              { !hideFields.includes('params.max_subscribers') && (
+                <EntityField
+                  field={fields.get('paramsMaxSubscribers')}
+                  entity={discount}
+                  onChange={this.onChangeFiled}
+                  editable={editable}
+                  error={errors.get('params.max_subscribers', onChangeErrors.paramsMaxSubscribers)}
+                />
+              )}
+              { !hideFields.includes('excludes') && (
+                <FormGroup>
+                  <Col componentClass={ControlLabel} sm={3} lg={2}>
+                    Excludes
+                  </Col>
+                  <Col sm={8} lg={9}>
+                    <Field
+                      fieldType="select"
+                      multi={true}
+                      value={excludeDiscounts}
+                      options={excludeDiscountsOptions}
+                      onChange={this.onChangeExcludes}
+                      editable={editable}
+                    />
+                  </Col>
+                </FormGroup>
+              )}
               <EntityFields
                 entityName="discounts"
                 entity={discount}
@@ -551,6 +568,7 @@ class DiscountDetails extends Component {
               onChangeConditionValue={this.onChangeConditionValue}
               addCondition={this.onAddCondition}
               removeCondition={this.onRemoveCondition}
+              errors={errors}
             />
 
             <Panel header={<h3>{getFieldName('panle_plan_discount', 'discount')}</h3>}>
@@ -596,11 +614,15 @@ class DiscountDetails extends Component {
       </Row>
     );
   }
-
 }
 
-const mapStateToProps = (state, props) => ({
-  availableEntities: entitiesOptionsSelector(state, props, ['discount', 'plan', 'service']),
-});
+
+const mapStateToProps = (state, props) => {
+  const parentErrors = typeof props.errors !== 'undefined' ? props.errors : Immutable.Map();
+  const reduxErrors = formModalErrosSelector(state) || Immutable.Map();
+  return ({
+    availableEntities: entitiesOptionsSelector(state, props, ['discount', 'plan', 'service']),
+    errors: Immutable.merge(parentErrors, reduxErrors),
+})};
 
 export default connect(mapStateToProps)(DiscountDetails);

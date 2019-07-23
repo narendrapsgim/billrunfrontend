@@ -14,6 +14,7 @@ import {
   getItemId,
   getItemDateValue,
 } from '@/common/Util';
+import { validateEntity } from '@/actions/discountsActions'; // use same validation as Discounts
 import { showSuccess } from '@/actions/alertsActions';
 import { setPageTitle } from '@/actions/guiStateActions/pageActions';
 import {
@@ -26,7 +27,7 @@ import {
 } from '@/actions/chargesActions';
 import { clearItems, getRevisions, clearRevisions } from '@/actions/entityListActions';
 import { modeSelector, itemSelector, idSelector, revisionsSelector } from '@/selectors/entitySelector';
-import { currencySelector } from '@/selectors/settingsSelector';
+import { currencySelector, chargeFieldsSelector } from '@/selectors/settingsSelector';
 
 
 class ChargeSetup extends Component {
@@ -35,6 +36,7 @@ class ChargeSetup extends Component {
     itemId: PropTypes.string,
     item: PropTypes.instanceOf(Immutable.Map),
     revisions: PropTypes.instanceOf(Immutable.List),
+    fields: PropTypes.instanceOf(Immutable.List),
     mode: PropTypes.string,
     currency: PropTypes.string,
     router: PropTypes.shape({
@@ -47,9 +49,11 @@ class ChargeSetup extends Component {
     item: Immutable.Map(),
     currency: '',
     revisions: Immutable.List(),
+    fields: Immutable.List(),
   }
 
   state = {
+    errors: Immutable.Map(),
     progress: false,
   }
 
@@ -136,6 +140,9 @@ class ChargeSetup extends Component {
   }
 
   onChangeFieldValue = (path, value) => {
+    const { errors } = this.state;
+    const pathString = path.join('.');
+    this.setState(() => ({ errors: errors.delete(pathString) }));
     this.props.dispatch(update(path, value));
   }
 
@@ -171,30 +178,17 @@ class ChargeSetup extends Component {
   }
 
   validate = () => {
-    // const { item } = this.props;
-    // if (item.getIn(['params', 'service'], Immutable.List()).isEmpty() && item.getIn(['params', 'plan'], '').lenght === 0) {
-    //   this.props.dispatch(showDanger('Please select charge conditions'));
-    //   return false;
-    // }
-    //
-    // const serviceDiscountExist = item
-    //   .getIn(['subject', 'service'], Immutable.Map())
-    //   .some(value => (value !== null && value !== ''));
-    //
-    // const planDiscountExist = item
-    //   .getIn(['subject', 'plan'], Immutable.Map())
-    //   .some(value => (value !== null && value !== ''));
-    //
-    // if (!serviceDiscountExist && !planDiscountExist) {
-    //   this.props.dispatch(showDanger('Please set charge value'));
-    //   return false;
-    // }
-
-    return true;
+    const { item, fields, mode } = this.props;
+    const errors = this.props.dispatch(validateEntity(item, fields, mode));
+    this.setState(() => ({ errors }));
+    if (errors.isEmpty()) {
+      return true;
+    }
+    return false;
   }
 
   render() {
-    const { progress } = this.state;
+    const { progress, errors } = this.state;
     const { item, mode, revisions, currency } = this.props;
     if (mode === 'loading') {
       return (<LoadingItemPlaceholder onClick={this.handleBack} />);
@@ -224,6 +218,7 @@ class ChargeSetup extends Component {
             currency={currency}
             onFieldUpdate={this.onChangeFieldValue}
             onFieldRemove={this.onRemoveFieldValue}
+            errors={errors}
           />
         </Panel>
 
@@ -246,6 +241,7 @@ const mapStateToProps = (state, props) => ({
   mode: modeSelector(state, props, 'charge'),
   revisions: revisionsSelector(state, props, 'charge'),
   currency: currencySelector(state, props) || undefined,
+  fields: chargeFieldsSelector(state, props),
 });
 
 export default withRouter(connect(mapStateToProps)(ChargeSetup));
