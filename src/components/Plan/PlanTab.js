@@ -80,8 +80,8 @@ export default class Plan extends Component {
   }
 
   onChangeProrated = (e) => {
-    const { value } = e.target;
-    this.props.onChangeFieldValue(['prorated'], value);
+    const { value, id } = e.target;
+    this.props.onChangeFieldValue([id], value);
   }
 
   onChangePlanDescription = (e) => {
@@ -261,9 +261,35 @@ export default class Plan extends Component {
               </FormGroup>
 
               <FormGroup>
-                <Col componentClass={ControlLabel} sm={3} lg={2}>Prorated?</Col>
-                <Col sm={4} style={editable ? { padding: '10px 15px' } : { paddingTop: 5 }}>
-                  <Field value={plan.get('prorated', '')} onChange={this.onChangeProrated} fieldType="checkbox" editable={editable} />
+                <Col componentClass={ControlLabel} sm={3} lg={2}>Proration‎</Col>
+                <Col sm={8} lg={9} className="pt5">
+                  <Field
+                    fieldType="checkbox"
+                    value={plan.get('prorated_start', '')}
+                    onChange={this.onChangeProrated}
+                    className="mr10 inline"
+                    label="Prorated start"
+                    editable={editable}
+                    id="prorated_start"
+                  />
+                  <Field
+                    fieldType="checkbox"
+                    value={plan.get('prorated_end', '')}
+                    onChange={this.onChangeProrated}
+                    className="mr10 inline"
+                    label="Prorate old plan charge on plan change"
+                    editable={editable}
+                    id="prorated_end"
+                  />
+                  <Field
+                    fieldType="checkbox"
+                    value={plan.get('prorated_termination', '')}
+                    onChange={this.onChangeProrated}
+                    className="inline"
+                    label="Prorate charge on termination"
+                    editable={editable}
+                    id="prorated_termination"
+                  />
                 </Col>
               </FormGroup>
 
