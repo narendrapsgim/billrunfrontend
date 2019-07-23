@@ -115,8 +115,14 @@ class PlanSetup extends Component {
       this.props.dispatch(setClonePlan());
       this.handleSelectTab(1);
     }
-    if (item.get('prorated', null) === null) {
-      this.props.dispatch(onPlanFieldUpdate(['prorated'], true));
+    if (item.get('prorated_start', null) === null) {
+      this.props.dispatch(onPlanFieldUpdate(['prorated_start'], true));
+    }
+    if (item.get('prorated_end', null) === null) {
+      this.props.dispatch(onPlanFieldUpdate(['prorated_end'], true));
+    }
+    if (item.get('prorated_termination', null) === null) {
+      this.props.dispatch(onPlanFieldUpdate(['prorated_termination'], true));
     }
   }
 
