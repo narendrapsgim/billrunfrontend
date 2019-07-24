@@ -112,6 +112,18 @@ class ChargeDetails extends Component {
           this.props.onFieldRemove(path);
         }
       break;
+      case 'type':
+        // if (value === 'percentage') {
+        //   this.props.onFieldRemove(['subject.service']);
+        //   this.props.onFieldRemove(['subject.plan']);
+        //   this.props.onFieldRemove(['subject.monthly_fees']);
+        //   this.props.onFieldRemove(['subject.matched_plans']);
+        //   this.props.onFieldRemove(['subject.matched_services']);
+        // } else if (value === 'monetary') {
+        //   this.props.onFieldRemove(['subject.general']);
+        // }
+        this.props.onFieldUpdate(path, value);
+      break;
       case 'subject.general.value':
         if (value !== null) {
           this.props.onFieldUpdate(path, value);
@@ -289,11 +301,12 @@ class ChargeDetails extends Component {
 
   createServicesOptions = () => {
     const { availableEntities } = this.props;
-    const isPercentaget = this.isPercentaget();
     return availableEntities
       .get('service', Immutable.List())
-      .filter(availableService => !(isPercentaget && availableService.get('quantitative', false)))
-      .push(Immutable.Map({name: 'matched_services', description: getFieldName('matched_services', 'charge')}))
+      .push(Immutable.Map({
+        name: 'matched_services',
+        description: getFieldName('matched_services', 'charge')
+      }))
       .map(this.createOption)
       .toArray();
   }
@@ -423,19 +436,6 @@ class ChargeDetails extends Component {
     const services = this.getSelectedServices().keySeq().toList().join(',');
     const plans = this.getSelectedPlans().keySeq().toList().join(',');
     const suffix = isPercentaget ? undefined : getSymbolFromCurrency(currency);
-    const includesQuantitative = charge
-      .getIn(['subject', 'service'], Immutable.Map())
-      .keySeq().toList()
-      .reduce((acc, serviceName) => (this.isServiceQuantitative(serviceName) ? true : acc), false);
-    const percentageLabel = (!includesQuantitative) ? getFieldName('type_percentage', 'charge') : (
-      <span>
-        {getFieldName('type_percentage', 'charge')}&nbsp;&nbsp;
-        <Label bsStyle="warning">
-          {getFieldName('quantitative_not_compatible', 'charge')}
-        </Label>
-      </span>
-    );
-
     return (
       <Row>
         <Col lg={12}>
@@ -470,7 +470,7 @@ class ChargeDetails extends Component {
                           <Field fieldType="radio" onChange={this.onChangeDiscountType} name="type" value="monetary" label={getFieldName('type_monetary', 'charge')} checked={!isPercentaget} />
                         </span>
                         <span style={{ display: 'inline-block' }}>
-                          <Field fieldType="radio" onChange={this.onChangeDiscountType} name="type" value="percentage" label={percentageLabel} checked={isPercentaget} disabled={includesQuantitative} />
+                          <Field fieldType="radio" onChange={this.onChangeDiscountType} name="type" value="percentage" label={getFieldName('type_percentage', 'charge')} checked={isPercentaget} />
                         </span>
                       </span>
                     )
@@ -551,64 +551,68 @@ class ChargeDetails extends Component {
               removeCondition={this.onRemoveCondition}
               errors={errors}
             />
-
-            <Panel header={<h3>{getFieldName('panle_plan_discount', 'charge')}</h3>}>
-              <FormGroup>
-                <Col componentClass={ControlLabel} sm={3} lg={2}>
-                  {getFieldName('select_plans', 'charge')}
-                </Col>
-                <Col sm={8} lg={9}>
-                  <Field
-                    fieldType="select"
-                    multi={true}
-                    value={plans}
-                    options={plansOptions}
-                    onChange={this.onChangePlan}
-                    editable={editable}
-                  />
-                </Col>
-              </FormGroup>
-              { (!this.getSelectedPlans().isEmpty()) && <hr /> }
-              { this.renderPlanDiscountValue() }
+            { isPercentaget && (
+              <Panel header={<h3>{getFieldName('panel_plan_discount', 'charge')}</h3>}>
+                <FormGroup>
+                  <Col componentClass={ControlLabel} sm={3} lg={2}>
+                    {getFieldName('select_plans', 'charge')}
+                  </Col>
+                  <Col sm={8} lg={9}>
+                    <Field
+                      fieldType="select"
+                      multi={true}
+                      value={plans}
+                      options={plansOptions}
+                      onChange={this.onChangePlan}
+                      editable={editable}
+                    />
+                  </Col>
+                </FormGroup>
+                { (!this.getSelectedPlans().isEmpty()) && <hr /> }
+                { this.renderPlanDiscountValue() }
+                </Panel>
+              )}
+              { isPercentaget && (
+                <Panel header={<h3>{getFieldName('panel_service_discount', 'charge')}</h3>}>
+                <FormGroup>
+                  <Col componentClass={ControlLabel} sm={3} lg={2}>
+                    {getFieldName('select_services', 'charge')}
+                  </Col>
+                  <Col sm={8} lg={9}>
+                    <Field
+                      fieldType="select"
+                      multi={true}
+                      value={services}
+                      options={servicesOptions}
+                      onChange={this.onChangeService}
+                      editable={editable}
+                    />
+                  </Col>
+                </FormGroup>
+                { (!this.getSelectedServices().isEmpty()) && <hr /> }
+                { this.renderServivesDiscountValues() }
               </Panel>
-              <Panel header={<h3>{getFieldName('panle_service_discount', 'charge')}</h3>}>
-              <FormGroup>
-                <Col componentClass={ControlLabel} sm={3} lg={2}>
-                  {getFieldName('select_services', 'charge')}
-                </Col>
-                <Col sm={8} lg={9}>
-                  <Field
-                    fieldType="select"
-                    multi={true}
-                    value={services}
-                    options={servicesOptions}
-                    onChange={this.onChangeService}
-                    editable={editable}
-                  />
-                </Col>
-              </FormGroup>
-              { (!this.getSelectedServices().isEmpty()) && <hr /> }
-              { this.renderServivesDiscountValues() }
-            </Panel>
-
-            <Panel header={<h3>{getFieldName('charge_values', 'charge')}</h3>}>
-              <FormGroup>
-                <Col componentClass={ControlLabel} sm={3} lg={2}>
-                  { getFieldName('subject_general', 'charge')}
-                </Col>
-                <Col sm={8} lg={9}>
-                  <Field
-                    fieldType="toggeledInput"
-                    value={charge.getIn(['subject', 'general', 'value'], null)}
-                    onChange={this.onChangeSubjectGeneral}
-                    label="Charge by"
-                    editable={editable}
-                    suffix={suffix}
-                    inputProps={{ fieldType: isPercentaget ? 'percentage' : 'number' }}
-                  />
-                </Col>
-              </FormGroup>
-            </Panel>
+            )}
+            { !isPercentaget && (
+              <Panel header={<h3>{getFieldName('charge_values', 'charge')}</h3>}>
+                <FormGroup>
+                  <Col componentClass={ControlLabel} sm={3} lg={2}>
+                    { getFieldName('subject_general', 'charge')}
+                  </Col>
+                  <Col sm={8} lg={9}>
+                    <Field
+                      fieldType="toggeledInput"
+                      value={charge.getIn(['subject', 'general', 'value'], null)}
+                      onChange={this.onChangeSubjectGeneral}
+                      label="Charge by"
+                      editable={editable}
+                      suffix={suffix}
+                      inputProps={{ fieldType: isPercentaget ? 'percentage' : 'number' }}
+                    />
+                  </Col>
+                </FormGroup>
+              </Panel>
+            )}
           </Form>
         </Col>
       </Row>
