@@ -119,6 +119,8 @@ class ChargeDetails extends Component {
           this.props.onFieldRemove(['subject.monthly_fees']);
           this.props.onFieldRemove(['subject.matched_plans']);
           this.props.onFieldRemove(['subject.matched_services']);
+        } else if (value === 'monetary') {
+          this.props.onFieldRemove(['subject.general']);
         }
         this.props.onFieldUpdate(path, value);
       break;
@@ -299,11 +301,12 @@ class ChargeDetails extends Component {
 
   createServicesOptions = () => {
     const { availableEntities } = this.props;
-    const isPercentaget = this.isPercentaget();
     return availableEntities
       .get('service', Immutable.List())
-      .filter(availableService => !(isPercentaget && availableService.get('quantitative', false)))
-      .push(Immutable.Map({name: 'matched_services', description: getFieldName('matched_services', 'charge')}))
+      .push(Immutable.Map({
+        name: 'matched_services',
+        description: getFieldName('matched_services', 'charge')
+      }))
       .map(this.createOption)
       .toArray();
   }
@@ -441,24 +444,21 @@ class ChargeDetails extends Component {
     const services = this.getSelectedServices().keySeq().toList().join(',');
     const plans = this.getSelectedPlans().keySeq().toList().join(',');
     const suffix = isPercentaget ? undefined : getSymbolFromCurrency(currency);
-    const includesQuantitative = charge
-      .getIn(['subject', 'service'], Immutable.Map())
-      .keySeq().toList()
-      .reduce((acc, serviceName) => (this.isServiceQuantitative(serviceName) ? true : acc), false);
     const disableMonetaryType = !existsSubjects.filter(subject => 'general' !== subject).isEmpty();
-    const percentageLabel = (!includesQuantitative) ? getFieldName('type_percentage', 'charge') : (
-      <span>
-        {getFieldName('type_percentage', 'charge')}&nbsp;&nbsp;
-        <Label bsStyle="warning">
-          {getFieldName('quantitative_not_compatible', 'charge')}
-        </Label>
-      </span>
-    );
     const monetaryLabel = !disableMonetaryType ? getFieldName('type_monetary', 'charge') : (
       <span>
         {getFieldName('type_monetary', 'charge')}&nbsp;&nbsp;
         <Label bsStyle="warning">
-          {getFieldName('subject_not_compatible', 'charge')}
+          {getFieldName('monetary_subject_not_compatible', 'charge')}
+        </Label>
+      </span>
+    );
+    const disablePercentageType = existsSubjects.includes('general');
+    const percentageLabel = !disablePercentageType ? getFieldName('type_percentage', 'charge') : (
+      <span>
+        {getFieldName('type_percentage', 'charge')}&nbsp;&nbsp;
+        <Label bsStyle="warning">
+          {getFieldName('percentage_subject_not_compatible', 'charge')}
         </Label>
       </span>
     );
@@ -497,7 +497,7 @@ class ChargeDetails extends Component {
                           <Field fieldType="radio" onChange={this.onChangeDiscountType} name="type" value="monetary" label={monetaryLabel} checked={!isPercentaget} disabled={disableMonetaryType}/>
                         </span>
                         <span style={{ display: 'inline-block' }}>
-                          <Field fieldType="radio" onChange={this.onChangeDiscountType} name="type" value="percentage" label={percentageLabel} checked={isPercentaget} disabled={includesQuantitative} />
+                          <Field fieldType="radio" onChange={this.onChangeDiscountType} name="type" value="percentage" label={percentageLabel} checked={isPercentaget} disabled={disablePercentageType} />
                         </span>
                       </span>
                     )
@@ -620,24 +620,26 @@ class ChargeDetails extends Component {
                 { this.renderServivesDiscountValues() }
               </Panel>
             )}
-            <Panel header={<h3>{getFieldName('charge_values', 'charge')}</h3>}>
-              <FormGroup>
-                <Col componentClass={ControlLabel} sm={3} lg={2}>
-                  { getFieldName('subject_general', 'charge')}
-                </Col>
-                <Col sm={8} lg={9}>
-                  <Field
-                    fieldType="toggeledInput"
-                    value={charge.getIn(['subject', 'general', 'value'], null)}
-                    onChange={this.onChangeSubjectGeneral}
-                    label="Charge by"
-                    editable={editable}
-                    suffix={suffix}
-                    inputProps={{ fieldType: isPercentaget ? 'percentage' : 'number' }}
-                  />
-                </Col>
-              </FormGroup>
-            </Panel>
+            { !isPercentaget && (
+              <Panel header={<h3>{getFieldName('charge_values', 'charge')}</h3>}>
+                <FormGroup>
+                  <Col componentClass={ControlLabel} sm={3} lg={2}>
+                    { getFieldName('subject_general', 'charge')}
+                  </Col>
+                  <Col sm={8} lg={9}>
+                    <Field
+                      fieldType="toggeledInput"
+                      value={charge.getIn(['subject', 'general', 'value'], null)}
+                      onChange={this.onChangeSubjectGeneral}
+                      label="Charge by"
+                      editable={editable}
+                      suffix={suffix}
+                      inputProps={{ fieldType: isPercentaget ? 'percentage' : 'number' }}
+                    />
+                  </Col>
+                </FormGroup>
+              </Panel>
+            )}
           </Form>
         </Col>
       </Row>

@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import Immutable from 'immutable';
-import { Form, FormGroup, ControlLabel, Col, Row, Panel, Label, HelpBlock } from 'react-bootstrap';
+import { Form, FormGroup, ControlLabel, Col, Row, Panel, HelpBlock } from 'react-bootstrap';
 import getSymbolFromCurrency from 'currency-symbol-map';
 import { titleCase, paramCase } from 'change-case';
 import isNumber from 'is-number';
@@ -287,11 +287,12 @@ class DiscountDetails extends Component {
 
   createServicesOptions = () => {
     const { availableEntities } = this.props;
-    const isPercentaget = this.isPercentaget();
     return availableEntities
       .get('service', Immutable.List())
-      .filter(availableService => !(isPercentaget && availableService.get('quantitative', false)))
-      .push(Immutable.Map({name: 'matched_services', description: getFieldName('matched_services', 'discount')}))
+      .push(Immutable.Map({
+        name: 'matched_services',
+        description: getFieldName('matched_services', 'discount')
+      }))
       .map(this.createOption)
       .toArray();
   }
@@ -419,18 +420,7 @@ class DiscountDetails extends Component {
     const excludeDiscountsOptions = this.createExcludeDiscountOptions();
     const services = this.getSelectedServices().keySeq().toList().join(',');
     const plans = this.getSelectedPlans().keySeq().toList().join(',');
-    const includesQuantitative = discount
-      .getIn(['subject', 'service'], Immutable.Map())
-      .keySeq().toList()
-      .reduce((acc, serviceName) => (this.isServiceQuantitative(serviceName) ? true : acc), false);
-    const percentageLabel = (!includesQuantitative) ? getFieldName('type_percentage', 'discount') : (
-      <span>
-        {getFieldName('type_percentage', 'discount')}&nbsp;&nbsp;
-        <Label bsStyle="warning">
-          {getFieldName('quantitative_not_compatible', 'discount')}
-        </Label>
-      </span>
-    );
+    const percentageLabel = getFieldName('type_percentage', 'discount');
 
     return (
       <Row>
@@ -467,7 +457,7 @@ class DiscountDetails extends Component {
                             <Field fieldType="radio" onChange={this.onChangeDiscountType} name="type" value="monetary" label={getFieldName('type_monetary', 'discount')} checked={discount.get('type', '') === 'monetary'} />
                           </span>
                           <span style={{ display: 'inline-block' }}>
-                            <Field fieldType="radio" onChange={this.onChangeDiscountType} name="type" value="percentage" label={percentageLabel} checked={discount.get('type', '') === 'percentage'} disabled={includesQuantitative} />
+                            <Field fieldType="radio" onChange={this.onChangeDiscountType} name="type" value="percentage" label={percentageLabel} checked={discount.get('type', '') === 'percentage'} />
                           </span>
                         </span>
                       )
