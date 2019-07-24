@@ -36,7 +36,7 @@ export default {
           'service',
           { value: 'credit', label: 'Charge / Refund' },
           'discount',
-          { value: 'charge', label: 'Conditional Charges' },
+          { value: 'conditional_charge', label: 'Conditional Charges' },
           'all',
         ],
       } },
