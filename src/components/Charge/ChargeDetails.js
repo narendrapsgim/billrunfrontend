@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import Immutable from 'immutable';
-import { Form, FormGroup, ControlLabel, Col, Row, Panel, Label, HelpBlock } from 'react-bootstrap';
+import { Form, FormGroup, ControlLabel, Col, Row, Panel, HelpBlock } from 'react-bootstrap';
 import getSymbolFromCurrency from 'currency-symbol-map';
 import { titleCase, paramCase } from 'change-case';
 import isNumber from 'is-number';
