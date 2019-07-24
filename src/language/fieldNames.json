@@ -187,7 +187,6 @@
     "panel_service_discount": "Services Charge Values",
     "charge_values": "Charge Values",
     "subject_general": "General",
-    "monetary_subject_not_compatible": "is not compatible with Plans Charge and Services Charge.",
     "percentage_subject_not_compatible": "is not compatible with  General Charge."
   },
   "aid": "Customer ID",

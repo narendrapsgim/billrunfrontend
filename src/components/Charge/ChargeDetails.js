@@ -113,15 +113,15 @@ class ChargeDetails extends Component {
         }
       break;
       case 'type':
-        if (value === 'percentage') {
-          this.props.onFieldRemove(['subject.service']);
-          this.props.onFieldRemove(['subject.plan']);
-          this.props.onFieldRemove(['subject.monthly_fees']);
-          this.props.onFieldRemove(['subject.matched_plans']);
-          this.props.onFieldRemove(['subject.matched_services']);
-        } else if (value === 'monetary') {
-          this.props.onFieldRemove(['subject.general']);
-        }
+        // if (value === 'percentage') {
+        //   this.props.onFieldRemove(['subject.service']);
+        //   this.props.onFieldRemove(['subject.plan']);
+        //   this.props.onFieldRemove(['subject.monthly_fees']);
+        //   this.props.onFieldRemove(['subject.matched_plans']);
+        //   this.props.onFieldRemove(['subject.matched_services']);
+        // } else if (value === 'monetary') {
+        //   this.props.onFieldRemove(['subject.general']);
+        // }
         this.props.onFieldUpdate(path, value);
       break;
       case 'subject.general.value':
@@ -362,13 +362,6 @@ class ChargeDetails extends Component {
     return charge.get('type', '') === 'percentage'
   }
 
-  getExistsSubjects = () => {
-    const { charge } = this.props;
-    return charge.get('subject', Immutable.Map()).reduce((acc, value, key) => (
-      value.isEmpty() ? acc : acc.push(key)
-    ), Immutable.List());
-  }
-
   renderServivesDiscountValues = () => {
     const { availableEntities, mode, currency } = this.props;
     const discountSubject = this.getSelectedServices();
@@ -436,7 +429,6 @@ class ChargeDetails extends Component {
     const { charge, mode, currency, fields, errors } = this.props;
     const editable = (mode !== 'view');
     const isPercentaget = this.isPercentaget();
-    const existsSubjects = this.getExistsSubjects();
     const plansOptions = this.createPlansOptions();
     const servicesOptions = this.createServicesOptions();
     const excludeDiscounts = charge.get('excludes', Immutable.List()).join(',');
@@ -444,25 +436,6 @@ class ChargeDetails extends Component {
     const services = this.getSelectedServices().keySeq().toList().join(',');
     const plans = this.getSelectedPlans().keySeq().toList().join(',');
     const suffix = isPercentaget ? undefined : getSymbolFromCurrency(currency);
-    const disableMonetaryType = !existsSubjects.filter(subject => 'general' !== subject).isEmpty();
-    const monetaryLabel = !disableMonetaryType ? getFieldName('type_monetary', 'charge') : (
-      <span>
-        {getFieldName('type_monetary', 'charge')}&nbsp;&nbsp;
-        <Label bsStyle="warning">
-          {getFieldName('monetary_subject_not_compatible', 'charge')}
-        </Label>
-      </span>
-    );
-    const disablePercentageType = existsSubjects.includes('general');
-    const percentageLabel = !disablePercentageType ? getFieldName('type_percentage', 'charge') : (
-      <span>
-        {getFieldName('type_percentage', 'charge')}&nbsp;&nbsp;
-        <Label bsStyle="warning">
-          {getFieldName('percentage_subject_not_compatible', 'charge')}
-        </Label>
-      </span>
-    );
-
     return (
       <Row>
         <Col lg={12}>
@@ -494,10 +467,10 @@ class ChargeDetails extends Component {
                     ? (
                       <span>
                         <span style={{ display: 'inline-block', marginRight: 20 }}>
-                          <Field fieldType="radio" onChange={this.onChangeDiscountType} name="type" value="monetary" label={monetaryLabel} checked={!isPercentaget} disabled={disableMonetaryType}/>
+                          <Field fieldType="radio" onChange={this.onChangeDiscountType} name="type" value="monetary" label={getFieldName('type_monetary', 'charge')} checked={!isPercentaget} />
                         </span>
                         <span style={{ display: 'inline-block' }}>
-                          <Field fieldType="radio" onChange={this.onChangeDiscountType} name="type" value="percentage" label={percentageLabel} checked={isPercentaget} disabled={disablePercentageType} />
+                          <Field fieldType="radio" onChange={this.onChangeDiscountType} name="type" value="percentage" label={getFieldName('type_percentage', 'charge')} checked={isPercentaget} />
                         </span>
                       </span>
                     )
