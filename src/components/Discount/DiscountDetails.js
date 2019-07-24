@@ -571,44 +571,48 @@ class DiscountDetails extends Component {
               errors={errors}
             />
 
-            <Panel header={<h3>{getFieldName('panle_plan_discount', 'discount')}</h3>}>
-              <FormGroup>
-                <Col componentClass={ControlLabel} sm={3} lg={2}>
-                  {getFieldName('select_plans', 'discount')}
-                </Col>
-                <Col sm={8} lg={9}>
-                  <Field
-                    fieldType="select"
-                    multi={true}
-                    value={plans}
-                    options={plansOptions}
-                    onChange={this.onChangePlan}
-                    editable={editable}
-                  />
-                </Col>
-              </FormGroup>
-              { (!this.getSelectedPlans().isEmpty()) && <hr /> }
-              { this.renderPlanDiscountValue() }
+            { !hideFields.includes('subject.plan') && (
+              <Panel header={<h3>{getFieldName('panel_plan_discount', 'discount')}</h3>}>
+                <FormGroup>
+                  <Col componentClass={ControlLabel} sm={3} lg={2}>
+                    {getFieldName('select_plans', 'discount')}
+                  </Col>
+                  <Col sm={8} lg={9}>
+                    <Field
+                      fieldType="select"
+                      multi={true}
+                      value={plans}
+                      options={plansOptions}
+                      onChange={this.onChangePlan}
+                      editable={editable}
+                    />
+                  </Col>
+                </FormGroup>
+                { (!this.getSelectedPlans().isEmpty()) && <hr /> }
+                { this.renderPlanDiscountValue() }
               </Panel>
-              <Panel header={<h3>{getFieldName('panle_service_discount', 'discount')}</h3>}>
-              <FormGroup>
-                <Col componentClass={ControlLabel} sm={3} lg={2}>
-                  {getFieldName('select_services', 'discount')}
-                </Col>
-                <Col sm={8} lg={9}>
-                  <Field
-                    fieldType="select"
-                    multi={true}
-                    value={services}
-                    options={servicesOptions}
-                    onChange={this.onChangeService}
-                    editable={editable}
-                  />
-                </Col>
-              </FormGroup>
-              { (!this.getSelectedServices().isEmpty()) && <hr /> }
-              { this.renderServivesDiscountValues() }
-            </Panel>
+            )}
+            { !hideFields.includes('subject.service') && (
+              <Panel header={<h3>{getFieldName('panel_service_discount', 'discount')}</h3>}>
+                <FormGroup>
+                  <Col componentClass={ControlLabel} sm={3} lg={2}>
+                    {getFieldName('select_services', 'discount')}
+                  </Col>
+                  <Col sm={8} lg={9}>
+                    <Field
+                      fieldType="select"
+                      multi={true}
+                      value={services}
+                      options={servicesOptions}
+                      onChange={this.onChangeService}
+                      editable={editable}
+                    />
+                  </Col>
+                </FormGroup>
+                { (!this.getSelectedServices().isEmpty()) && <hr /> }
+                { this.renderServivesDiscountValues() }
+              </Panel>
+            )}
           </Form>
         </Col>
       </Row>

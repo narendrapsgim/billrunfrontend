@@ -112,6 +112,16 @@ class ChargeDetails extends Component {
           this.props.onFieldRemove(path);
         }
       break;
+      case 'type':
+        if (value === 'percentage') {
+          this.props.onFieldRemove(['subject.service']);
+          this.props.onFieldRemove(['subject.plan']);
+          this.props.onFieldRemove(['subject.monthly_fees']);
+          this.props.onFieldRemove(['subject.matched_plans']);
+          this.props.onFieldRemove(['subject.matched_services']);
+        }
+        this.props.onFieldUpdate(path, value);
+      break;
       case 'subject.general.value':
         if (value !== null) {
           this.props.onFieldUpdate(path, value);
@@ -349,6 +359,13 @@ class ChargeDetails extends Component {
     return charge.get('type', '') === 'percentage'
   }
 
+  getExistsSubjects = () => {
+    const { charge } = this.props;
+    return charge.get('subject', Immutable.Map()).reduce((acc, value, key) => (
+      value.isEmpty() ? acc : acc.push(key)
+    ), Immutable.List());
+  }
+
   renderServivesDiscountValues = () => {
     const { availableEntities, mode, currency } = this.props;
     const discountSubject = this.getSelectedServices();
@@ -416,6 +433,7 @@ class ChargeDetails extends Component {
     const { charge, mode, currency, fields, errors } = this.props;
     const editable = (mode !== 'view');
     const isPercentaget = this.isPercentaget();
+    const existsSubjects = this.getExistsSubjects();
     const plansOptions = this.createPlansOptions();
     const servicesOptions = this.createServicesOptions();
     const excludeDiscounts = charge.get('excludes', Immutable.List()).join(',');
@@ -427,11 +445,20 @@ class ChargeDetails extends Component {
       .getIn(['subject', 'service'], Immutable.Map())
       .keySeq().toList()
       .reduce((acc, serviceName) => (this.isServiceQuantitative(serviceName) ? true : acc), false);
+    const disableMonetaryType = !existsSubjects.filter(subject => 'general' !== subject).isEmpty();
     const percentageLabel = (!includesQuantitative) ? getFieldName('type_percentage', 'charge') : (
       <span>
         {getFieldName('type_percentage', 'charge')}&nbsp;&nbsp;
         <Label bsStyle="warning">
           {getFieldName('quantitative_not_compatible', 'charge')}
+        </Label>
+      </span>
+    );
+    const monetaryLabel = !disableMonetaryType ? getFieldName('type_monetary', 'charge') : (
+      <span>
+        {getFieldName('type_monetary', 'charge')}&nbsp;&nbsp;
+        <Label bsStyle="warning">
+          {getFieldName('subject_not_compatible', 'charge')}
         </Label>
       </span>
     );
@@ -467,7 +494,7 @@ class ChargeDetails extends Component {
                     ? (
                       <span>
                         <span style={{ display: 'inline-block', marginRight: 20 }}>
-                          <Field fieldType="radio" onChange={this.onChangeDiscountType} name="type" value="monetary" label={getFieldName('type_monetary', 'charge')} checked={!isPercentaget} />
+                          <Field fieldType="radio" onChange={this.onChangeDiscountType} name="type" value="monetary" label={monetaryLabel} checked={!isPercentaget} disabled={disableMonetaryType}/>
                         </span>
                         <span style={{ display: 'inline-block' }}>
                           <Field fieldType="radio" onChange={this.onChangeDiscountType} name="type" value="percentage" label={percentageLabel} checked={isPercentaget} disabled={includesQuantitative} />
@@ -551,46 +578,48 @@ class ChargeDetails extends Component {
               removeCondition={this.onRemoveCondition}
               errors={errors}
             />
-
-            <Panel header={<h3>{getFieldName('panle_plan_discount', 'charge')}</h3>}>
-              <FormGroup>
-                <Col componentClass={ControlLabel} sm={3} lg={2}>
-                  {getFieldName('select_plans', 'charge')}
-                </Col>
-                <Col sm={8} lg={9}>
-                  <Field
-                    fieldType="select"
-                    multi={true}
-                    value={plans}
-                    options={plansOptions}
-                    onChange={this.onChangePlan}
-                    editable={editable}
-                  />
-                </Col>
-              </FormGroup>
-              { (!this.getSelectedPlans().isEmpty()) && <hr /> }
-              { this.renderPlanDiscountValue() }
+            { isPercentaget && (
+              <Panel header={<h3>{getFieldName('panel_plan_discount', 'charge')}</h3>}>
+                <FormGroup>
+                  <Col componentClass={ControlLabel} sm={3} lg={2}>
+                    {getFieldName('select_plans', 'charge')}
+                  </Col>
+                  <Col sm={8} lg={9}>
+                    <Field
+                      fieldType="select"
+                      multi={true}
+                      value={plans}
+                      options={plansOptions}
+                      onChange={this.onChangePlan}
+                      editable={editable}
+                    />
+                  </Col>
+                </FormGroup>
+                { (!this.getSelectedPlans().isEmpty()) && <hr /> }
+                { this.renderPlanDiscountValue() }
+                </Panel>
+              )}
+              { isPercentaget && (
+                <Panel header={<h3>{getFieldName('panel_service_discount', 'charge')}</h3>}>
+                <FormGroup>
+                  <Col componentClass={ControlLabel} sm={3} lg={2}>
+                    {getFieldName('select_services', 'charge')}
+                  </Col>
+                  <Col sm={8} lg={9}>
+                    <Field
+                      fieldType="select"
+                      multi={true}
+                      value={services}
+                      options={servicesOptions}
+                      onChange={this.onChangeService}
+                      editable={editable}
+                    />
+                  </Col>
+                </FormGroup>
+                { (!this.getSelectedServices().isEmpty()) && <hr /> }
+                { this.renderServivesDiscountValues() }
               </Panel>
-              <Panel header={<h3>{getFieldName('panle_service_discount', 'charge')}</h3>}>
-              <FormGroup>
-                <Col componentClass={ControlLabel} sm={3} lg={2}>
-                  {getFieldName('select_services', 'charge')}
-                </Col>
-                <Col sm={8} lg={9}>
-                  <Field
-                    fieldType="select"
-                    multi={true}
-                    value={services}
-                    options={servicesOptions}
-                    onChange={this.onChangeService}
-                    editable={editable}
-                  />
-                </Col>
-              </FormGroup>
-              { (!this.getSelectedServices().isEmpty()) && <hr /> }
-              { this.renderServivesDiscountValues() }
-            </Panel>
-
+            )}
             <Panel header={<h3>{getFieldName('charge_values', 'charge')}</h3>}>
               <FormGroup>
                 <Col componentClass={ControlLabel} sm={3} lg={2}>

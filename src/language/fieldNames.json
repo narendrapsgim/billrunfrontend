@@ -161,8 +161,8 @@
     "matched_services": "Matched Services",
     "monthly_fees": "Plans and included services",
     "matched_plans": "Matched Plans",
-    "panle_plan_discount": "Plans Discount Values",
-    "panle_service_discount": "Services Discount Values",
+    "panel_plan_discount": "Plans Discount Values",
+    "panel_service_discount": "Services Discount Values",
     "quantitative_not_compatible": "not compatible with quantitative service type."
   },
   "charge": {
@@ -184,10 +184,11 @@
     "matched_services": "Matched Services",
     "monthly_fees": "Plans and included services",
     "matched_plans": "Matched Plans",
-    "panle_plan_discount": "Plans Charge Values",
-    "panle_service_discount": "Services Charge Values",
+    "panel_plan_discount": "Plans Charge Values",
+    "panel_service_discount": "Services Charge Values",
     "charge_values": "Charge Values",
     "subject_general": "General",
+    "subject_not_compatible": "Plans Charge and Services Charge is compatible with Monetary charge type.",
     "quantitative_not_compatible": "not compatible with quantitative service type."
   },
   "aid": "Customer ID",
