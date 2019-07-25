@@ -83,23 +83,26 @@ export default {
       { id: 'aid', type: 'number' },
     ],
     event: [
-      { id: 'type',
-        inputConfig: {
-          inputType: 'select',
-          options: ['is', 'in', 'is_not', 'is_less_than', 'is_less_than_or_equal', 'is_greater_than', 'is_greater_than_or_equal', 'reached_constant', 'reached_constant_recurring', 'has_changed', 'has_changed_to', 'has_changed_from'],
-        },
-      },
-      { id: 'aid', type: 'number' },
-      { id: 'sid', type: 'number' },
-      { id: 'creation_time', type: 'date' },
-      { id: 'notify_time', type: 'date' },
-      { id: 'value' },
-      { id: 'stamp' },
-      { id: 'event_code', inputConfig: {
-         inputType: 'select',
-         callback: 'getEventCodeOptions', /* callback function + should be implementation */
+      { id: 'extra_params.aid', type: 'number' },
+      { id: 'extra_params.sid', type: 'number' },
+      { id: 'before', type: 'number' },
+      { id: 'after', type: 'number' },
+      { id: 'event_type', inputConfig: {
+        inputType: 'select',
+        options: ['balance', 'fraud'],
       } },
-      { id: 'returned_value', searchable: false },
+      { id: 'based_on', inputConfig: {
+        inputType: 'select',
+        options: ['usage', 'monetary'],
+      } },
+      { id: 'event_code', inputConfig: {
+        inputType: 'select',
+        callback: 'getEventCodeOptions',
+      } },
+      { id: 'creation_time', type: 'datetime' },
+      { id: 'notify_time', type: 'datetime' },
+      { id: 'stamp' },
+      { id: 'returned_value', searchable: false},
     ],
     logFile: [
       { id: 'file_name', title: 'File name' },
