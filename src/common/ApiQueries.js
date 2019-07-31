@@ -282,6 +282,15 @@ export const apiEntityQuery = (collection, action, body) => ({
   },
 });
 
+export const getEntityCSVQuery = (entity, params) => ({
+  action: 'export',
+  entity,
+  params,
+  options: {
+    method: 'GET',
+  },
+});
+
 
 export const getGroupsQuery = collection => ({
   action: 'uniqueget',

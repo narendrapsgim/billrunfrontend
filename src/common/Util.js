@@ -10,6 +10,7 @@ import mainMenu from '../config/mainMenu.json';
 import eventsConfig from '../config/events.json';
 import ratesConfig from '../config/rates.json';
 import importConfig from '../config/import.json';
+import exportConfig from '../config/export.json';
 import collectionsConfig from '../config/collections.json';
 import customFieldsConfig from '../config/customFields.json';
 import discountConfig from '../config/discount.json';
@@ -64,6 +65,8 @@ export const getConfig = (key, defaultValue = null) => {
       case 'rates': configCache = configCache.set('rates', Immutable.fromJS(ratesConfig));
         break;
       case 'import': configCache = configCache.set('import', Immutable.fromJS(importConfig));
+        break;
+      case 'export': configCache = configCache.set('export', Immutable.fromJS(exportConfig));
         break;
       case 'collections': configCache = configCache.set('collections', Immutable.fromJS(collectionsConfig));
         break;

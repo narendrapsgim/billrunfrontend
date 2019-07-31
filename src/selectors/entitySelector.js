@@ -221,6 +221,11 @@ export const importItemTypeSelector = createSelector(
   itemType => (getConfig(['import', 'allowed_entities'], Immutable.List()).includes(itemType) ? itemType : undefined),
 );
 
+export const exportItemTypeSelector = createSelector(
+  getEntityType,
+  itemType => (getConfig('systemItems', Immutable.Map()).keySeq().includes(itemType) ? itemType : undefined),
+);
+
 export const modeSimpleSelector = createSelector(
   getAction,
   idSelector,

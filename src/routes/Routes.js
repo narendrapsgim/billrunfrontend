@@ -47,6 +47,7 @@ import AutoRenewSetup from '@/components/AutoRenew/AutoRenewSetup';
 import CustomFields from '@/components/CustomFields';
 import Events from '@/components/Events';
 import { ImporterSetup } from '../components/Importer';
+import { ExporterSetup } from '../components/Exporter';
 import { TaxList, TaxSetup, TaxMapping } from '@/components/Tax';
 
 
@@ -158,6 +159,7 @@ const routes = () => (
         <Route path="/about" component={About} title="About" />
         <Route path="/changepassword(/:itemId)" component={ChangePassword} title="Change Password" />
         <Route path="/import(/:itemType)" component={Authentication(ImporterSetup)} />
+        <Route path="/export(/:itemType)" component={Authentication(ExporterSetup)} />
         <Route path="*" component={PageNotFound404} title=" " />
       </Route>
     </Router>
