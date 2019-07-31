@@ -6,7 +6,7 @@ import RevisionTimeline from './RevisionTimeline';
 import ModalWrapper from './ModalWrapper';
 import ConfirmModal from './ConfirmModal';
 import CreateButton from './CreateButton';
-import Actions from './Actions';
+import Actions, { Action } from './Actions';
 import SortableFieldsContainer from './SortableFieldsContainer';
 import DragHandle from './DragHandle';
 import ZoneDate from './ZoneDate';
@@ -32,6 +32,7 @@ export {
   ConfirmModal,
   CreateButton,
   Actions,
+  Action,
   SortableFieldsContainer,
   DragHandle,
   ZoneDate,
