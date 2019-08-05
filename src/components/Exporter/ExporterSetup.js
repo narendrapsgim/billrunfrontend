@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { titleCase } from 'change-case';
 import { Panel } from 'react-bootstrap';
-import Exporter from '../Exporter';
+import Exporter from './Exporter';
 import { exportItemTypeSelector } from '../../selectors/entitySelector';
 import { getConfig } from '@/common/Util';
 import { setPageTitle } from '@/actions/guiStateActions/pageActions';

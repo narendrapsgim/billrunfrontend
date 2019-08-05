@@ -40,11 +40,15 @@ class Exporter extends Component {
 
   static getDerivedStateFromProps(props, state) {
     if (props.entityKey !== '' && props.entityKey !== state.entity) {
+      const defaultFuleName = Exporter.defaultOptions.get('file_name', '');
+      const entitiesName = getConfig(['systemItems', props.entityKey, 'itemsType'], props.entityKey);
+      const fileName = `${defaultFuleName}_${entitiesName}`
       return ({
-        options: state.options.set('file_name', `${Exporter.defaultOptions.get('file_name', '')}_${props.entityKey}`),
+        options: state.options.set('file_name', fileName),
         entity: props.entityKey,
       });
     }
+    return null;
   }
 
   clickExport = () => {
@@ -77,9 +81,12 @@ class Exporter extends Component {
 
   onChangeFileName = (e) => {
     const { value } = e.target;
-    this.setState((prevState) => ({
-      options: prevState.options.set('file_name', value)
-    }));
+    this.setState((prevState) => {
+      const newOptions = (value && value.length > 0)
+        ? prevState.options.set('file_name', value)
+        : prevState.options.delete('file_name');
+      return ({ options: newOptions});
+    });
   }
 
   setDefaultFileName = ({newEntity, newDate}) => {
@@ -141,7 +148,7 @@ class Exporter extends Component {
         )}
         <FormGroup>
           <Col componentClass={ControlLabel} sm={3} lg={2}>
-            From<span className="danger-red"> *</span>
+            From
           </Col>
           <Col sm={8} lg={9}>
             <Field
@@ -149,13 +156,14 @@ class Exporter extends Component {
               onChange={this.onChangeFrom}
               value={fromValue}
               isClearable={true}
+              showYearDropdown={true}
               placeholderText="Select Date..."
             />
           </Col>
         </FormGroup>
         <FormGroup>
           <Col componentClass={ControlLabel} sm={3} lg={2}>
-            File name<span className="danger-red"> *</span>
+            File Name
           </Col>
           <Col sm={8} lg={9}>
             <Field

@@ -1,7 +1,7 @@
-import Exporter from './Exporter';
 import ExporterSetup from './ExporterSetup';
+import ExporterPopup from './ExporterPopup';
 
 export {
-  Exporter as default,
   ExporterSetup,
+  ExporterPopup,
 };
