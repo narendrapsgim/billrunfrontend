@@ -4,11 +4,13 @@ import { connect } from 'react-redux';
 import { withRouter } from 'react-router';
 import Immutable from 'immutable';
 import moment from 'moment';
+import { titleCase } from 'change-case';
 import EntityList from '../EntityList';
 import { LoadingItemPlaceholder, ModalWrapper, ConfirmModal } from '@/components/Elements';
 import Importer from '../Importer';
 import { getSettings } from '@/actions/settingsActions';
 import { accountFieldsSelector } from '@/selectors/settingsSelector';
+import { itemSelector } from '@/selectors/entitySelector';
 import { getFieldName, getConfig } from '@/common/Util';
 
 
@@ -17,6 +19,7 @@ class CustomersList extends Component {
   static propTypes = {
     accountFields: PropTypes.instanceOf(Immutable.List),
     accountAllwaysShownFields: PropTypes.instanceOf(Immutable.List),
+    importItem: PropTypes.instanceOf(Immutable.Map),
     router: PropTypes.shape({
       push: PropTypes.func.isRequired,
     }).isRequired,
@@ -26,6 +29,7 @@ class CustomersList extends Component {
   static defaultProps = {
     accountFields: null,
     accountAllwaysShownFields: Immutable.List(['aid', 'firstname', 'lastname']),
+    importItem: Immutable.Map(),
   };
 
   state = {
@@ -60,16 +64,19 @@ class CustomersList extends Component {
     type: 'refresh',
   }, {
     type: 'import',
-    label: 'Import',
-    actionStyle: 'primary',
-    showIcon: true,
     onClick: this.onClickImprt,
-    actionSize: 'xsmall',
+    show: this.getEntityOptions().length > 0
   }];
 
   getActions = () => [
     { type: 'edit' },
   ];
+
+  getEntityOptions = () => getConfig(['import', 'allowed_entities'], Immutable.List())
+    .reduce((acc, entity) => (
+      ['customer', 'subscription'].includes(entity) ? acc.push(entity) : acc
+    ), Immutable.List())
+    .toArray();
 
   onCloseImport = () => {
     this.setState({
@@ -98,7 +105,7 @@ class CustomersList extends Component {
   }
 
   render() {
-    const { accountFields } = this.props;
+    const { accountFields, importItem } = this.props;
     const { showImport, refreshString, showCloseImportConfirm } = this.state;
 
     if (accountFields === null) {
@@ -112,15 +119,18 @@ class CustomersList extends Component {
     const defaultFrom = moment().format(apiDateFormat);
     const defaultTo = moment().add(100, 'years').format(apiDateFormat);
     const closeImportConfirmMessage = 'Are you sure you want to close import ?';
-
-    const subscriptionDefaultValues = Immutable.Map({
-      from: defaultFrom,
-      to: defaultTo,
-    });
-    const customerDefaultValues = Immutable.Map({
-      from: defaultFrom,
-      to: defaultTo,
-    });
+    const importEntitiesOptions = this.getEntityOptions();
+    const importEntityName = getConfig(['systemItems', importItem.get('entity', ''), 'itemsName'], '');
+    const importDefaultValues = Immutable.Map({
+      subscription: Immutable.Map({
+        from: defaultFrom,
+        to: defaultTo,
+      }),
+      customer:  Immutable.Map({
+        from: defaultFrom,
+        to: defaultTo,
+      }),
+    })
 
     return (
       <div>
@@ -134,16 +144,16 @@ class CustomersList extends Component {
           listActions={listActions}
           refreshString={refreshString}
         />
-        <ModalWrapper show={showImport} title="Import" onHide={this.onClickAskCloseImport} modalSize="large">
+        <ModalWrapper
+          show={showImport}
+          title={`Import ${titleCase(importEntityName)}`}
+          onHide={this.onClickAskCloseImport}
+          modalSize="large"
+        >
           <Importer
-            entityOptions={['customer', 'subscription']}
+            entityOptions={importEntitiesOptions}
             onFinish={this.onCloseImport}
-            defaultValues={
-              Immutable.Map({
-                subscription: subscriptionDefaultValues,
-                customer: customerDefaultValues,
-              },
-            )}
+            defaultValues={importDefaultValues}
           />
         </ModalWrapper>
         <ConfirmModal onOk={this.onCloseImport} onCancel={this.onClickCancelCloseConfirm} show={showCloseImportConfirm} message={closeImportConfirmMessage} labelOk="Yes" />
@@ -154,6 +164,7 @@ class CustomersList extends Component {
 
 const mapStateToProps = (state, props) => ({
   accountFields: accountFieldsSelector(state, props),
+  importItem: itemSelector(state, props, 'importer'),
 });
 
 export default withRouter(connect(mapStateToProps)(CustomersList));

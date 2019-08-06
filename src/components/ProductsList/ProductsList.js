@@ -35,10 +35,6 @@ class ProductsList extends Component {
     this.props.dispatch(getSettings('rates.fields'));
   }
 
-  onClickImport = () => {
-    this.props.router.push('/import/product');
-  }
-
   parserUsegt = (item) => {
     const usegt = item.get('rates', Immutable.Map()).keySeq().first();
     return (typeof usegt !== 'undefined') ? usegt : '';
@@ -57,8 +53,6 @@ class ProductsList extends Component {
     }
     return isPlaysEnabled;
   }
-
-  isImportEnabled = () => getConfig(['import', 'allowed_entities'], Immutable.List()).includes('product');
 
   getProjectFields = () => {
     const { fields, defaultListFields } = this.props;
@@ -95,18 +89,11 @@ class ProductsList extends Component {
       .toArray();
   };
 
-  getListActions = () => [{
-    type: 'add',
-  }, {
-    type: 'refresh',
-  }, {
-    type: 'import',
-    label: 'Import',
-    onClick: this.onClickImport,
-    show: this.isImportEnabled,
-    actionStyle: 'primary',
-    actionSize: 'xsmall',
-  }];
+  getListActions = () => [
+    { type: 'add' },
+    { type: 'refresh' },
+    { type: 'import' },
+  ];
 
   render() {
     const { fields } = this.props;

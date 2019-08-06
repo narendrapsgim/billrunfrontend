@@ -147,6 +147,11 @@ class EntityList extends Component {
     this.props.dispatch(clearRevisions(collection));
   }
 
+  onClickImport = () => {
+    const { itemType } = this.props;
+    this.props.router.push(`/import/${itemType}`);
+  }
+
   onSort = (sort) => {
     const { itemsType } = this.props;
     this.props.dispatch(setListPage(itemsType, 0));
@@ -239,11 +244,24 @@ class EntityList extends Component {
   addStateColumn = fields => ([
     { id: 'state', parser: this.parserState, cssClass: 'state' },
     ...fields,
-  ])
+  ]);
+
+  isImportEnabled = () => {
+    const { itemType } = this.props;
+    return getConfig(['import', 'allowed_entities'], Immutable.List()).includes(itemType);
+  }
+
 
   getListActions = () => {
     const { listActions } = this.props;
     const defaultActions = [{
+      type: 'import',
+      label: 'Import',
+      onClick: this.onClickImport,
+      show: this.isImportEnabled,
+      actionStyle: 'primary',
+      actionSize: 'xsmall'
+    }, {
       type: 'refresh',
       label: 'Refresh',
       actionStyle: 'primary',
