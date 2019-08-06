@@ -118,7 +118,6 @@ class ImporterSetup extends Component {
           onFinish={this.onCloseImport}
           defaultValues={defaultValues}
           predefinedValues={predefinedValues}
-          alterData={this.alterData}
           restartString={refreshString}
         />
       </Panel>
