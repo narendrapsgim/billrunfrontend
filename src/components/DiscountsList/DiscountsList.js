@@ -1,6 +1,5 @@
-import React, { useState, useMemo, useCallback } from 'react';
+import React from 'react';
 import EntityList from '../EntityList';
-import { ExporterPopup } from '@/components/Exporter';
 import { getFieldName } from '@/common/Util';
 
 
@@ -30,48 +29,14 @@ const actions = [
   { type: 'edit' },
 ];
 
-
-const DiscountsList = () => {
-
-  const [visibleExport, toggleExpoer] = useState(false);
-
-  const showExport = useCallback(() => {
-      toggleExpoer(true)
-  }, [toggleExpoer]);
-
-  const hideExport = useCallback(() => {
-      toggleExpoer(false)
-  }, [toggleExpoer]);
-
-  const listActions = useMemo(() => ([{
-    type: 'add',
-  }, {
-    type: 'refresh',
-  }, {
-    type: 'export_csv',
-    label: 'Export',
-    onClick: showExport,
-    actionStyle: 'primary',
-    actionSize: 'xsmall',
-  }]), [showExport]);
-
-  return (
-    <>
-      <EntityList
-        entityKey="discount"
-        filterFields={filterFields}
-        tableFields={tableFields}
-        projectFields={projectFields}
-        actions={actions}
-        listActions={listActions}
-      />
-      <ExporterPopup
-        entityKey="discount"
-        show={visibleExport}
-        onClose={hideExport}
-      />
-    </>
-  );
-};
+const DiscountsList = () => (
+  <EntityList
+    entityKey="discount"
+    filterFields={filterFields}
+    tableFields={tableFields}
+    projectFields={projectFields}
+    actions={actions}
+  />
+);
 
 export default DiscountsList;
