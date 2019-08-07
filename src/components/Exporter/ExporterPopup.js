@@ -1,7 +1,7 @@
 import React, { useCallback } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import { sentenceCase } from 'change-case';
+import { titleCase } from 'change-case';
 import Exporter from './Exporter';
 import { ModalWrapper } from '@/components/Elements';
  import {
@@ -26,7 +26,7 @@ const ExporterPopup = ({ entityKey, show, onClose, dispatch }) => {
   return (
     <ModalWrapper
       show={show}
-      title={`Export ${sentenceCase(getConfig(['systemItems', entityKey, 'itemsName'], entityKey))}`}
+      title={`Export ${titleCase(getConfig(['systemItems', entityKey, 'itemsName'], entityKey))}`}
       onHide={onHide}
       modalSize="large"
     >
@@ -39,7 +39,7 @@ const ExporterPopup = ({ entityKey, show, onClose, dispatch }) => {
 }
 
 ExporterPopup.defaultProps = {
-  show: true,
+  show: false,
   onClose: () => {}
 };
 
