@@ -7,11 +7,11 @@ import moment from 'moment';
 import { titleCase } from 'change-case';
 import { Panel } from 'react-bootstrap';
 import Importer from '../Importer';
-import { getSettings } from '../../actions/settingsActions';
-import { itemSelector, importItemTypeSelector } from '../../selectors/entitySelector';
-import { getConfig } from '../../common/Util';
-import { setPageTitle } from '../../actions/guiStateActions/pageActions';
-import { clearList } from '../../actions/entityListActions';
+import { getSettings } from '@/actions/settingsActions';
+import { setPageTitle } from '@/actions/guiStateActions/pageActions';
+import { clearList } from '@/actions/entityListActions';
+import { itemSelector, importItemTypeSelector } from '@/selectors/entitySelector';
+import { getConfig } from '@/common/Util';
 
 
 class ImporterSetup extends Component {

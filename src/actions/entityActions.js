@@ -97,7 +97,12 @@ const buildRequestData = (item, action) => {
 
     case 'import': {
       const formData = new FormData();
-      formData.append('update', JSON.stringify(item));
+      if (item.has('files')) {
+        item.get('files', []).forEach((file, i) => {
+          formData.append(`files[${i}]`, file, file.name)
+        });
+      }
+      formData.append('update', JSON.stringify(item.delete('files')));
       return formData;
     }
 

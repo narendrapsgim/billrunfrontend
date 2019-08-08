@@ -1,10 +1,13 @@
 import { createSelector } from 'reselect';
 import { compose } from 'redux';
 import Immutable from 'immutable';
+import { sentenceCase } from 'change-case';
 import {
   isLinkerField,
   isUpdaterField,
   setFieldTitle,
+  getConfig,
+  getFieldName,
 } from '@/common/Util';
 import {
   itemSelector,
@@ -170,4 +173,40 @@ export const importFieldsOptionsSelector = createSelector(
     fieldsByEntity => formatFieldOptions(fieldsByEntity, item),
     selectorFieldsByEntity,
   )(item, accountFields, subscriberImportFields, productImportFields),
+);
+
+const getConfigImportTypes = (state, props) => {
+  return getConfig(['import', 'allowed_entities_importype'], Immutable.Map())
+}
+
+const getApiSettingsImportTypes = (state, props) => {
+  return Immutable.Map();
+}
+
+const mergeImportOptions = (item, configTypes, apiSettingsTypes) =>
+  Immutable.List().withMutations((optionsWithMutations) => {
+    const entity = item ? item.get('entity', '') : '';
+    console.log("entity: ", entity);
+    configTypes
+      .filter(entities => entities.includes(entity))
+      .forEach((entities, type) => {
+        optionsWithMutations.push(type);
+      });
+    apiSettingsTypes
+      .filter(entities => entities.includes(entity))
+      .forEach((entities, type) => {
+        optionsWithMutations.push(type);
+      });
+  })
+  .map((option) => Immutable.Map.isMap(option)
+    ? ({ value: option.get('value', ''), label: option.get('label', '') })
+    : ({ value: option, label: sentenceCase(getFieldName(option, 'import')) })
+  )
+  .toArray();
+
+export const importTypesOptionsSelector = createSelector(
+  itemSelector,
+  getConfigImportTypes,
+  getApiSettingsImportTypes,
+  mergeImportOptions
 );
