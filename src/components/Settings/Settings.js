@@ -7,6 +7,7 @@ import { Tabs, Tab, Panel } from 'react-bootstrap';
 import DateTime from './DateTime';
 import Currency from './Currency';
 import Invoicing from './Invoicing';
+import Allowances from './Allowances';
 import Plays from './Plays/PlaysContainer';
 import Tax from './Tax';
 import Tenant from './Tenant';
@@ -159,7 +160,7 @@ class Settings extends Component {
     const { currencyOptions } = this.state;
 
     const currency = settings.getIn(['pricing', 'currency'], '');
-    const datetime = settings.get('billrun', Immutable.Map());
+    const billrun = settings.get('billrun', Immutable.Map());
     const sharedSecret = settings.get('shared_secret', Immutable.List());
     const tenant = settings.get('tenant', Immutable.Map());
     const mainMenuOverrides = settings.getIn(['menu', 'main'], Immutable.Map());
@@ -177,7 +178,7 @@ class Settings extends Component {
 
           <Tab title="Locale" eventKey={2}>
             <Panel style={{ borderTop: 'none' }}>
-              <DateTime onChange={this.onChangeFieldValue} data={datetime} />
+              <DateTime onChange={this.onChangeFieldValue} data={billrun} />
               <Currency
                 onChange={this.onChangeFieldValue}
                 data={currency}
@@ -215,7 +216,8 @@ class Settings extends Component {
 
           <Tab title="Invoicing" eventKey={6}>
             <Panel style={{ borderTop: 'none' }}>
-              <Invoicing onChange={this.onChangeFieldValue} data={datetime} />
+              <Invoicing onChange={this.onChangeFieldValue} data={billrun} />
+              <Allowances onChange={this.onChangeFieldValue} data={billrun} />
             </Panel>
           </Tab>
 
