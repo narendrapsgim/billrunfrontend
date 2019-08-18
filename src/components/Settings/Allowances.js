@@ -4,11 +4,10 @@ import Immutable from 'immutable';
 import { Form, FormGroup, Col } from 'react-bootstrap';
 import Field from '@/components/Field';
 
+
 const Allowances = ({ data, onChange }) => {
 
   const onChangeValue = (key, value) => {
-    // const newAllowances = data.get('allowances', Immutable.Map());
-    // onChange('billrun', 'allowances', newAllowances.set(key, value));
     onChange('billrun', ['allowances', key], value);
   }
 
@@ -26,7 +25,7 @@ const Allowances = ({ data, onChange }) => {
     const { value } = e.target;
     onChangeValue('taxable_paid_first', value);
   }
-console.log("data: ", data);
+
   return (
     <div className="Allowances">
       <Form horizontal>
