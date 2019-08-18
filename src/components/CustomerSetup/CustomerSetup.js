@@ -6,6 +6,7 @@ import Immutable from 'immutable';
 import { Tabs, Tab, Panel } from 'react-bootstrap';
 import Customer from './Customer';
 import Subscriptions from './Subscriptions';
+import CustomerAllowances from './CustomerAllowances';
 import {
   ActionButtons,
   LoadingItemPlaceholder,
@@ -60,6 +61,7 @@ class CustomerSetup extends Component {
     services: PropTypes.instanceOf(Immutable.List),
     gateways: PropTypes.instanceOf(Immutable.List),
     defaultSubsctiptionListFields: PropTypes.array,
+    allowancesEnabled: PropTypes.bool,
     activeTab: PropTypes.oneOfType([
       PropTypes.string,
       PropTypes.number,
@@ -84,6 +86,7 @@ class CustomerSetup extends Component {
     plans: Immutable.List(),
     services: Immutable.List(),
     defaultSubsctiptionListFields: ['sid', 'firstname', 'lastname', 'plan', 'plan_activation', 'services', 'address'],
+    allowancesEnabled: false,
   };
 
   componentWillMount() {
@@ -255,6 +258,7 @@ class CustomerSetup extends Component {
       mode,
       aid,
       activeTab,
+      allowancesEnabled,
     } = this.props;
     const showActionButtons = (activeTab === 1);
 
@@ -316,6 +320,13 @@ class CustomerSetup extends Component {
                   </Panel>
                 </Tab>
               }
+              {allowancesEnabled && (
+                <Tab title="Allowances" eventKey={5}>
+                  <Panel style={{ borderTop: 'none' }}>
+                    <CustomerAllowances aid={aid} />
+                  </Panel>
+                </Tab>
+              )}
             </Tabs>
           </div>
         </div>
@@ -336,6 +347,7 @@ const mapStateToProps = (state, props) => ({
   activeTab: tabSelector(state, props),
   aid: state.entity.getIn(['customer', 'aid']) || undefined,
   settings: state.settings.get('subscribers') || undefined,
+  allowancesEnabled: state.settings.getIn(['billrun', 'allowances', 'enabled']) || undefined,
   plans: state.list.get('available_plans') || undefined,
   services: state.list.get('available_services') || undefined,
   gateways: state.list.get('available_gateways') || undefined,
