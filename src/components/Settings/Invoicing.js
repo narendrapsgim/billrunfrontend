@@ -48,6 +48,7 @@ const Invoicing = ({ data, chargingDayOptions, onChange }) => {
               value={data.get('charging_day', '')}
               onChange={onChangeChargingDay}
               options={chargingDayOptions}
+              placeholder="Select charging day..."
             />
           </Col>
         </FormGroup>
