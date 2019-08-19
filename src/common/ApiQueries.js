@@ -367,6 +367,10 @@ export const getDeleteLineQuery = id => ({
 
 
 // List
+export const getAccountsQuery = (project = { aid: 1, firstname: 1, lastname: 1 }) =>
+  getEntitesQuery('subscribers', project, {type: 'account'});
+export const getSubscriptionsWithAidQuery = (project = { aid: 1, sid: 1, firstname: 1, lastname: 1 }) =>
+  getEntitesQuery('subscribers', project, {type: 'subscriber'});
 export const getPlansQuery = (project = { name: 1 }) => getEntitesQuery('plans', project);
 export const getServicesQuery = (project = { name: 1 }) => getEntitesQuery('services', project);
 export const getServicesKeysWithInfoQuery = () => getEntitesQuery('services', { name: 1, description: 1, play: 1, quantitative: 1, balance_period: 1 }, {}, { name: 1 	});

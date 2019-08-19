@@ -14,6 +14,10 @@ const Allowances = ({ data, onChange }) => {
   const onToggleAllowances = (e) => {
     const { value } = e.target;
     onChangeValue('enabled', value);
+    if (value === false) {
+      onChangeValue('included_in_allowance', false);
+      onChangeValue('taxable_paid_first', false);
+    }
   }
 
   const onToggleIncludedInAllowance = (e) => {
@@ -25,6 +29,8 @@ const Allowances = ({ data, onChange }) => {
     const { value } = e.target;
     onChangeValue('taxable_paid_first', value);
   }
+
+  const isEnabled = data.getIn(['allowances', 'enabled'], '') === true;
 
   return (
     <div className="Allowances">
@@ -46,6 +52,7 @@ const Allowances = ({ data, onChange }) => {
               label="Included in allowance"
               value={data.getIn(['allowances', 'included_in_allowance'], '')}
               onChange={onToggleIncludedInAllowance}
+              disabled={!isEnabled}
             />
           </Col>
         </FormGroup>
@@ -56,6 +63,7 @@ const Allowances = ({ data, onChange }) => {
               label="Taxable paid first"
               value={data.getIn(['allowances', 'taxable_paid_first'], '')}
               onChange={onToggleTaxablePaidFirst}
+              disabled={!isEnabled}
             />
           </Col>
         </FormGroup>

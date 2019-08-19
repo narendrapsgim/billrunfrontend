@@ -17,6 +17,8 @@ import {
   getPlansKeysQuery,
   getServicesKeysWithInfoQuery,
   getPaymentGatewaysQuery,
+  getSubscriptionsWithAidQuery,
+  getAccountsQuery,
 } from '@/common/ApiQueries';
 import {
   saveSubscription,
@@ -45,6 +47,11 @@ import {
   tabSelector,
   messageSelector,
 } from '@/selectors/entitySelector';
+import {
+  subscriptionsOptionsSelector,
+  accountsOptionsSelector,
+} from '@/selectors/listSelectors';
+import { currencySelector } from '@/selectors/settingsSelector';
 import { buildPageTitle, getConfig, getItemId } from '@/common/Util';
 
 
@@ -59,6 +66,9 @@ class CustomerSetup extends Component {
     settings: PropTypes.instanceOf(Immutable.Map),
     plans: PropTypes.instanceOf(Immutable.List),
     services: PropTypes.instanceOf(Immutable.List),
+    subscriptionsOptions: PropTypes.instanceOf(Immutable.List),
+    accountsOptions: PropTypes.instanceOf(Immutable.List),
+    currency: PropTypes.string,
     gateways: PropTypes.instanceOf(Immutable.List),
     defaultSubsctiptionListFields: PropTypes.array,
     allowancesEnabled: PropTypes.bool,
@@ -85,6 +95,9 @@ class CustomerSetup extends Component {
     gateways: Immutable.List(),
     plans: Immutable.List(),
     services: Immutable.List(),
+    subscriptionsOptions: Immutable.List(),
+    accountsOptions: Immutable.List(),
+    currency: '',
     defaultSubsctiptionListFields: ['sid', 'firstname', 'lastname', 'plan', 'plan_activation', 'services', 'address'],
     allowancesEnabled: false,
   };
@@ -107,6 +120,8 @@ class CustomerSetup extends Component {
       this.props.dispatch(getList('available_plans', getPlansKeysQuery({ name: 1, play: 1, description: 1, 'include.services': 1 })));
       this.props.dispatch(getList('available_services', getServicesKeysWithInfoQuery()));
     }
+    this.props.dispatch(getList('available_subscriptions', getSubscriptionsWithAidQuery()));
+    this.props.dispatch(getList('available_accounts', getAccountsQuery()));
   }
 
   componentWillReceiveProps(nextProps) {
@@ -153,9 +168,8 @@ class CustomerSetup extends Component {
     }
   }
 
-  onChangeCustomerField = (e) => {
-    const { value, id } = e.target;
-    this.props.dispatch(updateCustomerField(id, value));
+  onChangeCustomerField = (path, value) => {
+    this.props.dispatch(updateCustomerField(path, value));
   }
 
   onRemoveCustomerField = (path) => {
@@ -254,13 +268,16 @@ class CustomerSetup extends Component {
       settings,
       plans,
       services,
+      subscriptionsOptions,
+      accountsOptions,
+      currency,
       gateways,
       mode,
       aid,
       activeTab,
       allowancesEnabled,
     } = this.props;
-    const showActionButtons = (activeTab === 1);
+    const showActionButtons = [1, 5].includes(activeTab);
 
     if (mode === 'loading') {
       return (<LoadingItemPlaceholder onClick={this.handleBack} />);
@@ -323,7 +340,13 @@ class CustomerSetup extends Component {
               {allowancesEnabled && (
                 <Tab title="Allowances" eventKey={5}>
                   <Panel style={{ borderTop: 'none' }}>
-                    <CustomerAllowances aid={aid} />
+                    <CustomerAllowances
+                      customer={customer}
+                      allSubscriptions={subscriptionsOptions}
+                      allAccounts={accountsOptions}
+                      currency={currency}
+                      onChange={this.onChangeCustomerField}
+                    />
                   </Panel>
                 </Tab>
               )}
@@ -351,6 +374,9 @@ const mapStateToProps = (state, props) => ({
   plans: state.list.get('available_plans') || undefined,
   services: state.list.get('available_services') || undefined,
   gateways: state.list.get('available_gateways') || undefined,
+  subscriptionsOptions: subscriptionsOptionsSelector(state, props),
+  accountsOptions: accountsOptionsSelector(state, props),
+  currency: currencySelector(state, props) || undefined,
   message: messageSelector(state, props),
 });
 
