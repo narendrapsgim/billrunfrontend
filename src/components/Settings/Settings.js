@@ -217,7 +217,6 @@ class Settings extends Component {
           <Tab title="Invoicing" eventKey={6}>
             <Panel style={{ borderTop: 'none' }}>
               <Invoicing onChange={this.onChangeFieldValue} data={billrun} />
-              <hr className="mt0 mb10"/>
               <Allowances onChange={this.onChangeFieldValue} data={billrun} />
             </Panel>
           </Tab>

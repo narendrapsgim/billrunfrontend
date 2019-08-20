@@ -23,7 +23,7 @@ const CustomerAllowances = ({ customer, editable, allSubscriptions, allAccounts,
       .find(options => options.get('sid', '') === sid, null, Immutable.Map())
       .get('title', '');
     const confirm = {
-      message: `Are you sure you want to delete subscriber ${sid} - '${sidLabel}' ?`,
+      message: `Are you sure you want to delete  allowance for subscriber '${sidLabel}' ID ${sid}?`,
       onOk: onDeleteSid,
       labelOk: 'Delete',
       type: 'delete',
@@ -41,7 +41,7 @@ const CustomerAllowances = ({ customer, editable, allSubscriptions, allAccounts,
       .find(options => options.get('aid', '') === aid, null, Immutable.Map())
       .get('title', '')
     const confirm = {
-      message: `Are you sure you want to delete all ${aid} - '${aidLabel}' account subscribers  ?`,
+      message: `Are you sure you want to delete all allowances for customer '${aidLabel}' ID ${aid} ?`,
       onOk: onDeleteAisSids,
       labelOk: 'Delete',
       type: 'delete',
@@ -69,7 +69,7 @@ const CustomerAllowances = ({ customer, editable, allSubscriptions, allAccounts,
     .filter(option => option.get('aid', '') !== customer.get('aid', ''))
     .map(option => ({
       value: `${option.get('sid', '')}`,
-      label: `${option.get('sid', '')} - ${option.get('title', '')} (Account: ${option.get('aid', '')})`,
+      label: `${option.get('title', '')} (Subscriber ID: ${option.get('sid', '')}, Customer ID: ${option.get('aid', '')})`,
       aid: option.get('aid', ''),
     }))
     .toList()
@@ -78,7 +78,7 @@ const CustomerAllowances = ({ customer, editable, allSubscriptions, allAccounts,
 
   const renderGroupHeader = (aid, title) => (
     <div>
-      <small>{`${aid} - ${title}`}</small>
+      <small>{`${title} (Customer ID: ${aid})`}</small>
       <div className="pull-right">
         <Actions actions={aidGroupActions} data={aid} />
       </div>
@@ -153,18 +153,18 @@ const CustomerAllowances = ({ customer, editable, allSubscriptions, allAccounts,
               .get('title', '');
             return(
               <FormGroup key={`sid-${sid}`}>
-                <Col componentClass={ControlLabel} xs={12} sm={3} lg={2}>
-                  { `${sid} - ${sidLabel}` }
+                <Col componentClass={ControlLabel} xs={12} sm={5} offsetSm={1} className="pt5">
+                  {sidLabel}<br/>{`(Subscriber ID: ${sid})` }
                 </Col>
                 <Col xs={10} sm={5}>
-                    <Field
-                      id={sid}
-                      value={customerAllowance.get('allowance', '')}
-                      onChange={onChangeAllowanceValue}
-                      fieldType="number"
-                      editable={editable}
-                      suffix={getSymbolFromCurrency(currency)}
-                    />
+                  <Field
+                    id={sid}
+                    value={customerAllowance.get('allowance', '')}
+                    onChange={onChangeAllowanceValue}
+                    fieldType="number"
+                    editable={editable}
+                    suffix={getSymbolFromCurrency(currency)}
+                  />
                 </Col>
                 <Col xs={2} sm={1} className="input-min-line-height pr0 pl0">
                   <Actions actions={sidActions} data={sid} />
@@ -198,7 +198,9 @@ const CustomerAllowances = ({ customer, editable, allSubscriptions, allAccounts,
               </Col>
             </FormGroup>
           </Panel>
-          { renderAllowancesValue() }
+          <Panel header={getFieldName('Allowances', 'Customer')}>
+            { renderAllowancesValue() }
+          </Panel>
         </Form>
       </Col>
     </Row>

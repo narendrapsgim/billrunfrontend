@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import Immutable from 'immutable';
-import { Form, FormGroup, Col } from 'react-bootstrap';
+import { Form, FormGroup, Col, Panel } from 'react-bootstrap';
 import Field from '@/components/Field';
 
 
@@ -33,13 +33,13 @@ const Allowances = ({ data, onChange }) => {
   const isEnabled = data.getIn(['allowances', 'enabled'], '') === true;
 
   return (
-    <div className="Allowances">
+    <Panel header="Allowances">
       <Form horizontal>
         <FormGroup>
           <Col sm={10} smOffset={2} className="mt10">
             <Field
               fieldType="checkbox"
-              label="Enabled allowances"
+              label="Enable allowances"
               value={data.getIn(['allowances', 'enabled'], '')}
               onChange={onToggleAllowances}
             />
@@ -49,7 +49,7 @@ const Allowances = ({ data, onChange }) => {
           <Col sm={10} smOffset={2} className="mt10">
             <Field
               fieldType="checkbox"
-              label="Included in allowance"
+              label="Tax included in allowances"
               value={data.getIn(['allowances', 'included_in_allowance'], '')}
               onChange={onToggleIncludedInAllowance}
               disabled={!isEnabled}
@@ -60,7 +60,7 @@ const Allowances = ({ data, onChange }) => {
           <Col sm={10} smOffset={2} className="mt10">
             <Field
               fieldType="checkbox"
-              label="Taxable paid first"
+              label="Taxable amounts paid first"
               value={data.getIn(['allowances', 'taxable_paid_first'], '')}
               onChange={onToggleTaxablePaidFirst}
               disabled={!isEnabled}
@@ -68,7 +68,7 @@ const Allowances = ({ data, onChange }) => {
           </Col>
         </FormGroup>
       </Form>
-    </div>
+    </Panel>
   );
 }
 
