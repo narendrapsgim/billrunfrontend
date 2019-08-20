@@ -198,9 +198,11 @@ const CustomerAllowances = ({ customer, editable, allSubscriptions, allAccounts,
               </Col>
             </FormGroup>
           </Panel>
-          <Panel header={getFieldName('Allowances', 'Customer')}>
-            { renderAllowancesValue() }
-          </Panel>
+          {( customer.get('allowances', Immutable.List()).size > 0) && (
+            <Panel header={getFieldName('Allowances', 'Customer')}>
+              { renderAllowancesValue() }
+            </Panel>
+          )}
         </Form>
       </Col>
     </Row>
