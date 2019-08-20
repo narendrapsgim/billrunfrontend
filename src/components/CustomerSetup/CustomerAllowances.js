@@ -61,7 +61,7 @@ const CustomerAllowances = ({ customer, editable, allSubscriptions, allAccounts,
   const sidActions = useMemo(() => [{
     type: 'remove',
     showIcon: true,
-    helpText: 'Remove all account subscribres',
+    helpText: 'Remove subscribres',
     actionStyle: 'link',
     actionSize: 'xsmall',
     onClick: onAskDeleteSid,
@@ -80,7 +80,7 @@ const CustomerAllowances = ({ customer, editable, allSubscriptions, allAccounts,
 
   const renderGroupHeader = (aid, title) => (
     <div>
-      {`${aid} - ${title}`}
+      <small>{`${aid} - ${title}`}</small>
       <div className="pull-right">
         <Actions actions={aidGroupActions} data={aid} />
       </div>
@@ -155,10 +155,10 @@ const CustomerAllowances = ({ customer, editable, allSubscriptions, allAccounts,
               .get('title', '');
             return(
               <FormGroup key={`sid-${sid}`}>
-                <Col componentClass={ControlLabel} sm={3} lg={2}>
+                <Col componentClass={ControlLabel} xs={12} sm={3} lg={2}>
                   { `${sid} - ${sidLabel}` }
                 </Col>
-                <Col sm={8} lg={9}>
+                <Col xs={10} sm={5}>
                     <Field
                       id={sid}
                       value={customerAllowance.get('allowance', '')}
@@ -168,7 +168,7 @@ const CustomerAllowances = ({ customer, editable, allSubscriptions, allAccounts,
                       suffix={getSymbolFromCurrency(currency)}
                     />
                 </Col>
-                <Col sm={1} className="input-min-line-height pr0 pl0">
+                <Col xs={2} sm={1} className="input-min-line-height pr0 pl0">
                   <Actions actions={sidActions} data={sid} />
                 </Col>
               </FormGroup>
@@ -185,23 +185,21 @@ const CustomerAllowances = ({ customer, editable, allSubscriptions, allAccounts,
     <Row>
       <Col lg={12}>
         <Form horizontal>
-          <FormGroup>
-            <Col componentClass={ControlLabel} sm={3} lg={2}>
-              { getFieldName('Select Subscribers', 'Customer')}
-            </Col>
-            <Col sm={8} lg={9}>
-              <Field
-                fieldType="select"
-                options={subscriptionsSelectOptions}
-                value={selectedSubscriptions}
-                onChange={onChangeSubscriptions}
-                editable={editable}
-                multi={true}
-                clearable={false}
-              />
-            </Col>
-          </FormGroup>
-          <hr />
+          <Panel header={getFieldName('Select Subscribers', 'Customer')}>
+            <FormGroup>
+              <Col sm={10} smOffset={1}>
+                <Field
+                  fieldType="select"
+                  options={subscriptionsSelectOptions}
+                  value={selectedSubscriptions}
+                  onChange={onChangeSubscriptions}
+                  editable={editable}
+                  multi={true}
+                  clearable={false}
+                />
+              </Col>
+            </FormGroup>
+          </Panel>
           { renderAllowancesValue() }
         </Form>
       </Col>
