@@ -99,7 +99,7 @@ class Importer extends Component {
     if (isSingleEntity) {
       this.onChange('entity', entityOptions[0]);
     }
-    this.props.dispatch(getSettings('import.mapping'));
+    this.props.dispatch(getSettings(['import.mapping', 'importers']));
   }
 
   componentWillReceiveProps(nextProps) {
@@ -121,12 +121,12 @@ class Importer extends Component {
     const { item } = this.props;
     const importType = item.get('importType', '');
     const steps = [];
-    if (importType === 'predefined_mapping') {
-      steps.push({ id: 'upload', stepDate:{ title: 'Upload File'}, okLabel: 'Import', okAction: this.onImport});
-    } else {
+    if (importType === 'manual_mapping') {
       steps.push({ id: 'upload', stepDate:{ title: 'Upload File'}});
       steps.push({ id: 'mapping', stepDate:{ title: 'Field Map'}});
       steps.push({ id: 'validate', stepDate:{ title: 'Validate'}, okLabel: 'Confirm and Import', okAction: this.onImport });
+    } else {
+      steps.push({ id: 'upload', stepDate:{ title: 'Upload File'}, okLabel: 'Import', okAction: this.onImport});
     }
     steps.push({ id: 'finish', stepDate:{ title: 'Finish'}, okLabel: 'Close', okAction: this.onFinish});
     if (index === null) {
@@ -159,9 +159,9 @@ class Importer extends Component {
     const { item } = this.props;
     const entity = item.get('entity', '');
     const operation = item.get('operation', 'create');
-    const rows = (item.get('importType', '') === 'predefined_mapping')
-      ? item
-      : this.alterData(this.getFormatedRows());
+    const rows = (item.get('importType', '') === 'manual_mapping')
+      ? this.alterData(this.getFormatedRows())
+      : item;
     if (rows.size > 0 && entity !== '') {
       this.setState({ status: 'progress' });
       const collection = getConfig(['systemItems', entity, 'collection'], '');

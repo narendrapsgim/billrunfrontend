@@ -20,6 +20,7 @@ import {
   formatFieldOptions,
   addDefaultFieldOptions,
   importSelector,
+  importersSelector,
 } from './settingsSelector';
 
 const selectSubscriberImportFields = (fields, accountfields) => {
@@ -179,10 +180,6 @@ const getConfigImportTypes = (state, props) => {
   return getConfig(['import', 'allowed_entities_importype'], Immutable.Map())
 }
 
-const getApiSettingsImportTypes = (state, props) => {
-  return Immutable.Map();
-}
-
 const mergeImportOptions = (item, configTypes, apiSettingsTypes) =>
   Immutable.List().withMutations((optionsWithMutations) => {
     const entity = item ? item.get('entity', '') : '';
@@ -207,6 +204,6 @@ const mergeImportOptions = (item, configTypes, apiSettingsTypes) =>
 export const importTypesOptionsSelector = createSelector(
   itemSelector,
   getConfigImportTypes,
-  getApiSettingsImportTypes,
+  importersSelector,
   mergeImportOptions
 );

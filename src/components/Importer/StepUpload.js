@@ -8,7 +8,7 @@ import { sentenceCase } from 'change-case';
 import Field from '@/components/Field';
 import { getConfig, formatSelectOptions, getFieldName } from '@/common/Util';
 import PlaysSelector from '../Plays/PlaysSelector';
-import { Actions } from '@/components/Elements';
+import { Actions, AddFileButton } from '@/components/Elements';
 
 
 class StepUpload extends Component {
@@ -74,7 +74,9 @@ class StepUpload extends Component {
     if (typeSelectOptions && typeSelectOptions.length === 1 && typeSelectOptions[0].value !== importType) {
       this.onChangeImportType(typeSelectOptions[0].value);
     }
-    if (!['', 'predefined_mapping'].includes(item.get('importType', ''))) {
+    const oldImportType = this.props.item.get('importType', '');
+    // remove files if mapper was changed
+    if (oldImportType !== '' && oldImportType !== importType) {
       this.props.onDelete('files');
     }
   }
@@ -292,21 +294,21 @@ class StepUpload extends Component {
           </FormGroup>
         )}
 
-        {(['predefined_mapping'].includes(importType)) && (
+        {(!['manual_mapping'].includes(importType)) && (
           <FormGroup validationState={predefinedFileError === null ? null : 'error'}>
             <Col sm={3} componentClass={ControlLabel}>Upload CSV</Col>
             <Col sm={9}>
               <dl>
                 <dt>
-                  <input type="file" accept=".csv" onChange={this.onUploadPredefinedFile} multiple/>
+                  <AddFileButton onClick={this.onUploadPredefinedFile} />
                   {predefinedFileError !== null && <HelpBlock>{predefinedFileError}</HelpBlock>}
                 </dt>
                 {item.get('files', []).map((file, idx) => (
-                  <dd style={{ margin: 0 }} key={`${idx}-${file.name}`}>
-                    {file.name}
-                    <span className="inline ml10">
+                  <dd style={{ height: 28 }} key={`${idx}-${file.name}`}>
+                    <span className="inline ml10 mr10">
                       <Actions actions={predefinedFileActions} data={idx} />
                     </span>
+                    {file.name}
                   </dd>
                 ))}
               </dl>

@@ -14,6 +14,9 @@ import {
 const getTaxation = (state, props) => // eslint-disable-line no-unused-vars
   state.settings.getIn(['taxation']);
 
+const getImporters = (state, props) => // eslint-disable-line no-unused-vars
+  state.settings.getIn(['importers']);
+
 const getImport = (state, props) => // eslint-disable-line no-unused-vars
   state.settings.get('import');
 
@@ -226,6 +229,11 @@ export const inputProssesorRatingParamsSelector = createSelector(
 export const taxMappingSelector = createSelector(
   getTaxation,
   (tax = Immutable.Map()) => tax.get('mapping'),
+);
+
+export const importersSelector = createSelector(
+  getImporters,
+  (importers = Immutable.Map()) => importers,
 );
 
 export const importSelector = createSelector(
