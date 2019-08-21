@@ -130,12 +130,12 @@ export const saveSettingsQuery = (data, category) => {
   });
 };
 
-export const getSettingsQuery = category => ({
+export const getSettingsQuery = (category, data = {}) => ({
   api: 'settings',
   name: category,
   params: [
     { category },
-    { data: JSON.stringify({}) },
+    { data: JSON.stringify(data) },
   ],
 });
 
