@@ -21,9 +21,6 @@ const AddFileButton = ({
     'btn-link': buttonStyle === 'link',
     'btn-default': buttonStyle === 'default',
   });
-  console.log("buttonClass: ", buttonClass);
-  console.log("buttonStyle: ", buttonStyle);
-  console.log("buttonSize: ", buttonSize);
   return (
     <label className={buttonClass}>
         <input
