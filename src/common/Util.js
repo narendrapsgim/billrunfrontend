@@ -97,7 +97,7 @@ export const getFieldName = (field, category, defaultValue = null) => {
 
 /*  Map entity different names to fieldNames.json names */
 export const getFieldNameType = (type) => {
-  switch (type) {
+  switch (type.toLocaleLowerCase()) {
     case 'account':
     case 'accounts':
     case 'customer':
@@ -129,7 +129,7 @@ export const getFieldNameType = (type) => {
 
 /*  Map entity different names to entities.json names */
 export const getFieldEntityKey = (type) => {
-  switch (type) {
+  switch (type.toLocaleLowerCase()) {
     case 'account':
     case 'accounts':
     case 'customer':
