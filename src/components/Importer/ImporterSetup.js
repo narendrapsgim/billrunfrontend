@@ -48,6 +48,9 @@ class ImporterSetup extends Component {
   componentWillReceiveProps(nextProps) {
     const { importEntity } = nextProps;
     if (this.props.importEntity !== importEntity) {
+      this.setState({
+        refreshString: moment().format(), //refetch screen import
+      });
       if (!importEntity) {
         this.props.dispatch(setPageTitle('Import'));
       } else {
@@ -80,7 +83,7 @@ class ImporterSetup extends Component {
   render() {
     const { refreshString } = this.state;
     const { importEntity } = this.props;
-    const importEntities = (importEntity) ? [importEntity] : importEntity;
+    const importEntities = (importEntity) ? Immutable.List([importEntity]) : importEntity;
     const apiDateFormat = getConfig('apiDateFormat', 'YYYY-MM-DD');
     const defaultFrom = moment().format(apiDateFormat);
     const defaultTo = moment().add(100, 'years').format(apiDateFormat);

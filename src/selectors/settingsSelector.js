@@ -14,8 +14,8 @@ import {
 const getTaxation = (state, props) => // eslint-disable-line no-unused-vars
   state.settings.getIn(['taxation']);
 
-const getImporters = (state, props) => // eslint-disable-line no-unused-vars
-  state.settings.getIn(['importers']);
+const getPluginActions = (state, props) => // eslint-disable-line no-unused-vars
+  state.settings.getIn(['plugin_actions']);
 
 const getImport = (state, props) => // eslint-disable-line no-unused-vars
   state.settings.get('import');
@@ -232,8 +232,22 @@ export const taxMappingSelector = createSelector(
 );
 
 export const importersSelector = createSelector(
-  getImporters,
-  (importers = Immutable.Map()) => importers,
+  getPluginActions,
+  (actions = Immutable.Map()) => actions
+      // get only import plugins
+      .filter((methods, action) => action.startsWith('import'))
+      // create {plugin => [entity1, entity2]} array from {imporEntity => [plugin1, plugin2]}
+      .reduce((acc, actions, methode) => {
+        // the methode is like 'imporEntity'
+        const entity = getFieldNameType(methode.split('import')[1]);
+        actions.forEach(action => {
+            acc = acc.update(action, Immutable.List(), list =>
+              (list.includes(entity) ? list : list.push(entity))
+            );
+        });
+        return acc;
+      }, Immutable.Map()
+    ),
 );
 
 export const importSelector = createSelector(

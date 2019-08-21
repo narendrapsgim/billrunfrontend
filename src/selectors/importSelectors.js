@@ -183,7 +183,6 @@ const getConfigImportTypes = (state, props) => {
 const mergeImportOptions = (item, configTypes, apiSettingsTypes) =>
   Immutable.List().withMutations((optionsWithMutations) => {
     const entity = item ? item.get('entity', '') : '';
-    console.log("entity: ", entity);
     configTypes
       .filter(entities => entities.includes(entity))
       .forEach((entities, type) => {

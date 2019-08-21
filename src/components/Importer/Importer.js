@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import Immutable from 'immutable';
-import { titleCase } from 'change-case';
+import { titleCase, upperCaseFirst } from 'change-case';
 import { Form } from 'react-bootstrap';
 import StepUpload from './StepUpload';
 import StepMapper from './StepMapper';
@@ -46,7 +46,7 @@ class Importer extends Component {
     predefinedValuesOperation: PropTypes.instanceOf(Immutable.Map),
     hiddenActionFields: PropTypes.instanceOf(Immutable.Map),
     savedMappers: PropTypes.instanceOf(Immutable.List),
-    entityOptions: PropTypes.arrayOf(PropTypes.string),
+    entityOptions: PropTypes.instanceOf(Immutable.List),
     typeSelectOptions: PropTypes.array,
     showPlay: PropTypes.bool,
     restartString: PropTypes.string,
@@ -55,7 +55,7 @@ class Importer extends Component {
   }
 
   static defaultProps = {
-    entityOptions: getConfig(['import', 'allowed_entities'], Immutable.List()).toJS(),
+    entityOptions: getConfig(['import', 'allowed_entities'], Immutable.List()),
     item: Immutable.Map(),
     importFields: [],
     predefinedValues: Immutable.Map(),
@@ -95,15 +95,12 @@ class Importer extends Component {
   componentDidMount() {
     const { entityOptions } = this.props;
     this.props.dispatch(initImporter());
-    const isSingleEntity = (entityOptions && entityOptions.length === 1);
-    if (isSingleEntity) {
-      this.onChange('entity', entityOptions[0]);
-    }
-    this.props.dispatch(getSettings(['import.mapping', 'importers']));
+    this.initImportEntity(entityOptions);
+    this.props.dispatch(getSettings('import.mapping'));
   }
 
   componentWillReceiveProps(nextProps) {
-    const { restartString } = nextProps;
+    const { restartString, item, entityOptions } = nextProps;
     if (restartString !== this.props.restartString) {
       this.props.dispatch(initImporter());
       this.setState({
@@ -111,10 +108,28 @@ class Importer extends Component {
         stepIndex: 0,
       });
     }
+    if (!Immutable.is(this.props.entityOptions, entityOptions)) {
+      this.initImportEntity(entityOptions);
+    }
+    // import entity changes to new entity
+    const newEntity = item.get('entity', '');
+    const oldEntity = this.props.item.get('entity', '');
+    if (newEntity !== '' && oldEntity !== newEntity) {
+      const itemsType = getConfig(['systemItems', newEntity, 'itemsType'], '');
+      const importName = `import${upperCaseFirst(itemsType)}`;
+      this.props.dispatch(getSettings('plugin_actions', { actions: [importName] }));
+    }
   }
 
   componentWillUnmount() {
     this.props.dispatch(deleteImporter());
+  }
+
+  initImportEntity = (entityOptions) => {
+    const isSingleEntity = (entityOptions && entityOptions.size === 1);
+    if (isSingleEntity) {
+      this.onChange('entity', entityOptions.first());
+    }
   }
 
   getImporterSteps = (index = null) => {
@@ -601,7 +616,7 @@ class Importer extends Component {
       case 'upload': return (
         <StepUpload
           item={item}
-          entityOptions={entityOptions}
+          entityOptions={entityOptions.toJS()}
           onChange={this.onChange}
           onDelete={this.onDelete}
           onSelectMapping={this.onSelectMapping}
@@ -654,7 +669,7 @@ class Importer extends Component {
       <ActionButtons
         cancelLabel={this.getOkButtonLable()}
         onClickCancel={this.getOkButtonAction()}
-        disableCancel={inProgress || validateHasError}
+        disableCancel={inProgress || validateHasError || item.get('importType', '') === ''}
         saveLabel="Back"
         hideCancel={stepIndex === 3 && this.props.onFinish === null}
         disableSave={stepIndex === 0 || inProgress || inFinish}
