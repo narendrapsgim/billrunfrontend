@@ -27,23 +27,6 @@ const selectCyclesOptions = (options) => {
     value: option.get('billrun_key', ''),
   }));
 };
-const getSubscriptionsOptions = state => state.list.get('available_subscriptions', null);
-
-const selectSubscriptionsOptions = (options) => {
-  if (options === null) {
-    return undefined;
-  }
-  return options.map(option => {
-    let name = '';
-    name += option.get('firstname', '').trim() !== '' ? option.get('firstname', '').trim() : '';
-    name += option.get('lastname', '').trim() !== '' ? ` ${option.get('lastname', '').trim()}` : '';
-    return Immutable.Map({
-      title: name.trim(),
-      sid: option.get('sid', ''),
-      aid: option.get('aid', ''),
-    })
-  });
-}
 
 const getAccountsOptions = state => state.list.get('available_accounts', null);
 
@@ -192,11 +175,6 @@ export const listByNameSelector = createSelector(
   getOptionsByListName,
   () => 'key',
   formatSelectOptions,
-);
-
-export const subscriptionsOptionsSelector = createSelector(
-  getSubscriptionsOptions,
-  selectSubscriptionsOptions,
 );
 
 export const accountsOptionsSelector = createSelector(

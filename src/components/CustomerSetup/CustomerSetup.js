@@ -47,10 +47,6 @@ import {
   tabSelector,
   messageSelector,
 } from '@/selectors/entitySelector';
-import {
-  subscriptionsOptionsSelector,
-  accountsOptionsSelector,
-} from '@/selectors/listSelectors';
 import { currencySelector } from '@/selectors/settingsSelector';
 import { buildPageTitle, getConfig, getItemId } from '@/common/Util';
 
@@ -66,8 +62,6 @@ class CustomerSetup extends Component {
     settings: PropTypes.instanceOf(Immutable.Map),
     plans: PropTypes.instanceOf(Immutable.List),
     services: PropTypes.instanceOf(Immutable.List),
-    subscriptionsOptions: PropTypes.instanceOf(Immutable.List),
-    accountsOptions: PropTypes.instanceOf(Immutable.List),
     currency: PropTypes.string,
     gateways: PropTypes.instanceOf(Immutable.List),
     defaultSubsctiptionListFields: PropTypes.array,
@@ -95,8 +89,6 @@ class CustomerSetup extends Component {
     gateways: Immutable.List(),
     plans: Immutable.List(),
     services: Immutable.List(),
-    subscriptionsOptions: Immutable.List(),
-    accountsOptions: Immutable.List(),
     currency: '',
     defaultSubsctiptionListFields: ['sid', 'firstname', 'lastname', 'plan', 'plan_activation', 'services', 'address'],
     allowancesEnabled: false,
@@ -268,8 +260,6 @@ class CustomerSetup extends Component {
       settings,
       plans,
       services,
-      subscriptionsOptions,
-      accountsOptions,
       currency,
       gateways,
       mode,
@@ -342,8 +332,6 @@ class CustomerSetup extends Component {
                   <Panel style={{ borderTop: 'none' }}>
                     <CustomerAllowances
                       customer={customer}
-                      allSubscriptions={subscriptionsOptions}
-                      allAccounts={accountsOptions}
                       currency={currency}
                       onChange={this.onChangeCustomerField}
                     />
@@ -374,8 +362,6 @@ const mapStateToProps = (state, props) => ({
   plans: state.list.get('available_plans') || undefined,
   services: state.list.get('available_services') || undefined,
   gateways: state.list.get('available_gateways') || undefined,
-  subscriptionsOptions: subscriptionsOptionsSelector(state, props),
-  accountsOptions: accountsOptionsSelector(state, props),
   currency: currencySelector(state, props) || undefined,
   message: messageSelector(state, props),
 });
