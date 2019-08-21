@@ -2,11 +2,13 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import ReactSelect from 'react-select';
 import Creatable from 'react-select/creatable';
+import AsyncSelect from 'react-select/async';
 
 
 const Select = ({
   value, onChange, editable, disabled,
   multi, clearable, noResultsText, options, allowCreate, addLabelText, placeholder,
+  isAsync, loadAsyncOptions,
   ...otherProps
 }) => {
   const fixBoolValues = (value) => {
@@ -69,6 +71,24 @@ const Select = ({
     }
   }
 
+  if (isAsync) {
+    return (
+      <AsyncSelect
+        {...otherProps}
+        placeholder={placeholder}
+        value={selectValue}
+        classNamePrefix="react-select"
+        onChange={onChangeValue}
+        isMulti={isMulti}
+        isClearable={isClearable}
+        isDisabled={isDisabled}
+        noOptionsMessage={noOptionsMessage}
+        formatCreateLabel={formatCreateLabel}
+        loadOptions={loadAsyncOptions}
+      />
+      );
+  }
+
   if (allowCreate) {
     return (
       <Creatable
@@ -108,6 +128,7 @@ Select.defaultProps = {
   disabled: false,
   editable: true,
   multi: false,
+  isAsync: false,
   clearable: true,
   allowCreate:false,
   noResultsText: undefined,
@@ -116,6 +137,7 @@ Select.defaultProps = {
   options: [],
   inputProps: {},
   onChange: () => {},
+  loadAsyncOptions: () => {},
 };
 
 Select.propTypes = {
@@ -128,6 +150,7 @@ Select.propTypes = {
   disabled: PropTypes.bool,
   editable: PropTypes.bool,
   multi: PropTypes.bool,
+  isAsync: PropTypes.bool,
   clearable: PropTypes.bool,
   noResultsText: PropTypes.string,
   options: PropTypes.array,
@@ -137,6 +160,7 @@ Select.propTypes = {
   ]),
   placeholder: PropTypes.string,
   onChange: PropTypes.func,
+  loadAsyncOptions: PropTypes.func,
 };
 
 export default Select;
