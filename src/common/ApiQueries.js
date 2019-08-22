@@ -322,7 +322,7 @@ export const getEntityByIdQuery = (collection, id) => ({
   ],
 });
 
-export const getEntitesQuery = (collection, project = {}, query = {}, sort = null) => {
+export const getEntitesQuery = (collection, project = {}, query = {}, sort = null, options = {}) => {
   let action;
   switch (collection) {
     case 'users':
@@ -341,6 +341,7 @@ export const getEntitesQuery = (collection, project = {}, query = {}, sort = nul
       { query: JSON.stringify(query) },
       { project: JSON.stringify(project) },
       { sort: JSON.stringify(sortBy) },
+      { options: JSON.stringify(options) },
     ],
   });
 };

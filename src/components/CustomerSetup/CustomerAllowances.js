@@ -10,7 +10,11 @@ import { Actions } from '@/components/Elements';
 import Field from '@/components/Field';
 import { showConfirmModal } from '@/actions/guiStateActions/pageActions';
 import { entitySearchByQuery } from '@/actions/entityActions';
-import { getFieldName } from '@/common/Util';
+import {
+  getFieldName,
+  getFirstName,
+  getLastName,
+} from '@/common/Util';
 
 
 class CustomerAllowances extends Component {
@@ -104,7 +108,7 @@ class CustomerAllowances extends Component {
 
   onAskDeleteAisSids = aid => {
     const { customer } = this.props;
-    const { allAccounts } = this.props;
+    const { allAccounts } = this.state;
     const onDeleteAisSids = () => {
       const allowances = customer.get('allowances', Immutable.List())
         .filter(allowance => allowance.get('aid', '') !== aid);
@@ -138,7 +142,7 @@ class CustomerAllowances extends Component {
 
   formatNames = (options, key) =>
     options.reduce((acc, option) => {
-      const name = [option.get('firstname', ''), option.get('lastname', '')]
+      const name = [getFirstName(option), getLastName(option)]
       .map(option => option.trim())
       .filter(option => option !== '')
       .join(' ');
@@ -146,7 +150,7 @@ class CustomerAllowances extends Component {
     }, Immutable.Map())
 
   createSubscriptionsSelectOption = option => {
-    const name = [option.get('firstname', ''), option.get('lastname', '')]
+    const name = [getFirstName(option), getLastName(option)]
       .map(option => option.trim())
       .filter(option => option !== '')
       .join(' ');
@@ -158,8 +162,9 @@ class CustomerAllowances extends Component {
     };
   }
 
-  subscriptionsSelectOptions = (options, aid) => options
+  subscriptionsSelectOptions = (options, aid, sids) => options
     .filter(option => option.get('aid', '') !== aid)
+    .filter(option => !sids.includes(option.get('sid', '')))
     .map(this.createSubscriptionsSelectOption)
     .toList()
     .toArray();
@@ -201,16 +206,18 @@ class CustomerAllowances extends Component {
       return callback([]);
     }
     const query = {
-      $or: {
         firstname: { $regex: inputValue, $options: 'i' },
         lastname: { $regex: inputValue, $options: 'i' },
-        aid: { $regex: inputValue, $options: 'i' },
-        sid: { $regex: inputValue, $options: 'i' },
-      }
+        aid: parseFloat(inputValue),
+        sid: parseFloat(inputValue),
     };
-    return this.props.dispatch(entitySearchByQuery('subscribers', query, {sid: 1, aid: 1, firstname: 1, lastname: 1}))
+    const options = {or_fields: Object.keys(query)};
+    const project = {sid: 1, aid: 1, firstname: 1, lastname: 1};
+    const sort = {aid: 1, sid: 1, firstname: 1, lastname: 1};
+    const existsSid = customer.get('allowances', Immutable.List()).map(allowance => allowance.get('sid', ''));
+    return this.props.dispatch(entitySearchByQuery('subscribers', query, project, sort, options))
       .then(options =>
-        callback(this.subscriptionsSelectOptions(Immutable.fromJS(options), customer.get('aid', '')))
+        callback(this.subscriptionsSelectOptions(Immutable.fromJS(options), customer.get('aid', ''), existsSid))
       )
       .catch(() => callback([]));
   }
