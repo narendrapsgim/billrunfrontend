@@ -1,8 +1,8 @@
 import moment from 'moment';
 import Immutable from 'immutable';
 import { upperCaseFirst } from 'change-case';
-import { apiBillRun, apiBillRunErrorHandler, apiBillRunSuccessHandler } from '../common/Api';
-import { getEntityByIdQuery, apiEntityQuery, getEntitesQuery } from '../common/ApiQueries';
+import { apiBillRun, apiBillRunErrorHandler, apiBillRunSuccessHandler, buildRequestUrl } from '../common/Api';
+import { getEntityByIdQuery, apiEntityQuery, getEntityCSVQuery, getEntitesQuery } from '../common/ApiQueries';
 import { getItemDateValue, getConfig, getItemId } from '@/common/Util';
 import { startProgressIndicator } from './progressIndicatorActions';
 
@@ -97,8 +97,19 @@ const buildRequestData = (item, action) => {
 
     case 'import': {
       const formData = new FormData();
-      formData.append('update', JSON.stringify(item));
+      if (item.has('files')) {
+        item.get('files', []).forEach((file, i) => {
+          formData.append(`files[${i}]`, file, file.name)
+        });
+      }
+      formData.append('update', JSON.stringify(item.delete('files')));
       return formData;
+    }
+
+    case 'export': {
+      return item
+        .reduce((acc, data, key) => acc.push({[key]: JSON.stringify(data)}), Immutable.List())
+        .toArray()
     }
 
     case 'update': {
@@ -181,7 +192,16 @@ export const importEntities = (collection, items, operation) => (dispatch) => {
   const query = apiEntityQuery(collection, 'import', body);
   return apiBillRun(query, { timeOutMessage: apiTimeOutMessage })
     .then(success => dispatch(apiBillRunSuccessHandler(success)))
-    .catch(error => dispatch(apiBillRunErrorHandler(error, 'Error saving Entities')));
+    .catch(error => dispatch(apiBillRunErrorHandler(error, 'Error importing Entities')));
+};
+
+export const exportEntities = (entityType, params) => (dispatch) => {
+  const collection = getConfig(['systemItems', entityType, 'collection'], entityType);
+  const data = requestDataBuilder(collection, params, 'export');
+  const apiQuery = getEntityCSVQuery(collection, data);
+  const url = buildRequestUrl(apiQuery);
+  window.open(url)
+  return true;
 };
 
 const fetchEntity = (collection, query) => (dispatch) => {

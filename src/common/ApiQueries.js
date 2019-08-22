@@ -130,12 +130,12 @@ export const saveSettingsQuery = (data, category) => {
   });
 };
 
-export const getSettingsQuery = category => ({
+export const getSettingsQuery = (category, data = {}) => ({
   api: 'settings',
   name: category,
   params: [
     { category },
-    { data: JSON.stringify({}) },
+    { data: JSON.stringify(data) },
   ],
 });
 
@@ -279,6 +279,15 @@ export const apiEntityQuery = (collection, action, body) => ({
   options: {
     method: 'POST',
     body,
+  },
+});
+
+export const getEntityCSVQuery = (entity, params) => ({
+  action: 'export',
+  entity,
+  params,
+  options: {
+    method: 'GET',
   },
 });
 

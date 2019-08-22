@@ -6,6 +6,7 @@ import Immutable from 'immutable';
 import changeCase from 'change-case';
 import { Col, Row, Panel } from 'react-bootstrap';
 import { LoadingItemPlaceholder, Actions } from '@/components/Elements';
+import { ExporterPopup } from '@/components/Exporter';
 import List from '../List';
 import Pager from './Pager';
 import State from './State';
@@ -90,6 +91,10 @@ class EntityList extends Component {
     listActions: null,
   }
 
+  state = {
+    showExport: false,
+  }
+
   componentWillMount() {
     const { forceRefetchItems, items, sort, defaultSort, itemsType } = this.props;
     if (forceRefetchItems || items == null || items.isEmpty()) {
@@ -145,6 +150,19 @@ class EntityList extends Component {
     const { collection } = this.props;
     this.fetchItems(this.props);
     this.props.dispatch(clearRevisions(collection));
+  }
+
+  onClickImport = () => {
+    const { itemType } = this.props;
+    this.props.router.push(`/import/${itemType}`);
+  }
+
+  onClickExport = () => {
+    this.setState(() => ({ showExport: true }));
+  }
+
+  onExportFinish = () => {
+    this.setState(() => ({ showExport: false }));
   }
 
   onSort = (sort) => {
@@ -239,11 +257,35 @@ class EntityList extends Component {
   addStateColumn = fields => ([
     { id: 'state', parser: this.parserState, cssClass: 'state' },
     ...fields,
-  ])
+  ]);
+
+  isImportEnabled = () => {
+    const { itemType } = this.props;
+    return getConfig(['import', 'allowed_entities'], Immutable.List()).includes(itemType);
+  }
+
+  isExportEnabled = () => {
+    const { itemType } = this.props;
+    return getConfig(['export', 'allowed_entities'], Immutable.List()).includes(itemType);
+  }
 
   getListActions = () => {
     const { listActions } = this.props;
     const defaultActions = [{
+      type: 'export',
+      label: 'Export',
+      onClick: this.onClickExport,
+      show: this.isExportEnabled,
+      actionStyle: 'primary',
+      actionSize: 'xsmall'
+    }, {
+      type: 'import',
+      label: 'Import',
+      onClick: this.onClickImport,
+      show: this.isImportEnabled,
+      actionStyle: 'primary',
+      actionSize: 'xsmall'
+    }, {
       type: 'refresh',
       label: 'Refresh',
       actionStyle: 'primary',
@@ -268,6 +310,21 @@ class EntityList extends Component {
       }
       return listAction;
     }).reverse();
+  }
+
+  renderExporter = () => {
+    const { showExport } = this.state;
+    const { itemType } = this.props;
+    if (this.isExportEnabled()) {
+      return (
+        <ExporterPopup
+          entityKey={itemType}
+          show={showExport}
+          onClose={this.onExportFinish}
+        />
+      )
+    }
+    return null;
   }
 
   renderPanelHeader = () => {
@@ -362,6 +419,7 @@ class EntityList extends Component {
           </Panel>
           { this.renderPager() }
         </Col>
+        { this.renderExporter() }
       </Row>
     );
   }

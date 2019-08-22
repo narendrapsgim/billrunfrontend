@@ -136,6 +136,8 @@
     "price_plan": "Plan Price Override"
   },
   "import": {
+    "manual_mapping": "Map Manually CSV colums to entity field",
+    "predefined_mapping": "Use file with predefined structure",
     "permanentchange": "Update",
     "rates.percentage": "Plan Price Override by Percentage"
   },

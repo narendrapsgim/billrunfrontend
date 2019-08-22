@@ -10,6 +10,7 @@ import mainMenu from '../config/mainMenu.json';
 import eventsConfig from '../config/events.json';
 import ratesConfig from '../config/rates.json';
 import importConfig from '../config/import.json';
+import exportConfig from '../config/export.json';
 import collectionsConfig from '../config/collections.json';
 import customFieldsConfig from '../config/customFields.json';
 import discountConfig from '../config/discount.json';
@@ -65,6 +66,8 @@ export const getConfig = (key, defaultValue = null) => {
         break;
       case 'import': configCache = configCache.set('import', Immutable.fromJS(importConfig));
         break;
+      case 'export': configCache = configCache.set('export', Immutable.fromJS(exportConfig));
+        break;
       case 'collections': configCache = configCache.set('collections', Immutable.fromJS(collectionsConfig));
         break;
       case 'customFields': configCache = configCache.set('customFields', Immutable.fromJS(customFieldsConfig));
@@ -94,7 +97,7 @@ export const getFieldName = (field, category, defaultValue = null) => {
 
 /*  Map entity different names to fieldNames.json names */
 export const getFieldNameType = (type) => {
-  switch (type) {
+  switch (type.toLocaleLowerCase()) {
     case 'account':
     case 'accounts':
     case 'customer':
@@ -126,7 +129,7 @@ export const getFieldNameType = (type) => {
 
 /*  Map entity different names to entities.json names */
 export const getFieldEntityKey = (type) => {
-  switch (type) {
+  switch (type.toLocaleLowerCase()) {
     case 'account':
     case 'accounts':
     case 'customer':
