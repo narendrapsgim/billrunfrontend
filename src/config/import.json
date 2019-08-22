@@ -1,6 +1,6 @@
 {
   "allowed_entities": [
-    "discount", "charge", "customer", "subscription", "plan"
+    "discount", "charge", "customer", "subscription", "plan" , "service"
   ],
   "allowed_entities_actions": {
     "create": ["customer", "subscription", "product"],
