@@ -111,8 +111,14 @@ class EntityList extends Component {
     if (sort.isEmpty() && !defaultSort.isEmpty()) {
       this.props.dispatch(setListSort(itemsType, defaultSort));
     }
-    const importName = `import${upperCaseFirst(itemsType)}`;
-    this.props.dispatch(getSettings('plugin_actions', { actions: [importName] }));
+  }
+
+  componentDidMount() {
+    const { itemsType } = this.props;
+    if (this.isImportEnabled()) {
+      const importName = `import${upperCaseFirst(itemsType)}`;
+      this.props.dispatch(getSettings('plugin_actions', { actions: [importName] }));
+    }
   }
 
   // shouldComponentUpdate(nextProps, nextState) { // eslint-disable-line no-unused-vars
@@ -270,9 +276,13 @@ class EntityList extends Component {
   ]);
 
   isImportEnabled = () => {
-    const { itemType, typeSelectOptions } = this.props;
-    return getConfig(['import', 'allowed_entities'], Immutable.List()).includes(itemType)
-      && typeSelectOptions.length > 0;
+    const { itemType } = this.props;
+    return getConfig(['import', 'allowed_entities'], Immutable.List()).includes(itemType);
+  }
+
+  showImportEnabled = () => {
+    const { typeSelectOptions } = this.props;
+    return this.isImportEnabled() && typeSelectOptions.length > 0;
   }
 
   isExportEnabled = () => {
@@ -293,7 +303,7 @@ class EntityList extends Component {
       type: 'import',
       label: 'Import',
       onClick: this.onClickImport,
-      show: this.isImportEnabled(),
+      show: this.showImportEnabled(),
       actionStyle: 'primary',
       actionSize: 'xsmall'
     }, {
@@ -417,8 +427,7 @@ class EntityList extends Component {
   }
 
   render() {
-    const { items, typeSelectOptions } = this.props;
-    console.log("LIST typeSelectOptions: ", typeSelectOptions);
+    const { items } = this.props;
     if (items === null) {
       return (<LoadingItemPlaceholder />);
     }
