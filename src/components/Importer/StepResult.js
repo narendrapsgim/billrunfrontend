@@ -107,7 +107,7 @@ const StepResult = (props) => {
       <div>
         <p>
           <Label bsStyle="success">{success.length}</Label> rows were successfully imported.<br />
-          <Label bsStyle="danger">{result.size - success.size}</Label> rows were faild import.<br />
+          <Label bsStyle="danger">{result.size - success.size}</Label> rows failed to import.<br />
           Please remove successfully imported rows from file, fix errors and try again.
         </p>
         {downlodCsvWithErrors}
