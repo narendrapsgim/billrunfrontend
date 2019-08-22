@@ -65,7 +65,7 @@ class CustomersList extends Component {
   }, {
     type: 'import',
     onClick: this.onClickImprt,
-    show: this.getEntityOptions().length > 0
+    show: this.getEntityOptions().size > 0
   }];
 
   getActions = () => [
@@ -76,7 +76,6 @@ class CustomersList extends Component {
     .reduce((acc, entity) => (
       ['customer', 'subscription'].includes(entity) ? acc.push(entity) : acc
     ), Immutable.List())
-    .toArray();
 
   onCloseImport = () => {
     this.setState({
@@ -130,7 +129,7 @@ class CustomersList extends Component {
         from: defaultFrom,
         to: defaultTo,
       }),
-    })
+    });
 
     return (
       <div>
