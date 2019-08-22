@@ -180,9 +180,12 @@ const getConfigImportTypes = (state, props) => {
   return getConfig(['import', 'allowed_entities_importype'], Immutable.Map())
 }
 
-const mergeImportOptions = (item, configTypes, apiSettingsTypes) =>
+const mergeImportOptions = (item, configTypes, apiSettingsTypes, itemType = '') =>
   Immutable.List().withMutations((optionsWithMutations) => {
-    const entity = item ? item.get('entity', '') : '';
+    let entity = itemType;
+    if (entity === '' && item && item.get('entity', '') !== '') {
+      entity = item.get('entity', '');
+    }
     configTypes
       .filter(entities => entities.includes(entity))
       .forEach((entities, type) => {
@@ -204,5 +207,6 @@ export const importTypesOptionsSelector = createSelector(
   itemSelector,
   getConfigImportTypes,
   importersSelector,
+  (state, props, action, itemType) => itemType,
   mergeImportOptions
 );
