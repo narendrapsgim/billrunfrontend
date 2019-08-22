@@ -16,7 +16,7 @@
     "subscription": ["firstname", "lastname", "plan", "services"]
   },
   "defaultHiddenFields": {
-    "customer": ["aid", "payment_gateway"],
+    "customer": ["aid", "payment_gateway", "allowances"],
     "subscription": ["sid", "aid", "plan_activation", "play"],
     "product": ["from", "to", "play", "tax"],
     "service": ["from", "to", "include", "play", "tax"],
