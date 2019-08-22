@@ -2,7 +2,7 @@ import moment from 'moment';
 import Immutable from 'immutable';
 import { upperCaseFirst } from 'change-case';
 import { apiBillRun, apiBillRunErrorHandler, apiBillRunSuccessHandler, buildRequestUrl } from '../common/Api';
-import { getEntityByIdQuery, apiEntityQuery, getEntityCSVQuery } from '../common/ApiQueries';
+import { getEntityByIdQuery, apiEntityQuery, getEntityCSVQuery, getEntitesQuery } from '../common/ApiQueries';
 import { getItemDateValue, getConfig, getItemId } from '@/common/Util';
 import { startProgressIndicator } from './progressIndicatorActions';
 
@@ -259,4 +259,16 @@ export const validateMandatoryField = (value, fieldConfig) => {
     }
   }
   return true;
+}
+
+export const entitySearchByQuery = (collection, query, project, sort, options) => dispatch => {
+  const searchQuery = getEntitesQuery(collection, project, query, sort, options);
+  return apiBillRun(searchQuery, { timeOutMessage: apiTimeOutMessage })
+    .then((success) => {
+      if (success && success.data && success.data[0] && success.data[0].data && success.data[0].data.details) {
+        return success.data[0].data.details;
+      }
+      throw new Error();
+    })
+    .catch(error => false);
 }
