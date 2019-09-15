@@ -219,11 +219,17 @@ export const getItemDateValue = (item, fieldName, defaultValue = moment()) => {
   if (Immutable.Map.isMap(item)) {
     const dateString = item.get(fieldName, false);
     if (typeof dateString === 'string') {
-      return moment(dateString);
+      const dateFromString = moment(dateString);
+      if (dateFromString.isValid()) {
+        return dateFromString;
+      }
     }
     const dateUnix = item.getIn([fieldName, 'sec'], false);
     if (typeof dateUnix === 'number') {
-      return moment.unix(dateUnix);
+      const dateFromTimestemp = moment.unix(dateUnix);
+      if (dateFromTimestemp.isValid()) {
+        return dateFromTimestemp;
+      }
     }
   }
   return defaultValue;
