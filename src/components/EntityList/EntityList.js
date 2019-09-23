@@ -261,11 +261,17 @@ class EntityList extends Component {
 
   isImportEnabled = () => {
     const { itemType } = this.props;
+    if (window.import_export === true) {
+      return true;
+    }
     return getConfig(['import', 'allowed_entities'], Immutable.List()).includes(itemType);
   }
 
   isExportEnabled = () => {
     const { itemType } = this.props;
+    if (window.import_export === true) {
+      return true;
+    }
     return getConfig(['export', 'allowed_entities'], Immutable.List()).includes(itemType);
   }
 
