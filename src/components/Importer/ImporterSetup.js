@@ -7,11 +7,11 @@ import moment from 'moment';
 import { titleCase } from 'change-case';
 import { Panel } from 'react-bootstrap';
 import Importer from '../Importer';
-import { getSettings } from '../../actions/settingsActions';
-import { itemSelector, importItemTypeSelector } from '../../selectors/entitySelector';
-import { getConfig } from '../../common/Util';
-import { setPageTitle } from '../../actions/guiStateActions/pageActions';
-import { clearList } from '../../actions/entityListActions';
+import { getSettings } from '@/actions/settingsActions';
+import { setPageTitle } from '@/actions/guiStateActions/pageActions';
+import { clearList } from '@/actions/entityListActions';
+import { itemSelector, importItemTypeSelector } from '@/selectors/entitySelector';
+import { getConfig } from '@/common/Util';
 
 
 class ImporterSetup extends Component {
@@ -48,6 +48,9 @@ class ImporterSetup extends Component {
   componentWillReceiveProps(nextProps) {
     const { importEntity } = nextProps;
     if (this.props.importEntity !== importEntity) {
+      this.setState({
+        refreshString: moment().format(), //refetch screen import
+      });
       if (!importEntity) {
         this.props.dispatch(setPageTitle('Import'));
       } else {
@@ -80,7 +83,7 @@ class ImporterSetup extends Component {
   render() {
     const { refreshString } = this.state;
     const { importEntity } = this.props;
-    const importEntities = (importEntity) ? [importEntity] : importEntity;
+    const importEntities = (importEntity) ? Immutable.List([importEntity]) : importEntity;
     const apiDateFormat = getConfig('apiDateFormat', 'YYYY-MM-DD');
     const defaultFrom = moment().format(apiDateFormat);
     const defaultTo = moment().add(100, 'years').format(apiDateFormat);
@@ -118,7 +121,6 @@ class ImporterSetup extends Component {
           onFinish={this.onCloseImport}
           defaultValues={defaultValues}
           predefinedValues={predefinedValues}
-          alterData={this.alterData}
           restartString={refreshString}
         />
       </Panel>

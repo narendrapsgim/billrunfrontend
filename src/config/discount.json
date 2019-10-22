@@ -52,7 +52,7 @@
       { "id": "is", "title": "Is", "type": "string",
         "include": ["daterange"],
         "exclude": [],
-        "options": [{"value": "active", "label": "Active"}, {"value": "notActive", "label": "No Active"}]
+        "options": [{"value": "active", "label": "Active"}, {"value": "notActive", "label": "Inactive"}]
       },
       { "id": "exists", "title": "Exists", "type": "boolean",
         "include": ["string", "textarea", "number", "percentage", "boolean", "date", "datetime", "ranges", "range"],

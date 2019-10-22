@@ -197,11 +197,12 @@ class Subscription extends Component {
     const { subscription, discountsHiddenFields } = this.state;
     const discounts = subscription.get('discounts', Immutable.List()) || Immutable.List();
     const isCreate = idx === null;
+    const apiDateTimeFormat = getConfig('apiDateTimeFormat', 'YYYY-MM-DD[T]HH:mm:ss.SSS[Z]');
     const newDiscount = discounts.get(idx, Immutable.Map({
       key: `SUBSCRIBER_DISCOUNT_${uuid.v4().replace(/-/g, '')}`,
       type: 'monetary',
-      from: subscription.get('from', ''),
-      to: subscription.get('to', ''),
+      from: subscription.get('from', moment().format(apiDateTimeFormat)),
+      to: subscription.get('to', moment().add(100, 'years').format(apiDateTimeFormat)),
     }))
     const onOk = (newItem) => {
       this.props.dispatch(setFormModalError());

@@ -10,7 +10,6 @@ import {
   getSettings,
 } from '@/actions/settingsActions';
 import { isPlaysEnabledSelector } from '@/selectors/settingsSelector';
-import { getConfig } from '@/common/Util';
 
 
 class ProductsList extends Component {
@@ -31,24 +30,25 @@ class ProductsList extends Component {
     defaultListFields: ['description', 'key', 'rates'],
   }
 
+  static rowActions = [
+    { type: 'edit' },
+    { type: 'view' },
+  ]
+
+  // TODO: get values field.get('searchable', false) when it will be ready
+  // depend on database index
+  static filterFields = [
+    { id: 'key', placeholder: 'Key' },
+  ]
+
   componentWillMount() {
     this.props.dispatch(getSettings('rates.fields'));
-  }
-
-  onClickImport = () => {
-    this.props.router.push('/import/product');
   }
 
   parserUsegt = (item) => {
     const usegt = item.get('rates', Immutable.Map()).keySeq().first();
     return (typeof usegt !== 'undefined') ? usegt : '';
   };
-
-  // TODO: get values field.get('searchable', false) when it will be ready
-  // depend on database index
-  filterFields = () => ([
-    { id: 'key', placeholder: 'Key' },
-  ]);
 
   filterPlayField = (field) => {
     const { isPlaysEnabled } = this.props;
@@ -58,8 +58,6 @@ class ProductsList extends Component {
     return isPlaysEnabled;
   }
 
-  isImportEnabled = () => getConfig(['import', 'allowed_entities'], Immutable.List()).includes('product');
-
   getProjectFields = () => {
     const { fields, defaultListFields } = this.props;
     return fields
@@ -67,10 +65,6 @@ class ProductsList extends Component {
       .reduce((acc, field) => acc.set(field.get('field_name'), 1), Immutable.Map({}))
       .toJS();
   };
-
-  getActions = () => ([
-    { type: 'edit' },
-  ]);
 
   getFields = () => {
     const { fields, defaultListFields } = this.props;
@@ -95,19 +89,6 @@ class ProductsList extends Component {
       .toArray();
   };
 
-  getListActions = () => [{
-    type: 'add',
-  }, {
-    type: 'refresh',
-  }, {
-    type: 'import',
-    label: 'Import',
-    onClick: this.onClickImport,
-    show: this.isImportEnabled,
-    actionStyle: 'primary',
-    actionSize: 'xsmall',
-  }];
-
   render() {
     const { fields } = this.props;
     if (fields === null) {
@@ -118,12 +99,11 @@ class ProductsList extends Component {
         collection="rates"
         itemType="product"
         itemsType="products"
-        filterFields={this.filterFields()}
+        filterFields={ProductsList.filterFields}
         tableFields={this.getFields()}
         projectFields={this.getProjectFields()}
         showRevisionBy="key"
-        actions={this.getActions()}
-        listActions={this.getListActions()}
+        actions={ProductsList.rowActions}
       />
     );
   }

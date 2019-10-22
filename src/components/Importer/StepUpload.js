@@ -8,6 +8,7 @@ import { sentenceCase } from 'change-case';
 import Field from '@/components/Field';
 import { getConfig, formatSelectOptions, getFieldName } from '@/common/Util';
 import PlaysSelector from '../Plays/PlaysSelector';
+import { Actions, AddFileButton } from '@/components/Elements';
 
 
 class StepUpload extends Component {
@@ -17,6 +18,12 @@ class StepUpload extends Component {
     mapperOptions: PropTypes.instanceOf(Immutable.List),
     mapperName: PropTypes.string,
     delimiterOptions: PropTypes.arrayOf(
+      PropTypes.shape({
+        value: PropTypes.string,
+        label: PropTypes.string,
+      }),
+    ),
+    typeSelectOptions: PropTypes.arrayOf(
       PropTypes.shape({
         value: PropTypes.string,
         label: PropTypes.string,
@@ -38,6 +45,7 @@ class StepUpload extends Component {
       { value: ',', label: 'Comma' },
     ],
     entityOptions: [],
+    typeSelectOptions: [],
     showPlay: false,
     mapperName: '',
     onChange: () => {},
@@ -47,6 +55,7 @@ class StepUpload extends Component {
 
   state = {
     fileError: null,
+    predefinedFileError: null,
     delimiterError: null,
     operations: Immutable.List(),
   }
@@ -57,9 +66,18 @@ class StepUpload extends Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    const { item } = nextProps;
+    const { item, typeSelectOptions } = nextProps;
     if (this.props.item.get('entity', '') !== item.get('entity', '')) {
       this.setoperation(item.get('entity', ''), item.get('operation', ''));
+    }
+    const importType = item.get('importType', '');
+    if (typeSelectOptions && typeSelectOptions.length === 1 && typeSelectOptions[0].value !== importType) {
+      this.onChangeImportType(typeSelectOptions[0].value);
+    }
+    const oldImportType = this.props.item.get('importType', '');
+    // remove files if mapper was changed
+    if (oldImportType !== '' && oldImportType !== importType) {
+      this.props.onDelete('files');
     }
   }
 
@@ -92,6 +110,7 @@ class StepUpload extends Component {
     if (results.errors.length === 0) {
       this.props.onChange('fileContent', results.data);
       this.props.onChange('fileName', file.name);
+      this.setState({ fileError: null });
     } else {
       this.setState({ fileError: 'Error in CSV file' });
       this.resetFile();
@@ -127,6 +146,29 @@ class StepUpload extends Component {
     this.resetFile();
   }
 
+  onUploadPredefinedFile = (e) => {
+    const { item } = this.props;
+    const { files } = e.target;
+    let newFiles = [];
+    if (files.length > 0) {
+      for (let i = 0; i < files.length; i++) {
+        newFiles.push(files[i]);
+      }
+    }
+    this.props.onChange('files', [...item.get('files', []), ...newFiles]);
+    e.target.value = null;
+  }
+
+  onRemovePredefinedFile = (idx = -1) => {
+    const { item } = this.props;
+    const removed = (idx === -1) ? [] : item.get('files', []).filter((file, index) => index !== idx);
+    if (removed.length === 0) {
+      this.props.onDelete('files');
+    } else {
+      this.props.onChange('files', removed);
+    }
+  }
+
   onChangeDelimiter = (value) => {
     if (value.length) {
       this.props.onChange('fileDelimiter', value);
@@ -142,10 +184,19 @@ class StepUpload extends Component {
     this.props.onDelete('map');
     this.props.onDelete('multiFieldAction');
     this.props.onDelete('play');
+    this.props.onDelete('importType');
     if (value.length) {
       this.props.onChange('entity', value);
     } else {
       this.props.onDelete('entity');
+    }
+  }
+
+  onChangeImportType = (value) => {
+    if (value.length) {
+      this.props.onChange('importType', value);
+    } else {
+      this.props.onDelete('importType');
     }
   }
 
@@ -182,18 +233,34 @@ class StepUpload extends Component {
     .toList();
   }
 
+  predefinedFileActions = () => [{
+    type: 'remove',
+    helpText: 'Remove file',
+    onClick: this.onRemovePredefinedFile,
+    actionClass: "pl0 pr0"
+  }];
+
   render() {
-    const { delimiterError, fileError, operations } = this.state;
-    const { item, delimiterOptions, entityOptions, mapperName, mapperOptions, showPlay } = this.props;
+    const { delimiterError, predefinedFileError, fileError, operations } = this.state;
+    const { item,
+      delimiterOptions,
+      entityOptions,
+      mapperName,
+      mapperOptions,
+      showPlay,
+      typeSelectOptions,
+    } = this.props;
     const delimiter = item.get('fileDelimiter', '');
     const operation = item.get('operation', '');
     const entity = item.get('entity', '');
     const fileName = item.get('fileName', '');
+    const importType = item.get('importType', '');
     const isSingleEntity = (entityOptions && entityOptions.length === 1);
     const entitySeletOptions = this.createEntityTypeOptions(entityOptions);
     const fileParsed = fileName !== '';
     const operationSelectOptions = operations.map(formatSelectOptions).toJS();
     const mapperSelectOptions = this.createSavedMapperOptions().toJS();
+    const predefinedFileActions = this.predefinedFileActions();
     return (
       <div className="StepUpload">
         { !isSingleEntity && (
@@ -211,46 +278,88 @@ class StepUpload extends Component {
             </Col>
           </FormGroup>
         )}
-        <FormGroup validationState={delimiterError === null ? null : 'error'}>
-          <Col sm={3} componentClass={ControlLabel}>Delimiter</Col>
-          <Col sm={9}>
-            <Field
-              fieldType="select"
-              allowCreate={true}
-              onChange={this.onChangeDelimiter}
-              options={delimiterOptions}
-              value={delimiter}
-              placeholder="Select or add new"
-              addLabelText="{label}"
-              clearable={false}
-              disabled={fileParsed}
-            />
-            { delimiterError !== null && <HelpBlock>{delimiterError}.</HelpBlock>}
-            { fileParsed && <HelpBlock className="mb0">To change delimiter please remove CSV file.</HelpBlock>}
-          </Col>
-        </FormGroup>
-        <FormGroup validationState={fileError === null ? null : 'error'}>
-          <Col sm={3} componentClass={ControlLabel}>Upload CSV</Col>
-          <Col sm={9}>
-            <div style={{ paddingTop: 5 }} >
-              {fileName !== ''
-                ? (<p style={{ margin: 0 }}>
-                  {fileName}
-                  <Button
-                    bsStyle="link"
-                    title="Remove file"
-                    onClick={this.onFileReset}
-                    style={{ padding: '0 0 0 10px', marginBottom: 1 }}
-                  >
-                    <i className="fa fa-minus-circle danger-red" />
-                  </Button>
-                </p>)
-                : <input type="file" accept=".csv" onChange={this.onFileUpload} onClick={this.onFileReset} />
-              }
-              {fileError !== null && <HelpBlock>{fileError}.</HelpBlock>}
-            </div>
-          </Col>
-        </FormGroup>
+        {(typeSelectOptions.length !== 1) && (
+          <FormGroup>
+            <Col sm={3} componentClass={ControlLabel}>Import option</Col>
+            <Col sm={9}>
+              <Field
+                fieldType="select"
+                onChange={this.onChangeImportType}
+                options={typeSelectOptions}
+                value={importType}
+                placeholder="Select import option...."
+                clearable={false}
+              />
+            </Col>
+          </FormGroup>
+        )}
+
+        {(!['manual_mapping'].includes(importType)) && (
+          <FormGroup validationState={predefinedFileError === null ? null : 'error'}>
+            <Col sm={3} componentClass={ControlLabel}>Upload CSV</Col>
+            <Col sm={9}>
+              <dl>
+                <dt>
+                  <AddFileButton onClick={this.onUploadPredefinedFile} />
+                  {predefinedFileError !== null && <HelpBlock>{predefinedFileError}</HelpBlock>}
+                </dt>
+                {item.get('files', []).map((file, idx) => (
+                  <dd style={{ height: 28 }} key={`${idx}-${file.name}`}>
+                    <span className="inline ml10 mr10">
+                      <Actions actions={predefinedFileActions} data={idx} />
+                    </span>
+                    {file.name}
+                  </dd>
+                ))}
+              </dl>
+            </Col>
+          </FormGroup>
+        )}
+
+        {['manual_mapping'].includes(importType) && (
+          <FormGroup validationState={delimiterError === null ? null : 'error'}>
+            <Col sm={3} componentClass={ControlLabel}>Delimiter</Col>
+            <Col sm={9}>
+              <Field
+                fieldType="select"
+                allowCreate={true}
+                onChange={this.onChangeDelimiter}
+                options={delimiterOptions}
+                value={delimiter}
+                placeholder="Select or add new"
+                addLabelText="{label}"
+                clearable={false}
+                disabled={fileParsed}
+              />
+              { delimiterError !== null && <HelpBlock>{delimiterError}.</HelpBlock>}
+              { fileParsed && <HelpBlock className="mb0">To change delimiter please remove CSV file.</HelpBlock>}
+            </Col>
+          </FormGroup>
+        )}
+        {['manual_mapping'].includes(importType) && (
+          <FormGroup validationState={fileError === null ? null : 'error'}>
+            <Col sm={3} componentClass={ControlLabel}>Upload CSV</Col>
+            <Col sm={9}>
+              <div style={{ paddingTop: 5 }} >
+                {fileName !== ''
+                  ? (<p style={{ margin: 0 }}>
+                    {fileName}
+                    <Button
+                      bsStyle="link"
+                      title="Remove file"
+                      onClick={this.onFileReset}
+                      style={{ padding: '0 0 0 10px', marginBottom: 1 }}
+                    >
+                      <i className="fa fa-minus-circle danger-red" />
+                    </Button>
+                  </p>)
+                  : <input type="file" accept=".csv" onChange={this.onFileUpload} onClick={this.onFileReset} />
+                }
+                {fileError !== null && <HelpBlock>{fileError}.</HelpBlock>}
+              </div>
+            </Col>
+          </FormGroup>
+        )}
         {operations.size > 1 && (
         <FormGroup validationState={delimiterError === null ? null : 'error'}>
           <Col sm={3} componentClass={ControlLabel}>Import Action</Col>
@@ -276,7 +385,7 @@ class StepUpload extends Component {
             fieldStyle={{ sm:9, lg: 9 }}
           />
         )}
-        {mapperOptions.size > 0 && (
+        {['manual_mapping'].includes(importType) && mapperOptions.size > 0 && (
         <FormGroup>
           <Col sm={3} componentClass={ControlLabel}>Saved Mapper</Col>
           <Col sm={9}>

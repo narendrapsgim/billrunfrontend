@@ -28,6 +28,23 @@ const selectCyclesOptions = (options) => {
   }));
 };
 
+const getAccountsOptions = state => state.list.get('available_accounts', null);
+
+const selectAccountsOptions = (options) => {
+  if (options === null) {
+    return undefined;
+  }
+  return options.map(option => {
+    let name = '';
+    name += option.get('firstname', '').trim() !== '' ? option.get('firstname', '').trim() : '';
+    name += option.get('lastname', '').trim() !== '' ? ` ${option.get('lastname', '').trim()}` : '';
+    return Immutable.Map({
+      title: name.trim(),
+      aid: option.get('aid', ''),
+    })
+  });
+}
+
 const getServicesOptions = state => state.list.get('available_services', null);
 
 const getTaxesOptions = state => state.list.get('available_taxRates', null);
@@ -158,6 +175,11 @@ export const listByNameSelector = createSelector(
   getOptionsByListName,
   () => 'key',
   formatSelectOptions,
+);
+
+export const accountsOptionsSelector = createSelector(
+  getAccountsOptions,
+  selectAccountsOptions,
 );
 
 export const servicesOptionsSelector = createSelector(

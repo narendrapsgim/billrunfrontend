@@ -15,11 +15,23 @@ const Stepper = ({steps, activeIndex}) => (
       titleTop={5}
       lineMarginOffset={10}
       circleTop={0}
-      size={24}
+      size={25}
       titleFontSize={12}
       circleFontSize={12}
       activeStep={activeIndex}
       steps={steps}
+      defaultBorderColor="#cccccc"
+      defaultBorderStyle="solid"
+      defaultBorderWidth={1}
+      activeColor="#008cba"
+      activeBorderColor="#004b63"
+      activeBorderStyle="solid"
+      activeBorderWidth={1}
+      completeColor="#008cba"
+      completeTitleColor="#757575"
+      completeBorderColor="#008cba"
+      completeBorderStyle="solid"
+      completeBorderWidth={1}
     />
   </div>
 );

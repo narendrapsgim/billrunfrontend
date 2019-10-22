@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import Immutable from 'immutable';
-import { titleCase } from 'change-case';
+import { titleCase, upperCaseFirst } from 'change-case';
 import { Form } from 'react-bootstrap';
 import StepUpload from './StepUpload';
 import StepMapper from './StepMapper';
@@ -25,6 +25,7 @@ import { showDanger } from '@/actions/alertsActions';
 import {
   importFieldsOptionsSelector,
   importMapperSelector,
+  importTypesOptionsSelector,
 } from '@/selectors/importSelectors';
 import { itemSelector } from '@/selectors/entitySelector';
 import {
@@ -45,7 +46,8 @@ class Importer extends Component {
     predefinedValuesOperation: PropTypes.instanceOf(Immutable.Map),
     hiddenActionFields: PropTypes.instanceOf(Immutable.Map),
     savedMappers: PropTypes.instanceOf(Immutable.List),
-    entityOptions: PropTypes.arrayOf(PropTypes.string),
+    entityOptions: PropTypes.instanceOf(Immutable.List),
+    typeSelectOptions: PropTypes.array,
     showPlay: PropTypes.bool,
     restartString: PropTypes.string,
     onFinish: PropTypes.func,
@@ -53,7 +55,7 @@ class Importer extends Component {
   }
 
   static defaultProps = {
-    entityOptions: getConfig(['import', 'allowed_entities'], Immutable.List()).toJS(),
+    entityOptions: getConfig(['import', 'allowed_entities'], Immutable.List()),
     item: Immutable.Map(),
     importFields: [],
     predefinedValues: Immutable.Map(),
@@ -79,16 +81,10 @@ class Importer extends Component {
     ], // csv comuns that will not shown as option
     savedMappers: Immutable.List(),
     restartString: '',
+    typeSelectOptions: [],
     showPlay: false,
     onFinish: null,
   };
-
-  static importerSteps = [
-    {title: 'Upload File'},
-    {title: 'Field Map'},
-    {title: 'Validate'},
-    {title: 'Finish'},
-  ];
 
   state = {
     status: 'create',
@@ -99,15 +95,12 @@ class Importer extends Component {
   componentDidMount() {
     const { entityOptions } = this.props;
     this.props.dispatch(initImporter());
-    const isSingleEntity = (entityOptions && entityOptions.length === 1);
-    if (isSingleEntity) {
-      this.onChange('entity', entityOptions[0]);
-    }
+    this.initImportEntity(entityOptions);
     this.props.dispatch(getSettings('import.mapping'));
   }
 
   componentWillReceiveProps(nextProps) {
-    const { restartString } = nextProps;
+    const { restartString, item, entityOptions } = nextProps;
     if (restartString !== this.props.restartString) {
       this.props.dispatch(initImporter());
       this.setState({
@@ -115,10 +108,46 @@ class Importer extends Component {
         stepIndex: 0,
       });
     }
+    if (!Immutable.is(this.props.entityOptions, entityOptions)) {
+      this.initImportEntity(entityOptions);
+    }
+    // import entity changes to new entity
+    const newEntity = item.get('entity', '');
+    const oldEntity = this.props.item.get('entity', '');
+    if (newEntity !== '' && oldEntity !== newEntity) {
+      const itemsType = getConfig(['systemItems', newEntity, 'itemsType'], '');
+      const importName = `import${upperCaseFirst(itemsType)}`;
+      this.props.dispatch(getSettings('plugin_actions', { actions: [importName] }));
+    }
   }
 
   componentWillUnmount() {
     this.props.dispatch(deleteImporter());
+  }
+
+  initImportEntity = (entityOptions) => {
+    const isSingleEntity = (entityOptions && entityOptions.size === 1);
+    if (isSingleEntity) {
+      this.onChange('entity', entityOptions.first());
+    }
+  }
+
+  getImporterSteps = (index = null) => {
+    const { item } = this.props;
+    const importType = item.get('importType', '');
+    const steps = [];
+    if (importType === 'manual_mapping') {
+      steps.push({ id: 'upload', stepDate:{ title: 'Upload File'}});
+      steps.push({ id: 'mapping', stepDate:{ title: 'Field Map'}});
+      steps.push({ id: 'validate', stepDate:{ title: 'Validate'}, okLabel: 'Confirm and Import', okAction: this.onImport });
+    } else {
+      steps.push({ id: 'upload', stepDate:{ title: 'Upload File'}, okLabel: 'Import', okAction: this.onImport});
+    }
+    steps.push({ id: 'finish', stepDate:{ title: 'Finish'}, okLabel: 'Close', okAction: this.onFinish});
+    if (index === null) {
+      return steps;
+    }
+    return steps[index] || {};
   }
 
   onChange = (path, value) => {
@@ -145,7 +174,9 @@ class Importer extends Component {
     const { item } = this.props;
     const entity = item.get('entity', '');
     const operation = item.get('operation', 'create');
-    const rows = this.alterData(this.getFormatedRows());
+    const rows = (item.get('importType', '') === 'manual_mapping')
+      ? this.alterData(this.getFormatedRows())
+      : item;
     if (rows.size > 0 && entity !== '') {
       this.setState({ status: 'progress' });
       const collection = getConfig(['systemItems', entity, 'collection'], '');
@@ -423,30 +454,14 @@ class Importer extends Component {
 
   getOkButtonLable = () => {
     const { stepIndex } = this.state;
-    switch (stepIndex) {
-      case 2:
-      case '2':
-        return 'Confirm and Import';
-      case 3:
-      case '3':
-        return 'Close';
-      default:
-        return 'Next';
-    }
+    const importerStep = this.getImporterSteps(stepIndex);
+    return importerStep.okLabel || 'Next';
   }
 
   getOkButtonAction = () => {
     const { stepIndex } = this.state;
-    switch (stepIndex) {
-      case 2:
-      case '2':
-        return this.onImport;
-      case 3:
-      case '3':
-        return this.onFinish;
-      default:
-        return this.onNextStep;
-    }
+    const importerStep = this.getImporterSteps(stepIndex);
+    return importerStep.okAction || this.onNextStep;
   }
 
   getFormatedRows = (limit = -1) => {
@@ -575,31 +590,43 @@ class Importer extends Component {
 
   renderStepper = () => {
     const { stepIndex } = this.state;
+    const importerSteps = this.getImporterSteps();
     return (
-      <Stepper activeIndex={stepIndex} steps={Importer.importerSteps} />
+      <Stepper activeIndex={stepIndex} steps={importerSteps.map(step => step.stepDate)} />
     );
   }
 
   renderStepContent = () => {
-    const { item, importFields, entityOptions, ignoredHeaders, defaultValues, savedMappers, showPlay } = this.props;
+    const {
+      item,
+      importFields,
+      entityOptions,
+      ignoredHeaders,
+      defaultValues,
+      savedMappers,
+      showPlay,
+      typeSelectOptions,
+    } = this.props;
     const { stepIndex, mapperPrefix } = this.state;
     const entity = item.get('entity', '');
     const mapperName = item.get('mapperName', '');
+    const id = this.getImporterSteps(stepIndex).id;
 
-    switch (stepIndex) {
-      case 0: return (
+    switch (id) {
+      case 'upload': return (
         <StepUpload
           item={item}
-          entityOptions={entityOptions}
+          entityOptions={entityOptions.toJS()}
           onChange={this.onChange}
           onDelete={this.onDelete}
           onSelectMapping={this.onSelectMapping}
           mapperName={mapperName}
           mapperOptions={savedMappers}
+          typeSelectOptions={typeSelectOptions}
           showPlay={showPlay}
         />
       );
-      case 1: return (
+      case 'mapping': return (
         <StepMapper
           item={item}
           customFilterFields={this.customFilterMapperFields}
@@ -611,7 +638,7 @@ class Importer extends Component {
           mapperPrefix={mapperPrefix}
         />
       );
-      case 2: return (
+      case 'validate': return (
         <StepValidate
           entity={entity}
           fields={importFields}
@@ -622,7 +649,7 @@ class Importer extends Component {
           removeMapper={this.removeMapper}
         />
       );
-      case 3: return (
+      case 'finish': return (
         <StepResult item={item} />
       );
       default: return (
@@ -642,7 +669,7 @@ class Importer extends Component {
       <ActionButtons
         cancelLabel={this.getOkButtonLable()}
         onClickCancel={this.getOkButtonAction()}
-        disableCancel={inProgress || validateHasError}
+        disableCancel={inProgress || validateHasError || item.get('importType', '') === ''}
         saveLabel="Back"
         hideCancel={stepIndex === 3 && this.props.onFinish === null}
         disableSave={stepIndex === 0 || inProgress || inFinish}
@@ -678,6 +705,7 @@ const mapStateToProps = (state, props) => {
     item,
     importFields: importFieldsOptionsSelector(state, props, 'importer'),
     savedMappers: importMapperSelector(state, props, 'importer'),
+    typeSelectOptions: importTypesOptionsSelector(state, props, 'importer'),
     showPlay: isPlaysEnabled && allowedEntitiesForPlays.includes(entity),
   });
 };

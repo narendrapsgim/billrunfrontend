@@ -49,7 +49,7 @@ const Action = (props) => {
     'fa-eye': type === 'view',
     'fa-pencil': type === 'edit',
     'fa-files-o': type === 'clone',
-    'fa-file-excel-o': type === 'export_csv',
+    'fa-file-excel-o': ['export_csv', 'export'].includes(type),
     'danger-red': ['enable', 'remove'].includes(type),
     'fa-trash-o': type === 'remove',
     'fa-toggle-off': type === 'enable',

@@ -1,10 +1,14 @@
 {
   "allowed_entities": [
-    "customer", "subscription"
+    "discount", "charge", "customer", "subscription", "plan" , "service"
   ],
   "allowed_entities_actions": {
     "create": ["customer", "subscription", "product"],
     "permanentchange": ["product"]
+  },
+  "allowed_entities_importype": {
+    "manual_mapping": ["customer", "subscription", "product"],
+    "predefined_mapping": ["discount", "charge"]
   },
   "default_values_allowed_actions": {
     "create": ["customer", "subscription", "product"],

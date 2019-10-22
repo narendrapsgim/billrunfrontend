@@ -78,7 +78,7 @@ const StepResult = (props) => {
     if (allFails) {
       return (
         <div>
-          <p>No records were imported, please fix errors and try again.</p>
+          <p>No records were imported. please fix the errors and try again.</p>
           <hr style={{ marginBottom: 0 }} />
           {rendeDetails()}
         </div>
@@ -86,16 +86,12 @@ const StepResult = (props) => {
     }
     // Mixed, some pased some fails
     const success = result.filter(status => status === true);
-    const errorCsvData = getErrorCsvData();
-    const errorCsvHeaders = getErrorCsvHeaders();
 
-    return (
-      <div>
-        <p>
-          <Label bsStyle="success">{success.length}</Label> rows were successfully imported.<br />
-          <Label bsStyle="danger">{result.size - success.length}</Label> rows were faild import.<br />
-          Please remove successfully imported rows from file, fix errors and try again.
-        </p>
+    let downlodCsvWithErrors = null;
+    if (item.get('importType', ',') === 'manual_mapping') {
+      const errorCsvData = getErrorCsvData();
+      const errorCsvHeaders = getErrorCsvHeaders();
+      downlodCsvWithErrors = (
         <CSVLink
           data={errorCsvData}
           headers={errorCsvHeaders}
@@ -104,6 +100,17 @@ const StepResult = (props) => {
         >
           Click here to download CSV file with errors
         </CSVLink>
+      );
+    }
+
+    return (
+      <div>
+        <p>
+          <Label bsStyle="success">{success.length}</Label> rows were successfully imported.<br />
+          <Label bsStyle="danger">{result.size - success.size}</Label> rows failed to import.<br />
+          Please remove successfully imported rows from the file, fix the errors and try again.
+        </p>
+        {downlodCsvWithErrors}
         <hr style={{ marginBottom: 0 }} />
         {rendeDetails()}
       </div>

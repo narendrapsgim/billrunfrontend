@@ -130,12 +130,12 @@ export const saveSettingsQuery = (data, category) => {
   });
 };
 
-export const getSettingsQuery = category => ({
+export const getSettingsQuery = (category, data = {}) => ({
   api: 'settings',
   name: category,
   params: [
     { category },
-    { data: JSON.stringify({}) },
+    { data: JSON.stringify(data) },
   ],
 });
 
@@ -282,6 +282,15 @@ export const apiEntityQuery = (collection, action, body) => ({
   },
 });
 
+export const getEntityCSVQuery = (entity, params) => ({
+  action: 'export',
+  entity,
+  params,
+  options: {
+    method: 'GET',
+  },
+});
+
 
 export const getGroupsQuery = collection => ({
   action: 'uniqueget',
@@ -322,7 +331,7 @@ export const getEntityByIdQuery = (collection, id) => ({
   ],
 });
 
-export const getEntitesQuery = (collection, project = {}, query = {}, sort = null) => {
+export const getEntitesQuery = (collection, project = {}, query = {}, sort = null, options = {}) => {
   let action;
   switch (collection) {
     case 'users':
@@ -341,6 +350,7 @@ export const getEntitesQuery = (collection, project = {}, query = {}, sort = nul
       { query: JSON.stringify(query) },
       { project: JSON.stringify(project) },
       { sort: JSON.stringify(sortBy) },
+      { options: JSON.stringify(options) },
     ],
   });
 };
@@ -367,6 +377,10 @@ export const getDeleteLineQuery = id => ({
 
 
 // List
+export const getAccountsQuery = (project = { aid: 1, firstname: 1, lastname: 1 }) =>
+  getEntitesQuery('subscribers', project, {type: 'account'});
+export const getSubscriptionsWithAidQuery = (project = { aid: 1, sid: 1, firstname: 1, lastname: 1 }) =>
+  getEntitesQuery('subscribers', project, {type: 'subscriber'});
 export const getPlansQuery = (project = { name: 1 }) => getEntitesQuery('plans', project);
 export const getServicesQuery = (project = { name: 1 }) => getEntitesQuery('services', project);
 export const getServicesKeysWithInfoQuery = () => getEntitesQuery('services', { name: 1, description: 1, play: 1, quantitative: 1, balance_period: 1 }, {}, { name: 1 	});
