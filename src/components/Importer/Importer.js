@@ -115,8 +115,8 @@ class Importer extends Component {
     const newEntity = item.get('entity', '');
     const oldEntity = this.props.item.get('entity', '');
     if (newEntity !== '' && oldEntity !== newEntity) {
-      const itemsType = getConfig(['systemItems', newEntity, 'itemsType'], '');
-      const importName = `import${upperCaseFirst(itemsType)}`;
+      const collection = getConfig(['systemItems', newEntity, 'collection'], '');
+      const importName = `import${upperCaseFirst(collection)}`;
       this.props.dispatch(getSettings('plugin_actions', { actions: [importName] }));
     }
   }
