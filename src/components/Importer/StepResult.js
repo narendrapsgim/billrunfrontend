@@ -72,31 +72,29 @@ const StepResult = (props) => {
       const nameUpdated = pluralize(itemName, Number(updated));
       const errors = item.getIn(['result', 'general_errors'], Immutable.List());
       const errorsMessages = (
-        <p className="mb5">
+        <div className="mb5">
           <Label bsStyle="danger">Errors :</Label>
           <ol className="pt0 pb0">
             {errors.map((error, idx) => (<li key={`error_${idx}`}>{error}</li>)).toArray()}
           </ol>
-        </p>
+        </div>
       );
       const warnings = item.getIn(['result', 'general_warnings'], Immutable.List());
       const warningMessages = (
-        <p className="mb5">
+        <div className="mb5">
           <Label bsStyle="warning">Warnings :</Label>
           <ol className="pt0 pb0">
             {warnings.map((warning, idx) => (<li key={`warning_${idx}`}>{warning}</li>)).toArray()}
           </ol>
-        </p>
+        </div>
       );
       return (
         <div className="ml10">
-          <p className="mb5">
-            <Label bsStyle="success">Success :</Label>
-            <ul className="pt0 pb0" >
-              <li>Created {created} {nameCreated}</li>
-              <li>Updated {updated} {nameUpdated}</li>
-            </ul>
-          </p>
+          <Label bsStyle="success">Success :</Label>
+          <ul className="pt0 pb0" >
+            <li>Created {created} {nameCreated}</li>
+            <li>Updated {updated} {nameUpdated}</li>
+          </ul>
           {errors.size > 0 && errorsMessages}
           {warnings.size > 0 && warningMessages}
         </div>
