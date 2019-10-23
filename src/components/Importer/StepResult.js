@@ -38,9 +38,9 @@ const StepResult = (props) => {
       <dl className="mb5" key={`status_${key}`}>
         <dt>
           {isNumber(key) ? `row ${key}` : key}
-          {status === true && <Label bsStyle="success ml10">Success</Label>}
-          {status === false && <Label bsStyle="info ml10">No errors</Label>}
-          {status !== false && status !== true && !Immutable.Iterable.isIterable(status) && <Label bsStyle="danger ml10">{status}</Label>}
+          {status === true && <Label bsStyle="success" className="ml10">Success</Label>}
+          {status === false && <Label bsStyle="info" className="ml10">No errors</Label>}
+          {status !== false && status !== true && !Immutable.Iterable.isIterable(status) && <Label bsStyle="danger" className="ml10">{status}</Label>}
         </dt>
         { Immutable.Iterable.isIterable(status) && status.map((message, type) => {
           let messageStyle = 'default';
@@ -70,7 +70,7 @@ const StepResult = (props) => {
       const itemName = getConfig(['systemItems', entity, 'itemName'], '');
       const nameCreated = pluralize(itemName, Number(created));
       const nameUpdated = pluralize(itemName, Number(updated));
-      const errors = item.getIn(['result', 'general_errors'], []);
+      const errors = item.getIn(['result', 'general_errors'], Immutable.List());
       const errorsMessages = (
         <p className="mb5">
           <Label bsStyle="danger">Errors :</Label>
@@ -79,7 +79,7 @@ const StepResult = (props) => {
           </ol>
         </p>
       );
-      const warnings = item.getIn(['result', 'general_warnings'], []);
+      const warnings = item.getIn(['result', 'general_warnings'], Immutable.List());
       const warningMessages = (
         <p className="mb5">
           <Label bsStyle="warning">Warnings :</Label>
