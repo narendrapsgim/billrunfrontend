@@ -191,12 +191,16 @@ const mergeImportOptions = (item, configTypes, apiSettingsTypes) =>
     apiSettingsTypes
       .filter(entities => entities.includes(entity))
       .forEach((entities, type) => {
-        optionsWithMutations.push(type);
+        optionsWithMutations.push(Immutable.Map({
+          value: type,
+          label: sentenceCase(getFieldName(type, 'import')),
+          type: 'plugin',
+        }));
       });
   })
   .map((option) => Immutable.Map.isMap(option)
-    ? ({ value: option.get('value', ''), label: option.get('label', '') })
-    : ({ value: option, label: sentenceCase(getFieldName(option, 'import')) })
+    ? ({ value: option.get('value', ''), label: option.get('label', ''), type: option.get('type', '') })
+    : ({ value: option, label: sentenceCase(getFieldName(option, 'import')), type: '' })
   )
   .toArray();
 
