@@ -261,6 +261,10 @@ class StepUpload extends Component {
     const operationSelectOptions = operations.map(formatSelectOptions).toJS();
     const mapperSelectOptions = this.createSavedMapperOptions().toJS();
     const predefinedFileActions = this.predefinedFileActions();
+    const isTypePlugin = typeSelectOptions
+      .filter(option => option.type === 'plugin')
+      .map(option => option.value)
+      .includes(importType);
     return (
       <div className="StepUpload">
         { !isSingleEntity && (
@@ -360,22 +364,22 @@ class StepUpload extends Component {
             </Col>
           </FormGroup>
         )}
-        {operations.size > 1 && (
-        <FormGroup validationState={delimiterError === null ? null : 'error'}>
-          <Col sm={3} componentClass={ControlLabel}>Import Action</Col>
-          <Col sm={9}>
-            <Field
-              fieldType="select"
-              onChange={this.onChangeOperation}
-              options={operationSelectOptions}
-              value={operation}
-              placeholder="Select import action"
-              addLabelText="{label}"
-              clearable={false}
-              disabled={operations.size === 1 || entity === ''}
-            />
-          </Col>
-        </FormGroup>
+        {operations.size > 1 && isTypePlugin === false && (
+          <FormGroup validationState={delimiterError === null ? null : 'error'}>
+            <Col sm={3} componentClass={ControlLabel}>Import Action</Col>
+            <Col sm={9}>
+              <Field
+                fieldType="select"
+                onChange={this.onChangeOperation}
+                options={operationSelectOptions}
+                value={operation}
+                placeholder="Select import action"
+                addLabelText="{label}"
+                clearable={false}
+                disabled={operations.size === 1 || entity === ''}
+              />
+            </Col>
+          </FormGroup>
         )}
         {showPlay && (
           <PlaysSelector
