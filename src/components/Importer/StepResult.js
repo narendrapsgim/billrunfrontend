@@ -1,8 +1,11 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import Immutable from 'immutable';
-import { Label } from 'react-bootstrap';
+import { Label, Panel } from 'react-bootstrap';
 import { CSVLink } from 'react-csv';
+import pluralize from 'pluralize';
+import isNumber from 'is-number';
+import { getConfig } from '@/common/Util';
 
 
 const StepResult = (props) => {
@@ -10,7 +13,8 @@ const StepResult = (props) => {
   const fileDelimiter = item.get('fileDelimiter', ',');
   const fileContent = item.get('fileContent', []) || [];
   const fileName = item.get('fileName', 'errors');
-  const result = item.get('result', Immutable.List()) || Immutable.List();
+  const entity = item.get('entity', '');
+  const result = item.getIn(['result', 'imported_entities'], Immutable.List()) || Immutable.List();
 
   const getErrorCsvHeaders = () => (
     [...fileContent[0], 'import_error_message', 'import_error_row']
@@ -28,38 +32,81 @@ const StepResult = (props) => {
     return rows;
   };
 
-  const rendeDetails = () => (
-    <div className="scrollbox">
-      { result
-        .sortBy((status, key) => parseInt(key))
-        .map((status, key) => (
-          <dl className="mb0" key={`status_${key}`}>
-            <dt>
-              {`row ${key} `}
-              {status === true && <Label bsStyle="success">Success</Label>}
-              {status === false && <Label bsStyle="info">No errors</Label>}
-              {status !== false && status !== true && !Immutable.Iterable.isIterable(status) && <Label bsStyle="danger">{status}</Label>}
-            </dt>
-            { Immutable.Iterable.isIterable(status) && status.map((message, index) => (
-              <dd key={`status_error_${key}_${index}`}>
-                - <Label bsStyle="danger">{message}</Label>
-              </dd>
-              ))
-              .toArray()
-            }
-          </dl>
-        ))
-        .toList()
-        .toArray()
-      }
-    </div>
-  );
+  const rendeDetails = () => result
+    .sortBy((status, key) => parseInt(key))
+    .map((status, key) => (
+      <dl className="mb5" key={`status_${key}`}>
+        <dt>
+          {isNumber(key) ? `row ${key}` : key}
+          {status === true && <Label bsStyle="success ml10">Success</Label>}
+          {status === false && <Label bsStyle="info ml10">No errors</Label>}
+          {status !== false && status !== true && !Immutable.Iterable.isIterable(status) && <Label bsStyle="danger ml10">{status}</Label>}
+        </dt>
+        { Immutable.Iterable.isIterable(status) && status.map((message, type) => {
+          let messageStyle = 'default';
+          if (type === 'warning') {
+            messageStyle = 'warning';
+          } else if (type === 'error') {
+            messageStyle = 'danger';
+          }
+          return (
+            <dd className="ml10" key={`status_error_${key}_${type}`}>
+              - <Label bsStyle={messageStyle}>{message}</Label>
+            </dd>
+          )})
+          .toList()
+          .toArray()
+        }
+      </dl>
+    ))
+    .toList()
+    .toArray()
 
   const renderStatus = () => {
+    // New format that support Created and updated counters
+    if (item.hasIn(['result','created'])) {
+      const created = item.getIn(['result', 'created'], 0);
+      const updated = item.getIn(['result', 'updated'], 0);
+      const itemName = getConfig(['systemItems', entity, 'itemName'], '');
+      const nameCreated = pluralize(itemName, Number(created));
+      const nameUpdated = pluralize(itemName, Number(updated));
+      const errors = item.getIn(['result', 'general_errors'], []);
+      const errorsMessages = (
+        <p className="mb5">
+          <Label bsStyle="danger">Errors :</Label>
+          <ol className="pt0 pb0">
+            {errors.map((error, idx) => (<li key={`error_${idx}`}>{error}</li>)).toArray()}
+          </ol>
+        </p>
+      );
+      const warnings = item.getIn(['result', 'general_warnings'], []);
+      const warningMessages = (
+        <p className="mb5">
+          <Label bsStyle="warning">Warnings :</Label>
+          <ol className="pt0 pb0">
+            {warnings.map((warning, idx) => (<li key={`warning_${idx}`}>{warning}</li>)).toArray()}
+          </ol>
+        </p>
+      );
+      return (
+        <div className="ml10">
+          <p className="mb5">
+            <Label bsStyle="success">Success :</Label>
+            <ul className="pt0 pb0" >
+              <li>Created {created} {nameCreated}</li>
+              <li>Updated {updated} {nameUpdated}</li>
+            </ul>
+          </p>
+          {errors.size > 0 && errorsMessages}
+          {warnings.size > 0 && warningMessages}
+        </div>
+      );
+    }
+    
     // No resolts -> no imports
     if (result.length === 0) {
       return (
-        <div>
+        <div className="ml10">
           <Label bsStyle="default">No records were imported</Label>
         </div>
       );
@@ -68,7 +115,7 @@ const StepResult = (props) => {
     const allSuccess = result.every(status => status === true);
     if (allSuccess) {
       return (
-        <div>
+        <div className="ml10">
           <Label bsStyle="success">{result.size} records were successfully imported</Label>
         </div>
       );
@@ -77,16 +124,13 @@ const StepResult = (props) => {
     const allFails = result.every(status => status !== true);
     if (allFails) {
       return (
-        <div>
+        <div className="ml10">
           <p>No records were imported. please fix the errors and try again.</p>
-          <hr style={{ marginBottom: 0 }} />
-          {rendeDetails()}
         </div>
       );
     }
     // Mixed, some pased some fails
     const success = result.filter(status => status === true);
-
     let downlodCsvWithErrors = null;
     if (item.get('importType', ',') === 'manual_mapping') {
       const errorCsvData = getErrorCsvData();
@@ -102,17 +146,14 @@ const StepResult = (props) => {
         </CSVLink>
       );
     }
-
     return (
-      <div>
+      <div className="ml10">
         <p>
-          <Label bsStyle="success">{success.length}</Label> rows were successfully imported.<br />
+          <Label bsStyle="success">{success.size}</Label> rows were successfully imported.<br />
           <Label bsStyle="danger">{result.size - success.size}</Label> rows failed to import.<br />
           Please remove successfully imported rows from the file, fix the errors and try again.
         </p>
         {downlodCsvWithErrors}
-        <hr style={{ marginBottom: 0 }} />
-        {rendeDetails()}
       </div>
     );
   };
@@ -121,6 +162,9 @@ const StepResult = (props) => {
     <div className="StepResult">
       <h4>Import status</h4>
       {renderStatus()}
+      <Panel header={<span>Details</span>} collapsible className="collapsible">
+        {rendeDetails()}
+      </Panel>
     </div>
   );
 };
