@@ -73,7 +73,7 @@ export default {
       { id: 'tax_data.total_amount', type: 'number', title: 'Total taxes' },
       { id: 'installments', type: 'number', title: 'Number of payments' },
       { id: 'installment_no', type: 'number', title: 'Current payment' },
-      { id: 'first_installment', type: 'number', title: 'First payment\'s stamp' },
+      { id: 'first_installment', type: 'string', title: 'Installments batch identifier' },
     ],
     subscribers: [
       { id: 'aid', type: 'number' },
@@ -231,7 +231,7 @@ export default {
     { id: 'last_days', title: 'Last (days)', include: ['fieldid:urt'], type: 'number', suffix: 'Days' },
     { id: 'last_days_include_today', title: 'Last (days including today)', include: ['fieldid:urt'], type: 'number', suffix: 'Days' },
     { id: 'last_hours', title: 'Last (hours)', include: ['fieldid:urt'], type: 'number', suffix: 'Hours' },
-    { id: 'eq', title: 'Equals', include: ['date', 'datetime', 'boolean', 'fieldid:billrun_status', 'fieldid:logfile_status'] }, // 'Equals'
+    { id: 'eq', title: 'Equals', include: ['date', 'datetime', 'boolean', 'fieldid:billrun_status', 'fieldid:logfile_status', 'fieldid:first_installment'] }, // 'Equals'
     { id: 'in', title: 'Equals', include: ['string', 'number'], exclude: ['fieldid:billrun_status', 'fieldid:logfile_status'] },
     { id: 'ne', title: 'Does not equal', include: ['boolean'], exclude: [] }, // 'Not equals'
     { id: 'nin', title: 'Does not equal', include: ['string', 'number'], exclude: ['fieldid:billrun_status', 'fieldid:logfile_status'] },
