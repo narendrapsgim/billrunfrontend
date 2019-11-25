@@ -71,6 +71,9 @@ export default {
       { id: 'tax_data.taxes.key', title: 'Tax key', inputConfig: { inputType: 'select', callback: 'getTaxesOptions' } },
       { id: 'tax_data.total_tax', type: 'number', title: 'Tax rate' },
       { id: 'tax_data.total_amount', type: 'number', title: 'Total taxes' },
+      { id: 'installments', type: 'number', title: 'Number of payments' },
+      { id: 'installment_no', type: 'number', title: 'Current payment' },
+      { id: 'first_installment', type: 'number', title: 'First payment\'s stamp' },
     ],
     subscribers: [
       { id: 'aid', type: 'number' },
@@ -213,6 +216,15 @@ export default {
       { id: 'last_checked_pending', type: 'date', title: 'Last Status Check' },
       { id: 'original_txid', type: 'string', title: 'Original BillRun Transaction ID' },
       { id: 'rejection_code', type: 'string', title: 'Rejection Code' },
+      { id: 'denial.transaction_date', type: 'datetime', title: 'Denial Transaction Date' },
+      { id: 'denial.amount', type: 'number', title: 'Denialed Amount' },
+      { id: 'denial.is_payments', type: 'boolean', title: 'Is Denialed Payments' },
+      { id: 'denial.credit_date', type: 'datetime', title: 'Denial Credit Date' },
+      { id: 'denial.credit_date', type: 'string', title: 'Card Type' },
+      { id: 'installments.total_amount', type: 'number', title: 'Installments Total Amount' },
+      { id: 'installments.number_of_payments', type: 'number', title: 'Number Of Payments' },
+      { id: 'installments.first_payment', type: 'number', title: 'First Payment' },
+      { id: 'installments.periodical_payments', type: 'number', title: 'Periodical Payment' },
     ],
   },
   conditionsOperators: [
@@ -227,7 +239,7 @@ export default {
     { id: 'lte', title: '<=', include: ['number', 'date', 'datetime', 'fieldid:billrun'], exclude: [] }, // 'Less than or equals'
     { id: 'gt', title: '>', include: ['number', 'date', 'datetime', 'fieldid:billrun'], exclude: [] }, // 'Greater than'
     { id: 'gte', title: '>=', include: ['number', 'date', 'datetime', 'fieldid:billrun'], exclude: [] }, // 'Greater than or equals'
-    { id: 'like', title: 'Contains', include: ['string', 'number'], exclude: ['fieldid:logfile_status'] },
+    { id: 'like', title: 'Contains', include: ['string', 'number'], exclude: ['fieldid:logfile_status', 'fieldid:installments', 'fieldid:installment_no'] },
     { id: 'starts_with', title: 'Starts with', include: ['string'], exclude: ['fieldid:logfile_status'] },
     { id: 'ends_with', title: 'Ends with', include: ['string'], exclude: ['fieldid:logfile_status'] },
     { id: 'in_range', title: 'Include‎', include: ['ranges', 'range', 'daterange'] },
