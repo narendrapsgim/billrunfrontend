@@ -155,8 +155,8 @@ export default {
         inputConfig: {
           inputType: 'select',
           options: [
-            { value: 'CreditGuard', label: 'Credit Guard' },
-            { value: 'DirectDebit', label: 'Direct Debit' },
+            { value: 'Credit_Card', label: 'Credit Card' },
+            { value: 'Direct_Debit', label: 'Direct Debit' },
             { value: 'OVC', label: 'OVC' },
           ],
         },
@@ -180,8 +180,8 @@ export default {
         inputConfig: {
           inputType: 'select',
           options: [
-            { value: 'CreditGuard', label: 'Credit Guard' },
-            { value: 'DirectDebit', label: 'Direct Debit' },
+            { value: 'Credit_Card', label: 'Credit Card' },
+            { value: 'Direct_Debit', label: 'Direct Debit' },
             { value: 'OVC', label: 'OVC' },
           ],
         },
@@ -207,8 +207,8 @@ export default {
         inputConfig: {
           inputType: 'select',
           options: [
-            { value: 'CreditGuard', label: 'Credit Guard' },
-            { value: 'DirectDebit', label: 'Direct Debit' },
+            { value: 'Credit_Card', label: 'Credit Card' },
+            { value: 'Direct_Debit', label: 'Direct Debit' },
             { value: 'OVC', label: 'OVC' },
           ],
         },
@@ -234,8 +234,8 @@ export default {
         inputConfig: {
           inputType: 'select',
           options: [
-            { value: 'CreditGuard', label: 'CreditGuard' },
-            { value: 'DirectDebit', label: 'Direct Debit' },
+            { value: 'Credit_Card', label: 'Credit Card' },
+            { value: 'Direct_Debit', label: 'Direct Debit' },
             { value: 'OVC', label: 'OVC' },
           ],
         },
