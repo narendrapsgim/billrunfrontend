@@ -163,7 +163,7 @@ export default {
       { id: 'aid', type: 'number', title: 'Customer ID' },
       { id: 'invoice_id', type: 'number', title: 'Invoice ID' },
       { id: 'due_date', type: 'date', title: 'Due Date' },
-      { id: 'due', type: 'number', title: 'Due amount' },
+      { id: 'due', type: 'number', title: 'Due Amount' },
       { id: 'payer_name', type: 'string', title: 'Payer Name' },
       { id: 'amount', type: 'number', title: 'Original Absolute Due Amount' },
       { id: 'lastname', type: 'string', title: 'Customer\'s Last Name' },
