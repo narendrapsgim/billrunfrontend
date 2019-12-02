@@ -163,7 +163,7 @@ export default {
       { id: 'aid', type: 'number', title: 'Customer ID' },
       { id: 'invoice_id', type: 'number', title: 'Invoice ID' },
       { id: 'due_date', type: 'date', title: 'Due Date' },
-      { id: 'due', type: 'number', title: 'Original Due Date' },
+      { id: 'due', type: 'number', title: 'Due Amount' },
       { id: 'payer_name', type: 'string', title: 'Payer Name' },
       { id: 'amount', type: 'number', title: 'Original Absolute Due Amount' },
       { id: 'lastname', type: 'string', title: 'Customer\'s Last Name' },
@@ -222,6 +222,7 @@ export default {
       { id: 'installments.number_of_payments', type: 'number', title: 'Number Of Installments' },
       { id: 'installments.first_payment', type: 'number', title: 'Installments First Payment' },
       { id: 'installments.periodical_payments', type: 'number', title: 'Installments Periodical Payment' },
+      { id: 'generated_pg_file_log', type: 'string', title: 'Payment Gateway File ID' },
     ],
   },
   conditionsOperators: [
