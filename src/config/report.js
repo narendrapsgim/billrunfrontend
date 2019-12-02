@@ -222,7 +222,7 @@ export default {
       { id: 'installments.number_of_payments', type: 'number', title: 'Number Of Installments' },
       { id: 'installments.first_payment', type: 'number', title: 'Installments First Payment' },
       { id: 'installments.periodical_payments', type: 'number', title: 'Installments Periodical Payment' },
-      { id: 'generated_pg_file_log', type: 'string', title: 'Payment gateway file id' },
+      { id: 'generated_pg_file_log', type: 'string', title: 'Payment Gateway File ID' },
     ],
   },
   conditionsOperators: [
