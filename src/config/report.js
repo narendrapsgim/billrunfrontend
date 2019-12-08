@@ -1,5 +1,17 @@
 export default {
-  entities: ['usage', 'subscription', 'customer', 'logFile', 'queue', 'event', 'bills'],
+  entities: [
+    'usage',
+    'subscription',
+    'customer',
+    'logFile',
+    'queue',
+    'event',
+    'bills',
+    'paymentsTransactionsRequest',
+    'paymentsTransactionsResponse',
+    'paymentDenials',
+    'paymentsFiles'
+  ],
   fields: {
     usage: [ // changes to usage will effect on queue
       // Default settings \ Example
@@ -133,6 +145,112 @@ export default {
         }
       },
     ],
+    'paymentsTransactionsRequest': [
+      { id: 'fetching_time', type: 'date' },
+      { id: 'received_time', type: 'date' },
+      { id: 'start_process_time', type: 'date' },
+      { id: 'process_time', type: 'date' },
+      { id: 'file_name', title: 'File name' },
+      { id: 'payment_gateway',
+        inputConfig: {
+          inputType: 'select',
+          options: [
+            { value: 'Credit_Card', label: 'Credit Card' },
+            { value: 'Direct_Debit', label: 'Direct Debit' },
+            { value: 'OVC', label: 'OVC' },
+          ],
+        },
+        title: 'Payment Gateway',
+      },
+      { id: 'errors', title: 'Errors' },
+      { id: 'warnings', title: 'Warnings' },
+      { id: 'info', title: 'Info' },
+      { id: 'transactions', title: 'Transactions', type: 'number' },
+      { id: 'parameters_string', title: 'Parameter String' },
+      { id: 'correlation_value', title: 'Correlation Value' },
+      
+    ],
+    'paymentsTransactionsResponse': [
+      { id: 'fetching_time', type: 'date' },
+      { id: 'received_time', type: 'date' },
+      { id: 'start_process_time', type: 'date' },
+      { id: 'process_time', type: 'date' },
+      { id: 'file_name', title: 'File name' },
+      { id: 'payment_gateway',
+        inputConfig: {
+          inputType: 'select',
+          options: [
+            { value: 'Credit_Card', label: 'Credit Card' },
+            { value: 'Direct_Debit', label: 'Direct Debit' },
+            { value: 'OVC', label: 'OVC' },
+          ],
+        },
+        title: 'Payment Gateway',
+      },
+      { id: 'errors', title: 'Errors' },
+      { id: 'warnings', title: 'Warnings' },
+      { id: 'info', title: 'Info' },
+      { id: 'transactions.confirmed', title: 'Confirmed Transactions', type: 'number' },
+      { id: 'transactions.rejected', title: 'Rejected Transactions', type: 'number' },
+      { id: 'transactions.denied', title: 'Denied Transactions', type: 'number' },
+      { id: 'last_file', type: 'boolean', title: 'Last File' },
+      { id: 'file_count', title: 'Files Count', type: 'number' },
+      { id: 'related_request_file', title: 'Related Request File' },
+    ],
+    'paymentDenials': [
+      { id: 'fetching_time', type: 'date' },
+      { id: 'received_time', type: 'date' },
+      { id: 'start_process_time', type: 'date' },
+      { id: 'process_time', type: 'date' },
+      { id: 'file_name', title: 'File name' },
+      { id: 'payment_gateway',
+        inputConfig: {
+          inputType: 'select',
+          options: [
+            { value: 'Credit_Card', label: 'Credit Card' },
+            { value: 'Direct_Debit', label: 'Direct Debit' },
+            { value: 'OVC', label: 'OVC' },
+          ],
+        },
+        title: 'Payment Gateway',
+      },
+      { id: 'errors', title: 'Errors' },
+      { id: 'warnings', title: 'Warnings' },
+      { id: 'info', title: 'Info' },
+      { id: 'transactions.confirmed', title: 'Confirmed Transactions', type: 'number' },
+      { id: 'transactions.rejected', title: 'Rejected Transactions', type: 'number' },
+      { id: 'transactions.denied', title: 'Denied Transactions', type: 'number' },
+      { id: 'last_file', type: 'boolean', title: 'Last File' },
+      { id: 'file_count', title: 'Files Count', type: 'number' },
+      { id: 'related_request_file', title: 'Related Request File' },
+    ],
+    'paymentsFiles': [
+      { id: 'fetching_time', type: 'date' },
+      { id: 'received_time', type: 'date' },
+      { id: 'start_process_time', type: 'date' },
+      { id: 'process_time', type: 'date' },
+      { id: 'file_name', title: 'File name' },
+      { id: 'payment_gateway',
+        inputConfig: {
+          inputType: 'select',
+          options: [
+            { value: 'Credit_Card', label: 'Credit Card' },
+            { value: 'Direct_Debit', label: 'Direct Debit' },
+            { value: 'OVC', label: 'OVC' },
+          ],
+        },
+        title: 'Payment Gateway',
+      },
+      { id: 'errors', title: 'Errors' },
+      { id: 'warnings', title: 'Warnings' },
+      { id: 'info', title: 'Info' },
+      { id: 'transactions.confirmed', title: 'Confirmed Transactions', type: 'number' },
+      { id: 'transactions.rejected', title: 'Rejected Transactions', type: 'number' },
+      { id: 'transactions.denied', title: 'Denied Transactions', type: 'number' },
+      { id: 'last_file', type: 'boolean', title: 'Last File' },
+      { id: 'file_count', title: 'Files Count', type: 'number' },
+      { id: 'related_request_file', title: 'Related Request File' },
+    ],
     queue: [
       // use all usage fields
       { id: 'calc_name',
@@ -230,16 +348,16 @@ export default {
     { id: 'last_days_include_today', title: 'Last (days including today)', include: ['fieldid:urt'], type: 'number', suffix: 'Days' },
     { id: 'last_hours', title: 'Last (hours)', include: ['fieldid:urt'], type: 'number', suffix: 'Hours' },
     { id: 'eq', title: 'Equals', include: ['date', 'datetime', 'boolean', 'fieldid:billrun_status', 'fieldid:logfile_status'] }, // 'Equals'
-    { id: 'in', title: 'Equals', include: ['string', 'number'], exclude: ['fieldid:billrun_status', 'fieldid:logfile_status'] },
+    { id: 'in', title: 'Equals', include: ['string', 'number'], exclude: ['fieldid:billrun_status', 'fieldid:logfile_status', 'fieldid:errors','fieldid:warnings', 'fieldid:info'] },
     { id: 'ne', title: 'Does not equal', include: ['boolean'], exclude: [] }, // 'Not equals'
-    { id: 'nin', title: 'Does not equal', include: ['string', 'number'], exclude: ['fieldid:billrun_status', 'fieldid:logfile_status'] },
+    { id: 'nin', title: 'Does not equal', include: ['string', 'number'], exclude: ['fieldid:billrun_status', 'fieldid:logfile_status', 'fieldid:errors','fieldid:warnings', 'fieldid:info'] },
     { id: 'lt', title: '<', include: ['number', 'date', 'datetime', 'fieldid:billrun'], exclude: [] }, // 'Less than'
     { id: 'lte', title: '<=', include: ['number', 'date', 'datetime', 'fieldid:billrun'], exclude: [] }, // 'Less than or equals'
     { id: 'gt', title: '>', include: ['number', 'date', 'datetime', 'fieldid:billrun'], exclude: [] }, // 'Greater than'
     { id: 'gte', title: '>=', include: ['number', 'date', 'datetime', 'fieldid:billrun'], exclude: [] }, // 'Greater than or equals'
-    { id: 'like', title: 'Contains', include: ['string', 'number'], exclude: ['fieldid:logfile_status'] },
-    { id: 'starts_with', title: 'Starts with', include: ['string'], exclude: ['fieldid:logfile_status'] },
-    { id: 'ends_with', title: 'Ends with', include: ['string'], exclude: ['fieldid:logfile_status'] },
+    { id: 'like', title: 'Contains', include: ['string', 'number'], exclude: ['fieldid:logfile_status', 'fieldid:errors','fieldid:warnings', 'fieldid:info'] },
+    { id: 'starts_with', title: 'Starts with', include: ['string'], exclude: ['fieldid:logfile_status', 'fieldid:errors','fieldid:warnings', 'fieldid:info'] },
+    { id: 'ends_with', title: 'Ends with', include: ['string'], exclude: ['fieldid:logfile_status', 'fieldid:errors','fieldid:warnings', 'fieldid:info'] },
     { id: 'in_range', title: 'Include‎', include: ['ranges', 'range', 'daterange'] },
     { id: 'nin_range', title: 'Does not include‎', include: ['ranges', 'range', 'daterange'] },
     { id: 'exists', title: 'Exists', type: 'boolean',
@@ -249,16 +367,16 @@ export default {
     },
   ],
   aggregateOperators: [
-    { id: 'group', title: 'Group', include: ['string', 'number', 'boolean', 'date'], exclude: ['fieldid:count_group', 'fieldid:tax_data.total_amount'] },
-    { id: 'sum', title: 'Sum', include: ['number'], exclude: ['fieldid:count_group', 'fieldid:tax_data.total_tax'] },
-    { id: 'avg', title: 'Average', include: ['number'], exclude: ['fieldid:count_group', 'fieldid:tax_data.total_tax'] },
+    { id: 'group', title: 'Group', include: ['string', 'number', 'boolean', 'date'], exclude: ['fieldid:count_group', 'fieldid:tax_data.total_amount', 'fieldid:errors','fieldid:warnings', 'fieldid:info'] },
+    { id: 'sum', title: 'Sum', include: ['number'], exclude: ['fieldid:count_group', 'fieldid:tax_data.total_tax', 'fieldid:errors','fieldid:warnings','fieldid:info'] },
+    { id: 'avg', title: 'Average', include: ['number'], exclude: ['fieldid:count_group', 'fieldid:tax_data.total_tax', 'fieldid:errors','fieldid:warnings','fieldid:info'] },
     { id: 'first', title: 'First', include: ['string', 'number', 'boolean', 'date', 'ranges', 'range'], exclude: ['fieldid:count_group'] },
     { id: 'last', title: 'Last', include: ['string', 'number', 'boolean', 'date', 'ranges', 'range'], exclude: ['fieldid:count_group'] },
-    { id: 'max', title: 'Max', include: ['number', 'date'], exclude: ['fieldid:count_group'] },
-    { id: 'min', title: 'Min', include: ['number', 'date'], exclude: ['fieldid:count_group'] },
+    { id: 'max', title: 'Max', include: ['number', 'date'], exclude: ['fieldid:count_group', 'fieldid:errors','fieldid:warnings','fieldid:info'] },
+    { id: 'min', title: 'Min', include: ['number', 'date'], exclude: ['fieldid:count_group', 'fieldid:errors','fieldid:warnings','fieldid:info'] },
     { id: 'push', title: 'List', include: ['string', 'number', 'boolean', 'date'], exclude: ['fieldid:count_group'] },
     { id: 'addToSet', title: 'Unique List', include: ['string', 'number', 'boolean', 'date', 'ranges', 'range'], exclude: ['fieldid:count_group'] },
-    { id: 'count', title: 'Count', include: ['fieldid:count_group'] },
+    { id: 'count', title: 'Count', include: ['fieldid:count_group', 'fieldid:errors','fieldid:warnings','fieldid:info'] },
   ],
   outputFormats: [
     { id: 'date_format', title: 'Date', options: [

@@ -128,6 +128,38 @@
     "itemType": "logFile",
     "itemsType": "logFiles"
   },
+  "paymentsTransactionsRequest": {
+    "collection": "log",
+    "uniqueField": "stamp",
+    "itemName": "Payments transactions request files",
+    "itemsName": "Payments transactions request files",
+    "itemType": "payment_transactions_request_files",
+    "itemsType": "payments_transactions_request_files"
+  },
+  "paymentsTransactionsResponse": {
+    "collection": "log",
+    "uniqueField": "stamp",
+    "itemName": "Payments transactions response files",
+    "itemsName": "Payments transactions response files",
+    "itemType": "payment_transactions_response_files",
+    "itemsType": "payments_transactions_response_files"
+  },
+  "paymentDenials": {
+    "collection": "log",
+    "uniqueField": "stamp",
+    "itemName": "Payment denials files",
+    "itemsName": "Payment denials files",
+    "itemType": "payment_denials_files",
+    "itemsType": "payments_denials_files"
+  },
+  "paymentsFiles" : {
+    "collection": "log",
+    "uniqueField": "stamp",
+    "itemName": "Payments files",
+    "itemsName": "Payments files",
+    "itemType": "payment_files",
+    "itemsType": "payments_files"
+  },
   "event": {
     "collection": "events",
     "uniqueField": "stamp",
