@@ -335,6 +335,7 @@ export default {
       { id: 'denial.is_payments', type: 'boolean', title: 'Is Denied Payments' },
       { id: 'denial.credit_date', type: 'datetime', title: 'Denial Credit Date' },
       { id: 'denial.credit_date', type: 'string', title: 'Card Type' },
+      { id: 'is_denial', type: 'boolean', title: 'Is denial?' },
       { id: 'installments.total_amount', type: 'number', title: 'Installments Total Amount' },
       { id: 'installments.number_of_payments', type: 'number', title: 'Number Of Installments' },
       { id: 'installments.first_payment', type: 'number', title: 'Installments First Payment' },
