@@ -117,10 +117,10 @@ class BalanceEvent extends Component {
     return (
       <FormGroup key={index} className="mb0">
         <Col sm={12}>
-          <div style={{ paddingRight: 100, display: 'inline-block' }}>
+          <div className="inline pr100">
             { getConditionDescription(conditionType, condition, params) }
           </div>
-          <span style={{ marginLeft: -100, paddingRight: 15 }} className="pull-right List row">
+          <span className="pull-right List row pr10 line-actions ml-100">
             <Actions actions={this.getConditionActions(index)} />
           </span>
         </Col>
@@ -167,7 +167,7 @@ class BalanceEvent extends Component {
             <Col componentClass={ControlLabel} sm={3}>Status</Col>
             <Col sm={7}>
               <span>
-                <span style={{ display: 'inline-block', marginRight: 20 }}>
+                <span className="mr20 inline">
                   <Field
                     fieldType="radio"
                     onChange={this.onChangeActive}
@@ -177,7 +177,7 @@ class BalanceEvent extends Component {
                     checked={item.get('active', true)}
                   />
                 </span>
-                <span style={{ display: 'inline-block' }}>
+                <span className="inline">
                   <Field
                     fieldType="radio"
                     onChange={this.onChangeActive}

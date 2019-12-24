@@ -3,10 +3,16 @@ import PropTypes from 'prop-types';
 import Immutable from 'immutable';
 import { connect } from 'react-redux';
 import { FormGroup, Col, ControlLabel, InputGroup } from 'react-bootstrap';
+import { upperCaseFirst, titleCase } from 'change-case'
 import Field from '@/components/Field';
 import UsageTypesSelector from '../../UsageTypes/UsageTypesSelector';
 import { getGroupsOptions } from '@/actions/reportsActions';
-import { groupsOptionsSelector, groupsDataSelector } from '@/selectors/listSelectors';
+import {
+  groupsOptionsSelector,
+  groupsDataSelector,
+  servicesDataSelector,
+  propertyTypesSelector,
+} from '@/selectors/listSelectors';
 import { currencySelector } from '@/selectors/settingsSelector';
 import {
   eventConditionsOperatorsSelectOptionsSelector,
@@ -16,8 +22,12 @@ import {
   getPathParams,
   buildBalanceConditionPath,
   getUnitTitle,
+  createGroupOption,
  } from '../EventsUtil';
-import { getGroupUsaget } from '@/common/Util';
+import {
+  getGroupUsaget,
+  getUsagePropertyType,
+} from '@/common/Util';
 
 class BalanceEventCondition extends Component {
 
@@ -29,13 +39,15 @@ class BalanceEventCondition extends Component {
     trigger: PropTypes.string,
     limitation: PropTypes.string,
     activityType: PropTypes.string,
-    groupName: PropTypes.string,
+    groupNames: PropTypes.string,
     overGroup: PropTypes.string,
     conditionsOperators: PropTypes.array,
     groupsOptions: PropTypes.instanceOf(Immutable.List),
     propertyTypes: PropTypes.instanceOf(Immutable.List),
     usageTypesData: PropTypes.instanceOf(Immutable.List),
     groupsData: PropTypes.instanceOf(Immutable.Map),
+    servicesData: PropTypes.instanceOf(Immutable.Map),
+    propertyTypeOptions: PropTypes.instanceOf(Immutable.Set),
     currency: PropTypes.string,
   }
 
@@ -46,13 +58,15 @@ class BalanceEventCondition extends Component {
     trigger: '',
     limitation: '',
     activityType: '',
-    groupName: '',
+    groupNames: '',
     overGroup: 'none',
     conditionsOperators: [],
     groupsOptions: Immutable.List(),
     propertyTypes: Immutable.List(),
     usageTypesData: Immutable.List(),
     groupsData: Immutable.Map(),
+    servicesData: Immutable.Map(),
+    propertyTypeOptions: Immutable.Set(),
     currency: '',
   }
 
@@ -65,12 +79,12 @@ class BalanceEventCondition extends Component {
   }
 
   onChangeTrigger = (e) => {
-    const { onChangeField, item, index, limitation } = this.props;
+    const { onChangeField, item, index, limitation, servicesData } = this.props;
     const { value } = e.target;
     const limitationToSave = (value === 'usagev' && limitation === 'none' ? 'group' : limitation);
-    const path = buildBalanceConditionPath(value, limitationToSave, { activityType: '', groupName: '', overGroup: '' });
+    const paths = buildBalanceConditionPath(value, limitationToSave, { activityType: '', groupNames: '', overGroup: '', servicesData });
     const condition = item.withMutations((itemWithMutation) => {
-      itemWithMutation.set('path', path);
+      itemWithMutation.set('paths', paths);
       itemWithMutation.set('unit', '');
       itemWithMutation.set('usaget', '');
     });
@@ -78,38 +92,53 @@ class BalanceEventCondition extends Component {
   };
 
   onChangeOverGroup = (e) => {
-    const { onChangeField, index, trigger, activityType, groupName, limitation } = this.props;
+    const { onChangeField, index, trigger, activityType, groupNames, limitation, servicesData } = this.props;
     const { value } = e.target;
-    const path = buildBalanceConditionPath(trigger, limitation, { activityType, groupName, overGroup: value });
-    onChangeField(['conditions', index, 'path'], path);
+    const paths = buildBalanceConditionPath(trigger, limitation,
+      { activityType, groupNames, overGroup: value, servicesData }
+    );
+    onChangeField(['conditions', index, 'paths'], paths);
   }
 
   onChangeLimitation = (e) => {
-    const { onChangeField, index, trigger, activityType, groupName } = this.props;
+    const { onChangeField, index, trigger, activityType, groupNames, servicesData } = this.props;
     const { value } = e.target;
-    const path = buildBalanceConditionPath(trigger, value, { activityType, groupName, overGroup: '' });
-    onChangeField(['conditions', index, 'path'], path);
+    const params = { activityType, groupNames, overGroup: '', servicesData };
+    const paths = buildBalanceConditionPath(trigger, value, params);
+    onChangeField(['conditions', index, 'paths'], paths);
+  };
+
+  onChangePropertyType = (propertyType) => {
+    const { onChangeField, item, index, trigger, limitation, servicesData } = this.props;
+    const paths = buildBalanceConditionPath(trigger, limitation, { activityType: '', groupNames: '', overGroup: '', servicesData });
+    const condition = item.withMutations((itemWithMutation) => {
+      itemWithMutation.set('property_type', propertyType);
+      itemWithMutation.set('paths', paths);
+      itemWithMutation.set('unit', '');
+      itemWithMutation.set('usaget', '');
+    });
+    onChangeField(['conditions', index], condition);
   };
 
   onChangeActivityType = (value) => {
-    const { onChangeField, item, index, trigger, limitation, overGroup } = this.props;
-    const path = buildBalanceConditionPath(trigger, limitation, { activityType: value, groupName: '', overGroup });
+    const { onChangeField, item, index, trigger, limitation, overGroup, servicesData } = this.props;
+    const paths = buildBalanceConditionPath(trigger, limitation, { activityType: value, groupNames: '', overGroup, servicesData });
     const condition = item.withMutations((itemWithMutation) => {
-      itemWithMutation.set('path', path);
+      itemWithMutation.set('paths', paths);
       itemWithMutation.set('unit', '');
       itemWithMutation.set('usaget', value);
     });
     onChangeField(['conditions', index], condition);
   };
 
-  onChangeGroupName = (value) => {
-    const { onChangeField, item, index, trigger, limitation } = this.props;
-    const path = buildBalanceConditionPath(trigger, limitation, { activityType: '', groupName: value });
-    const unit = this.getGroupUnit(value);
-    const usaget = this.getGroupActivityType(value);
+  onChangeGroupNames = (value) => {
+    const { onChangeField, item, index, trigger, limitation, servicesData } = this.props;
+    const paths = buildBalanceConditionPath(trigger, limitation, { activityType: '', groupNames: value, servicesData });
+    const unit = value !== '' ? this.getGroupUnit(value.split(',').pop()) : '';
+    const usaget = value !== '' ? this.getGroupActivityType(value.split(',').pop()) : '';
 
     const condition = item.withMutations((itemWithMutation) => {
-      itemWithMutation.set('path', path);
+      itemWithMutation.set('paths', paths);
       itemWithMutation.set('unit', unit);
       itemWithMutation.set('usaget', usaget);
     });
@@ -117,8 +146,13 @@ class BalanceEventCondition extends Component {
   };
 
   onChangeType = (value) => {
-    const { onChangeField, index } = this.props;
-    onChangeField(['conditions', index, 'type'], value);
+    const { onChangeField, index, item } = this.props;
+    if (value === 'reached_percentage') {
+      const convertedCondition = item.set('type', value).set('unit', '');
+      onChangeField(['conditions', index], convertedCondition);
+    } else {
+      onChangeField(['conditions', index, 'type'], value);
+    }
   };
 
   onChangeValue = (e) => {
@@ -138,18 +172,22 @@ class BalanceEventCondition extends Component {
   };
 
   filterRelevantGroups = (group) => {
-    const { trigger } = this.props;
-    return (trigger === 'usagev' && !this.props.groupsData.hasIn([group, 'cost'])) ||
-      (trigger === 'cost' && this.props.groupsData.hasIn([group, 'cost']));
+    const { trigger, usageTypesData, item, groupsData } = this.props;
+    const isRelevant = item.get('property_type', '') === getUsagePropertyType(usageTypesData, groupsData.getIn([group, 'usage_types']).keySeq().first());
+    return (trigger === 'usagev' && !this.props.groupsData.hasIn([group, 'cost']) && isRelevant) ||
+      (trigger === 'cost' && !this.props.groupsData.hasIn([group, 'cost']) && isRelevant);
   }
 
-  getGroupNamesOptions = () =>
-    this.props.groupsOptions
-      .filter(this.filterRelevantGroups)
-      .map(group => ({ value: group, label: group }))
-      .toArray();
+  getGroupNamesOptions = () => this.props.groupsOptions
+    .filter(this.filterRelevantGroups)
+    .map(group => createGroupOption(group, this.props.servicesData))
+    .toArray();
+
+  getPropertyTypesOptions = () => this.props.propertyTypeOptions.map(propType =>
+    ({ value: propType, label: upperCaseFirst(propType) })).toArray();
 
   getGroupUnit = group => this.props.groupsData.getIn([group, 'unit'], '');
+  
   getGroupActivityType = group => getGroupUsaget(this.props.groupsData.get(group, Immutable.Map()));
 
   onChangeMultiValues = (e) => {
@@ -171,7 +209,7 @@ class BalanceEventCondition extends Component {
       trigger,
       limitation,
       activityType,
-      groupName,
+      groupNames,
       overGroup,
       propertyTypes,
       usageTypesData,
@@ -179,8 +217,10 @@ class BalanceEventCondition extends Component {
     } = this.props;
 
     const usaget = (limitation === 'group' ? item.get('usaget', '') : activityType);
-    const unitLabel = getUnitTitle(item.get('unit', ''), trigger, usaget, propertyTypes, usageTypesData, currency);
+    const propertyType = item.get('property_type', '');
+    const unitLabel = getUnitTitle(item.get('unit', ''), trigger, usaget, propertyTypes, usageTypesData, currency, item.get('type', ''))
     const selectedConditionData = getBalanceConditionData(item.get('type', ''));
+    const UomEnabled = trigger === 'usagev' && limitation === 'group' && groupNames !== '' && item.get('type', '') !== 'reached_percentage';
     return (
       <Col sm={12}>
 
@@ -215,7 +255,7 @@ class BalanceEventCondition extends Component {
         </FormGroup>
 
         <FormGroup>
-          <Col sm={3} smOffset={1} style={{ textAlign: 'left' }} componentClass={ControlLabel}>Condition Limitations: </Col>
+          <Col sm={3} smOffset={1} className="text-left" componentClass={ControlLabel}>Condition Limitations: </Col>
         </FormGroup>
         <Col sm={12}>
 
@@ -234,7 +274,7 @@ class BalanceEventCondition extends Component {
             </Col>
           </FormGroup>
           <FormGroup>
-            <Col sm={3} smOffset={1}>
+            <Col sm={11} smOffset={1}>
               <Field
                 fieldType="radio"
                 name={`condition-limitation-${index}`}
@@ -242,35 +282,51 @@ class BalanceEventCondition extends Component {
                 value="group"
                 checked={limitation === 'group'}
                 onChange={this.onChangeLimitation}
-                label="Limit to Group"
+                label="Limit to any of the Groups"
               />
             </Col>
-            <Col sm={8}>
-              <Col sm={7} style={{ paddingRight: 0 }}>
+            <Col sm={10} smOffset={2}>
+              <Col sm={4} componentClass={ControlLabel}> Property Type </Col>
+              <Col sm={8} className="form-inner-edit-row">
                 <Field
                   fieldType="select"
-                  onChange={this.onChangeGroupName}
-                  value={groupName}
-                  options={this.getGroupNamesOptions()}
+                  id={`condition-limitation-property-type-${index}`}
+                  onChange={this.onChangePropertyType}
+                  value={titleCase(propertyType)}
+                  options={this.getPropertyTypesOptions()}
                   disabled={limitation !== 'group'}
                 />
               </Col>
-              <Col sm={5}>
+
+              <Col sm={4} componentClass={ControlLabel}> Groups Included </Col>
+              <Col sm={8} className="form-inner-edit-row">
+                <Field
+                  fieldType="select"
+                  onChange={this.onChangeGroupNames}
+                  value={groupNames}
+                  options={this.getGroupNamesOptions()}
+                  disabled={limitation !== 'group' || propertyType === ''}
+                  multi={true}
+                />
+              </Col>
+              { limitation === 'group' && <Col sm={4} componentClass={ControlLabel}> Units of Measure </Col> }
+              <Col sm={8} className="form-inner-edit-row">
                 <UsageTypesSelector
                   usaget={usaget}
-                  unit={item.get('unit', '')}
+                  unit={groupNames !== '' ? item.get('unit', '') : ''}
                   onChangeUsaget={this.onChangeActivityType}
                   onChangeUnit={this.onChangeUnit}
-                  enabled={limitation === 'group'}
-                  showUnits={trigger === 'usagev' && limitation === 'group'}
+                  enabled={UomEnabled}
+                  showUnits={limitation === 'group'}
                   showAddButton={false}
                   showSelectTypes={false}
                 />
               </Col>
             </Col>
           </FormGroup>
+
           <FormGroup>
-            <Col sm={3} smOffset={1}>
+            <Col sm={4} smOffset={1}>
               <Field
                 fieldType="radio"
                 name={`condition-limitation-${index}`}
@@ -281,7 +337,7 @@ class BalanceEventCondition extends Component {
                 label="Limit to Activity Type"
               />
             </Col>
-            <Col sm={8}>
+            <Col sm={7} className="form-inner-edit-row pl40 pr30">
               <Col sm={12}>
                 <UsageTypesSelector
                   usaget={activityType}
@@ -294,9 +350,10 @@ class BalanceEventCondition extends Component {
               </Col>
             </Col>
             { trigger === 'usagev' && limitation === 'activity_type' && (
-              <Col sm={8} smOffset={4}>
+              <Col sm={10} smOffset={2}>
+                <Col sm={8} smOffset={4} className="form-inner-edit-row">
                 <Col sm={12}>
-                  <span style={{ display: 'inline-block', marginRight: 20 }}>
+                  <span className="inline mr20">
                     <Field
                       fieldType="radio"
                       name={`condition-over-group-${index}`}
@@ -308,7 +365,7 @@ class BalanceEventCondition extends Component {
                       enabled={limitation === 'activity_type'}
                     />
                   </span>
-                  <span style={{ display: 'inline-block' }}>
+                  <span className="inline">
                     <Field
                       fieldType="radio"
                       name={`condition-over-group-${index}`}
@@ -322,13 +379,12 @@ class BalanceEventCondition extends Component {
                   </span>
                 </Col>
               </Col>
+              </Col>
             )}
-          </FormGroup>
 
-          <Col sm={12}>
-            <FormGroup>
-              <Col sm={5} componentClass={ControlLabel}>Type</Col>
-              <Col sm={4}>
+            <Col sm={10} smOffset={2}>
+              <Col sm={4} componentClass={ControlLabel}>Type</Col>
+              <Col sm={8} className="form-inner-edit-row">
                 <Field
                   fieldType="select"
                   onChange={this.onChangeType}
@@ -336,58 +392,38 @@ class BalanceEventCondition extends Component {
                   options={conditionsOperators}
                 />
               </Col>
-            </FormGroup>
-          </Col>
+            </Col>
 
-          {
-            selectedConditionData.get('extra_field', true) && selectedConditionData.get('type', 'text') !== 'tags' &&
-            (<Col sm={12}>
-              <FormGroup>
-                <Col sm={5} componentClass={ControlLabel}>
-                  Value
-                </Col>
-                <Col sm={4}>
-                  <InputGroup style={{ width: '100%' }}>
-                    <Field
-                      id={`cond-value-${index}`}
-                      onChange={this.onChangeValue}
-                      value={item.get('value', '')}
-                      fieldType={selectedConditionData.get('type', 'text')}
-                    />
+            { selectedConditionData.get('extra_field', true) && (
+              <Col sm={10} smOffset={2}>
+                <Col sm={4} componentClass={ControlLabel}>Value</Col>
+                <Col sm={8} className="form-inner-edit-row">
+                  <InputGroup className="full-width">
+                    {selectedConditionData.get('type', 'text') !== 'tags' ? (
+                      <Field
+                        id={`cond-value-${index}`}
+                        onChange={this.onChangeValue}
+                        value={item.get('value', '')}
+                        fieldType={selectedConditionData.get('type', 'text')}
+                      />
+                    ) : (
+                      <Field
+                        fieldType="tags"
+                        id={`cond-value-${index}`}
+                        onChange={this.onChangeMultiValues}
+                        value={String(item.get('value', '')).split(',').filter(val => val !== '')}
+                        renderInput={this.renderCustomInputNumber}
+                        onlyUnique={selectedConditionData.get('type', '') === 'tags'}
+                      />
+                    )}
                     { unitLabel !== '' && (
                       <InputGroup.Addon>{unitLabel}</InputGroup.Addon>
                     )}
                   </InputGroup>
                 </Col>
-              </FormGroup>
-            </Col>)
-        }
-
-          {
-          selectedConditionData.get('extra_field', true) && selectedConditionData.get('type', 'text') === 'tags' &&
-          (<Col sm={12}>
-            <FormGroup>
-              <Col sm={5} componentClass={ControlLabel}>
-                Value
               </Col>
-              <Col sm={4}>
-                <InputGroup>
-                  <Field
-                    fieldType="tags"
-                    id={`cond-value-${index}`}
-                    onChange={this.onChangeMultiValues}
-                    value={String(item.get('value', '')).split(',').filter(val => val !== '')}
-                    renderInput={this.renderCustomInputNumber}
-                    onlyUnique={selectedConditionData.get('type', '') === 'tags'}
-                  />
-                  { unitLabel !== '' && (
-                    <InputGroup.Addon>{unitLabel}</InputGroup.Addon>
-                  )}
-                </InputGroup>
-              </Col>
-            </FormGroup>
-          </Col>)
-        }
+            )}
+          </FormGroup>
         </Col>
       </Col>
     );
@@ -395,16 +431,18 @@ class BalanceEventCondition extends Component {
 }
 
 const mapStateToProps = (state, props) => {
-  const { trigger, limitation, activityType, groupName, overGroup } = getPathParams(props.item.get('path', ''));
+  const { trigger, limitation, activityType, groupNames, overGroup } = getPathParams(props.item.get('paths', Immutable.List()));
   return {
     trigger,
     limitation,
     activityType,
-    groupName,
+    groupNames,
+    propertyTypeOptions: propertyTypesSelector(state, props) || Immutable.Set(),
     overGroup,
     groupsOptions: groupsOptionsSelector(state, props) || Immutable.List(),
     groupsData: groupsDataSelector(state, props) || Immutable.Map(),
     currency: currencySelector(state, props),
+    servicesData: servicesDataSelector(state, props) || Immutable.Map(),
     conditionsOperators: eventConditionsOperatorsSelectOptionsSelector(null, { eventType: 'balance' }),
   };
 };

@@ -34,7 +34,8 @@
         { "id": "reached_constant_recurring", "title": "Reached Constant (Recurring)", "type": "number" },
         { "id": "has_changed", "title": "Has Changed", "extra_field": false },
         { "id": "has_changed_to", "title": "Has Changed To" },
-        { "id": "has_changed_from", "title": "Has Changed From" }
+        { "id": "has_changed_from", "title": "Has Changed From" },
+		    { "id": "reached_percentage", "title": "Reached Percentage", "type": "tags" }
       ]
     }
   },

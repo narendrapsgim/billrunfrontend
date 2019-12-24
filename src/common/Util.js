@@ -673,5 +673,35 @@ export const getPlayOptions = availablePlays => availablePlays.map(play => ({
   label: play.get('label', play.get('name', '')),
 })).toArray();
 
+/**
+ * return the property type of that mactches a usage type/s
+ * @param  {[List]} propertyTypes [List of property types]
+ * @param  {[List]} usageTypes    [List of usage types]
+ * @return {[Set]}               [Set of macthing property types]
+ */
+export const inferPropTypeFromUsageType = (propertyTypes, usageTypes) => {
+  const uom = Immutable.List().withMutations((listWithMutations) => {
+    usageTypes.forEach(usaget => listWithMutations.push(usaget.get('unit', '')));
+  });
+  const props = Immutable.List().withMutations((listWithMutations) => {
+    propertyTypes.forEach((p) => {
+      const units = p.get('uom', Immutable.List()).reduce((acc, curr) =>
+        acc.push(curr.get('name', '')), Immutable.List());
+      const t = Immutable.Map({ type: p.get('type', ''), uom: units });
+      listWithMutations.push(t);
+    });
+  });
+  return Immutable.Set().withMutations((listWithMutations) => {
+    props.forEach((prop) => {
+      uom.forEach((unit) => {
+        if (prop.get('uom', Immutable.List()).includes(unit)) {
+          listWithMutations.add(prop.get('type', ''));
+        }
+      });
+    });
+  });
+};
+
+
 
 export const test = () => {console.log('cool !!');}
