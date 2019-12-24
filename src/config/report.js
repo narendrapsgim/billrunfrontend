@@ -71,6 +71,7 @@ export default {
       { id: 'tax_data.taxes.key', title: 'Tax key', inputConfig: { inputType: 'select', callback: 'getTaxesOptions' } },
       { id: 'tax_data.total_tax', type: 'number', title: 'Tax rate' },
       { id: 'tax_data.total_amount', type: 'number', title: 'Total taxes' },
+      { id: 'tax_data.total_embedded_amount', type: 'number', title: 'Tax embedded amount' },
     ],
     subscribers: [
       { id: 'aid', type: 'number' },
