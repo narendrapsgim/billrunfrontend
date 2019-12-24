@@ -29,7 +29,7 @@ export default class GatewayParamsModal extends Component {
       const currentDenialsConnection = gateway.getIn(['denials', 'receiver', 'connections', 0]) === undefined ? {} :
         gateway.getIn(['denials', 'receiver', 'connections', 0]).toJS();
 
-      return this.setState({ transactionsConnection: currentTransactionsConnection, denialsConnection: currentDenialsConnection, gateway: gateway.toJS()});
+      return this.setState({ transactionsConnection: currentTransactionsConnection, denialsConnection: currentDenialsConnection, gateway: gateway.toJS()});// eslint-disable-line max-len
     }
     return this.setState({gateway: {name: settings.get('name'), params: {}}});
   }
@@ -119,7 +119,7 @@ export default class GatewayParamsModal extends Component {
     const { gateway, activeTab } = this.state;
     const exportValue = gateway.export !== undefined ? gateway.export : [];
     const transactionsReceiverValue = gateway.transactions.receiver !== undefined ? gateway.transactions.receiver : [];
-    const transactionsConnections = transactionsReceiverValue.connections !== undefined ? transactionsReceiverValue.connections : [];
+    const transactionsConnections = transactionsReceiverValue.connections !== undefined ? transactionsReceiverValue.connections : [];// eslint-disable-line max-len
     const transactionsConnection = transactionsConnections[0] !== undefined ? transactionsConnections[0] : [];
     const denialsReceiverValue = gateway.denials.receiver !== undefined ? gateway.denials.receiver : [];
     const denialsConnections = denialsReceiverValue.connections !== undefined ? denialsReceiverValue.connections : [];
