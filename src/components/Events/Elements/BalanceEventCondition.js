@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import Immutable from 'immutable';
 import { connect } from 'react-redux';
 import { FormGroup, Col, ControlLabel, InputGroup } from 'react-bootstrap';
-import { upperCaseFirst } from 'change-case'
+import { upperCaseFirst } from 'change-case';
 import Field from '@/components/Field';
 import UsageTypesSelector from '../../UsageTypes/UsageTypesSelector';
 import { getGroupsOptions } from '@/actions/reportsActions';
@@ -70,6 +70,8 @@ class BalanceEventCondition extends Component {
     currency: '',
   }
 
+  static defaultProps = { eventType: 'balance' };
+
   state = {
     unitLabel: '',
   };
@@ -95,9 +97,8 @@ class BalanceEventCondition extends Component {
   onChangeOverGroup = (e) => {
     const { onChangeField, index, trigger, activityType, groupNames, limitation, servicesData } = this.props;
     const { value } = e.target;
-    const paths = buildBalanceConditionPath(trigger, limitation,
-      { activityType, groupNames, overGroup: value, servicesData }
-    );
+    const params = { activityType, groupNames, overGroup: value, servicesData };
+    const paths = buildBalanceConditionPath(trigger, limitation, params);
     onChangeField(['conditions', index, 'paths'], paths);
   }
 
@@ -430,7 +431,9 @@ class BalanceEventCondition extends Component {
 }
 
 const mapStateToProps = (state, props) => {
-  const { trigger, limitation, activityType, groupNames, overGroup } = getPathParams(props.item.get('paths', Immutable.List()));
+  const {
+    trigger, limitation, activityType, groupNames, overGroup
+  } = getPathParams(props.item.get('paths', Immutable.List()));
   return {
     trigger,
     limitation,
@@ -442,7 +445,7 @@ const mapStateToProps = (state, props) => {
     groupsData: groupsDataSelector(state, props) || Immutable.Map(),
     currency: currencySelector(state, props),
     servicesData: servicesDataSelector(state, props) || Immutable.Map(),
-    conditionsOperators: eventConditionsOperatorsSelectOptionsSelector(null, { eventType: 'balance' }),
+    conditionsOperators: eventConditionsOperatorsSelectOptionsSelector(null, BalanceEventCondition.defaultProps),
   };
 };
 
