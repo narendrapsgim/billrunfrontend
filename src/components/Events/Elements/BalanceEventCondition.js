@@ -228,7 +228,7 @@ class BalanceEventCondition extends Component {
       <Col sm={12}>
 
         <FormGroup>
-          <Col sm={4} smOffset={1} className="text-left" componentClass={ControlLabel}>Condition Trigger: </Col>
+          <Col sm={4} smOffset={1} className="text-left" componentClass={ControlLabel}>Condition Trigger</Col>
           <Col sm={7} className="pl30">
             <Col sm={12}>
               <span className="inline mr40">
@@ -258,7 +258,7 @@ class BalanceEventCondition extends Component {
         </FormGroup>
 
         <FormGroup>
-          <Col sm={11} smOffset={1} className="text-left" componentClass={ControlLabel}>Condition Limitations: </Col>
+          <Col sm={11} smOffset={1} className="text-left" componentClass={ControlLabel}>Condition Limitations</Col>
           <Col sm={10} smOffset={2}>
             <Field
               fieldType="radio"
@@ -283,7 +283,7 @@ class BalanceEventCondition extends Component {
             />
           </Col>
           <Col sm={10} smOffset={2}>
-            <Col sm={4} componentClass={ControlLabel}> Property Type </Col>
+            <Col sm={4} componentClass={ControlLabel}> Property Type:</Col>
             <Col sm={8} className="form-inner-edit-row">
               <Field
                 fieldType="select"
@@ -295,7 +295,7 @@ class BalanceEventCondition extends Component {
               />
             </Col>
 
-            <Col sm={4} componentClass={ControlLabel}> Groups Included </Col>
+            <Col sm={4} componentClass={ControlLabel}> Groups Included:</Col>
             <Col sm={8} className="form-inner-edit-row">
               <Field
                 fieldType="select"
@@ -306,7 +306,7 @@ class BalanceEventCondition extends Component {
                 multi={true}
               />
             </Col>
-            { limitation === 'group' && <Col sm={4} componentClass={ControlLabel}> Units of Measure </Col> }
+            { limitation === 'group' && <Col sm={4} componentClass={ControlLabel}> Units of Measure:</Col> }
             <Col sm={8} className="form-inner-edit-row">
               <UsageTypesSelector
                 usaget={usaget}
@@ -377,7 +377,7 @@ class BalanceEventCondition extends Component {
           )}
 
           <Col sm={10} smOffset={2}>
-            <Col sm={4} componentClass={ControlLabel}>Type</Col>
+            <Col sm={4} componentClass={ControlLabel}>Type:</Col>
             <Col sm={8} className="form-inner-edit-row">
               <Field
                 fieldType="select"
@@ -390,7 +390,7 @@ class BalanceEventCondition extends Component {
 
           { selectedConditionData.get('extra_field', true) && (
             <Col sm={10} smOffset={2}>
-              <Col sm={4} componentClass={ControlLabel}>Value</Col>
+              <Col sm={4} componentClass={ControlLabel}>Value:</Col>
               <Col sm={8} className="form-inner-edit-row">
                 <InputGroup className="full-width">
                   {selectedConditionData.get('type', 'text') !== 'tags' ? (
