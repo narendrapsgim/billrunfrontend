@@ -108,6 +108,8 @@ class BalanceEventCondition extends Component {
     const paths = buildBalanceConditionPath(trigger, value, params);
     onChangeField(['conditions', index, 'paths'], paths);
     onChangeField(['conditions', index, 'property_type'], '');
+    onChangeField(['conditions', index, 'unit'], '');
+    onChangeField(['conditions', index, 'usaget'], '');
   };
 
   onChangePropertyType = (propertyType) => {
@@ -228,8 +230,8 @@ class BalanceEventCondition extends Component {
       <Col sm={12}>
 
         <FormGroup>
-          <Col sm={4} smOffset={1} className="text-left" componentClass={ControlLabel}>Condition Trigger</Col>
-          <Col sm={7} className="pl30">
+          <Col sm={4} smOffset={1} xsOffset={0} xs={12} className="text-left" componentClass={ControlLabel}>Condition Trigger</Col>
+          <Col sm={7} smOffset={0} xsOffset={1} xs={11} className="pl30">
             <Col sm={12}>
               <span className="inline mr40">
                 <Field
@@ -258,8 +260,8 @@ class BalanceEventCondition extends Component {
         </FormGroup>
 
         <FormGroup>
-          <Col sm={11} smOffset={1} className="text-left" componentClass={ControlLabel}>Condition Limitations</Col>
-          <Col sm={10} smOffset={2}>
+          <Col sm={11} smOffset={1} xsOffset={0} xs={12} className="text-left" componentClass={ControlLabel}>Condition Limitations</Col>
+          <Col sm={10} smOffset={2} xsOffset={1} xs={11}>
             <Field
               fieldType="radio"
               name={`condition-limitation-${index}`}
@@ -271,7 +273,7 @@ class BalanceEventCondition extends Component {
               label="Total Amount"
             />
           </Col>
-          <Col sm={10} smOffset={2}>
+          <Col sm={10} smOffset={2} xsOffset={1} xs={11}>
             <Field
               fieldType="radio"
               name={`condition-limitation-${index}`}
@@ -282,9 +284,9 @@ class BalanceEventCondition extends Component {
               label="Limit to any of the Groups"
             />
           </Col>
-          <Col sm={10} smOffset={2}>
+          <Col sm={10} smOffset={2} xsOffset={2} xs={10}>
             <Col sm={4} componentClass={ControlLabel}> Property Type:</Col>
-            <Col sm={8} className="form-inner-edit-row">
+            <Col sm={8} className="form-inner-edit-row pr0">
               <Field
                 fieldType="select"
                 id={`condition-limitation-property-type-${index}`}
@@ -296,7 +298,7 @@ class BalanceEventCondition extends Component {
             </Col>
 
             <Col sm={4} componentClass={ControlLabel}> Groups Included:</Col>
-            <Col sm={8} className="form-inner-edit-row">
+            <Col sm={8} className="form-inner-edit-row pr0">
               <Field
                 fieldType="select"
                 onChange={this.onChangeGroupNames}
@@ -306,21 +308,27 @@ class BalanceEventCondition extends Component {
                 multi={true}
               />
             </Col>
-            { limitation === 'group' && <Col sm={4} componentClass={ControlLabel}> Units of Measure:</Col> }
-            <Col sm={8} className="form-inner-edit-row">
-              <UsageTypesSelector
-                usaget={usaget}
-                unit={groupNames !== '' ? item.get('unit', '') : ''}
-                onChangeUsaget={this.onChangeActivityType}
-                onChangeUnit={this.onChangeUnit}
-                enabled={UomEnabled}
-                showUnits={limitation === 'group'}
-                showAddButton={false}
-                showSelectTypes={false}
-              />
-            </Col>
+            {trigger === 'usagev' && (
+              <>
+                <Col sm={4} componentClass={ControlLabel}>Units of Measure:</Col>
+                <Col sm={8} className="form-inner-edit-row pr0">
+                  <UsageTypesSelector
+                    usaget={usaget}
+                    unit={groupNames !== '' ? item.get('unit', '') : ''}
+                    onChangeUsaget={this.onChangeActivityType}
+                    onChangeUnit={this.onChangeUnit}
+                    enabled={UomEnabled}
+                    showUnits={true}
+                    showAddButton={false}
+                    showSelectTypes={false}
+                  />
+                </Col>
+              </>
+            )}
+
           </Col>
-          <Col sm={3} smOffset={2}>
+
+          <Col sm={3} smOffset={2} xsOffset={1} xs={11}>
             <Field
               fieldType="radio"
               name={`condition-limitation-${index}`}
@@ -331,20 +339,18 @@ class BalanceEventCondition extends Component {
               label="Limit to Activity Type"
             />
           </Col>
-          <Col sm={7} className="form-inner-edit-row pl40 pr30">
-            <Col sm={12}>
-              <UsageTypesSelector
-                usaget={activityType}
-                unit={item.get('unit', '')}
-                onChangeUsaget={this.onChangeActivityType}
-                onChangeUnit={this.onChangeUnit}
-                enabled={limitation === 'activity_type'}
-                showUnits={trigger === 'usagev' && limitation === 'activity_type'}
-              />
-            </Col>
+          <Col sm={7} smOffset={0} xsOffset={2} xs={10} className="form-inner-edit-row pl40 pr15">
+            <UsageTypesSelector
+              usaget={activityType}
+              unit={item.get('unit', '')}
+              onChangeUsaget={this.onChangeActivityType}
+              onChangeUnit={this.onChangeUnit}
+              enabled={limitation === 'activity_type'}
+              showUnits={trigger === 'usagev' && limitation === 'activity_type'}
+            />
           </Col>
           { trigger === 'usagev' && limitation === 'activity_type' && (
-            <Col sm={10} smOffset={2}>
+            <Col sm={10} smOffset={2} xsOffset={2} xs={10}>
               <Col sm={8} smOffset={4} className="form-inner-edit-row">
               <Col sm={12}>
                 <span className="inline mr40">
@@ -375,10 +381,11 @@ class BalanceEventCondition extends Component {
             </Col>
             </Col>
           )}
+          </FormGroup>
 
-          <Col sm={10} smOffset={2}>
-            <Col sm={4} componentClass={ControlLabel}>Type:</Col>
-            <Col sm={8} className="form-inner-edit-row">
+          <FormGroup>
+            <Col sm={4} smOffset={1} xsOffset={0} xs={12} className="text-left" componentClass={ControlLabel}>Condition Type</Col>
+            <Col sm={7} smOffset={0} xsOffset={2} xs={10} className="pl40">
               <Field
                 fieldType="select"
                 onChange={this.onChangeType}
@@ -386,38 +393,37 @@ class BalanceEventCondition extends Component {
                 options={conditionsOperators}
               />
             </Col>
-          </Col>
+          </FormGroup>
 
           { selectedConditionData.get('extra_field', true) && (
-            <Col sm={10} smOffset={2}>
-              <Col sm={4} componentClass={ControlLabel}>Value:</Col>
-              <Col sm={8} className="form-inner-edit-row">
-                <InputGroup className="full-width">
-                  {selectedConditionData.get('type', 'text') !== 'tags' ? (
-                    <Field
-                      id={`cond-value-${index}`}
-                      onChange={this.onChangeValue}
-                      value={item.get('value', '')}
-                      fieldType={selectedConditionData.get('type', 'text')}
-                    />
-                  ) : (
-                    <Field
-                      fieldType="tags"
-                      id={`cond-value-${index}`}
-                      onChange={this.onChangeMultiValues}
-                      value={String(item.get('value', '')).split(',').filter(val => val !== '')}
-                      renderInput={this.renderCustomInputNumber}
-                      onlyUnique={selectedConditionData.get('type', '') === 'tags'}
-                    />
-                  )}
-                  { unitLabel !== '' && (
-                    <InputGroup.Addon>{unitLabel}</InputGroup.Addon>
-                  )}
-                </InputGroup>
-              </Col>
-            </Col>
+            <FormGroup>
+              <Col sm={4} smOffset={1} xsOffset={0} xs={12} className="text-left" componentClass={ControlLabel}>Condition Value</Col>
+                <Col sm={7} smOffset={0} xsOffset={2} xs={10} className="pl40">
+                  <InputGroup className="full-width">
+                    {selectedConditionData.get('type', 'text') !== 'tags' ? (
+                      <Field
+                        id={`cond-value-${index}`}
+                        onChange={this.onChangeValue}
+                        value={item.get('value', '')}
+                        fieldType={selectedConditionData.get('type', 'text')}
+                      />
+                    ) : (
+                      <Field
+                        fieldType="tags"
+                        id={`cond-value-${index}`}
+                        onChange={this.onChangeMultiValues}
+                        value={String(item.get('value', '')).split(',').filter(val => val !== '')}
+                        renderInput={this.renderCustomInputNumber}
+                        onlyUnique={selectedConditionData.get('type', '') === 'tags'}
+                      />
+                    )}
+                    { unitLabel !== '' && (
+                      <InputGroup.Addon>{unitLabel}</InputGroup.Addon>
+                    )}
+                  </InputGroup>
+                </Col>
+            </FormGroup>
           )}
-        </FormGroup>
       </Col>
     );
   }

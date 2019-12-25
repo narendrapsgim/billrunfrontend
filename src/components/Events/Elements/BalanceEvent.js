@@ -114,7 +114,7 @@ class BalanceEvent extends Component {
           <div className="inline pr100">
             { getConditionDescription(condition, params) }
           </div>
-          <span className="pull-right List row pr10 line-actions ml-100">
+          <span className="pull-right List row pr10 line-actions">
             <Actions actions={this.getConditionActions(index)} />
           </span>
         </Col>
