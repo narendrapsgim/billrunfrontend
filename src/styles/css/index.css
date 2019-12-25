@@ -124,6 +124,7 @@ fieldset[disabled] .btn {
   z-index: 9999;
   position: fixed;
   right: 40px;
+  margin-top: -5px;
 }
 /* ~Props */
 
