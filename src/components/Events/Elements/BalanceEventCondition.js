@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import Immutable from 'immutable';
 import { connect } from 'react-redux';
 import { FormGroup, Col, ControlLabel, InputGroup } from 'react-bootstrap';
-import { upperCaseFirst, titleCase } from 'change-case'
+import { upperCaseFirst } from 'change-case'
 import Field from '@/components/Field';
 import UsageTypesSelector from '../../UsageTypes/UsageTypesSelector';
 import { getGroupsOptions } from '@/actions/reportsActions';
