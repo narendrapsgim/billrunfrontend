@@ -154,7 +154,7 @@ export const getConditionValue = (condition, params) => {
   return `${condition.get('value', '')} ${unitTitle}`;
 };
 
-export const getConditionDescription = (conditionType, condition, params) => {
+export const getConditionDescription = (condition, params) => {
   const { trigger, limitation, activityType } = getPathParams(condition.get('paths', Immutable.List()));
   let pref = trigger === 'usagev' ? 'Usage' : 'Cost';
   if (condition && condition.getIn(['paths', 0, 'path'], '').indexOf('over_group') !== -1) {
