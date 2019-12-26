@@ -50,7 +50,7 @@ const selectReportLinesFields = (
     });
     categoryFields.forEach((customKey) => {
       const fieldLabel = getFieldName(customKey, 'lines', sentenceCase(customKey));
-      const chargeLabel = getFieldName('charge‎', 'lines', sentenceCase('charge‎'));
+      const chargeLabel = getFieldName('charge', 'lines', sentenceCase('charge'));
       const productKeyLabel = getFieldName('product_key', 'lines', sentenceCase('product_key'));
       const fieldsPreffix = `rates.tariff_category.${customKey}`;
       optionsWithMutations.push(Immutable.Map({
@@ -130,8 +130,12 @@ const mergeEntityAndReportConfigFields = (billrunConfigFields, type, isPlayEnabl
       }
     });
   })
+  // filter play fields
   .filter(field => (
-    field.get('id') !== 'play' || (field.get('id') === 'play' && isPlayEnabled)
+    (!['play', 'subscriber.play'].includes(field.get('id', ''))) || (
+      (field.get('id', '') === 'play' && isPlayEnabled) ||
+      (field.get('id', '') === 'subscriber.play' && isPlayEnabled && type === 'usage')
+    )
   ))
   // filter hidden fields
   .filter(field => field.get('show', true))
@@ -218,14 +222,14 @@ export const reportSubscriberFieldsSelector = createSelector(
 export const reportAccountFieldsSelector = createSelector(
   accountFieldsSelector,
   () => 'account',
-  () => true,
+  isPlaysEnabledSelector,
   mergeEntityAndReportConfigFields,
 );
 
 const reportlogFileFieldsSelector = createSelector(
   () => Immutable.List(),
   () => 'logFile',
-  () => true,
+  isPlaysEnabledSelector,
   mergeEntityAndReportConfigFields,
 );
 
@@ -260,28 +264,28 @@ const reportPaymentsFilesFieldsSelector = createSelector(
 const reportEventFileFieldsSelector = createSelector(
   () => Immutable.List(),
   () => 'event',
-  () => true,
+  isPlaysEnabledSelector,
   mergeEntityAndReportConfigFields,
 );
 
 export const reportUsageFieldsSelector = createSelector(
   reportLinesFieldsSelector,
   () => 'usage',
-  () => true,
+  isPlaysEnabledSelector,
   mergeEntityAndReportConfigFields,
 );
 
 const reportQueueFieldsSelector = createSelector(
   reportUsageFieldsSelector,
   () => 'queue',
-  () => true,
+  isPlaysEnabledSelector,
   mergeEntityAndReportConfigFields,
 );
 
 const reportBillsSelector = createSelector(
   () => Immutable.List(),
   () => 'bills',
-  () => true,
+  isPlaysEnabledSelector,
   mergeEntityAndReportConfigFields,
 );
 

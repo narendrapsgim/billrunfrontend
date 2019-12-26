@@ -80,6 +80,10 @@ export default {
       { id: 'balance_normalized', type: 'number' },
       { id: 'start', title: 'Proration start date', type: 'datetime' },
       { id: 'end', title: 'Proration end date', type: 'datetime' },
+      { id: 'subscriber.play', title: 'Subscriber Play', inputConfig: {
+        inputType: 'select',
+        callback: 'getPlayTypeOptions',
+      } },
       { id: 'tax_data.taxes.key', title: 'Tax key', inputConfig: { inputType: 'select', callback: 'getTaxesOptions' } },
       { id: 'tax_data.total_tax', type: 'number', title: 'Tax rate' },
       { id: 'tax_data.total_amount', type: 'number', title: 'Total taxes' },
@@ -281,7 +285,7 @@ export default {
       { id: 'aid', type: 'number', title: 'Customer ID' },
       { id: 'invoice_id', type: 'number', title: 'Invoice ID' },
       { id: 'due_date', type: 'date', title: 'Due Date' },
-      { id: 'due', type: 'number', title: 'Due Amount' },
+      { id: 'due', type: 'number', title: 'Original Due Date' },
       { id: 'payer_name', type: 'string', title: 'Payer Name' },
       { id: 'amount', type: 'number', title: 'Original Absolute Due Amount' },
       { id: 'lastname', type: 'string', title: 'Customer\'s Last Name' },
@@ -355,14 +359,14 @@ export default {
     { id: 'lte', title: '<=', include: ['number', 'date', 'datetime', 'fieldid:billrun'], exclude: [] }, // 'Less than or equals'
     { id: 'gt', title: '>', include: ['number', 'date', 'datetime', 'fieldid:billrun'], exclude: [] }, // 'Greater than'
     { id: 'gte', title: '>=', include: ['number', 'date', 'datetime', 'fieldid:billrun'], exclude: [] }, // 'Greater than or equals'
-    { id: 'like', title: 'Contains', include: ['string', 'number'], exclude: ['fieldid:logfile_status', 'fieldid:errors','fieldid:warnings', 'fieldid:info'] },
-    { id: 'starts_with', title: 'Starts with', include: ['string'], exclude: ['fieldid:logfile_status', 'fieldid:errors','fieldid:warnings', 'fieldid:info'] },
-    { id: 'ends_with', title: 'Ends with', include: ['string'], exclude: ['fieldid:logfile_status', 'fieldid:errors','fieldid:warnings', 'fieldid:info'] },
+    { id: 'like', title: 'Contains', include: ['string', 'number'], exclude: ['fieldid:logfile_status', 'fieldid:errors','fieldid:warnings', 'fieldid:info', 'fieldid:subscriber.play'] },
+    { id: 'starts_with', title: 'Starts with', include: ['string'], exclude: ['fieldid:logfile_status', 'fieldid:errors','fieldid:warnings', 'fieldid:info', 'fieldid:subscriber.play'] },
+    { id: 'ends_with', title: 'Ends with', include: ['string'], exclude: ['fieldid:logfile_status', 'fieldid:errors','fieldid:warnings', 'fieldid:info', 'fieldid:subscriber.play'] },
     { id: 'in_range', title: 'Include‎', include: ['ranges', 'range', 'daterange'] },
     { id: 'nin_range', title: 'Does not include‎', include: ['ranges', 'range', 'daterange'] },
     { id: 'exists', title: 'Exists', type: 'boolean',
       include: ['string', 'number', 'boolean', 'date', 'datetime', 'ranges', 'range', 'daterange'],
-      exclude: [ 'fieldid:billrun_status', 'fieldid:logfile_status'],
+      exclude: [ 'fieldid:billrun_status', 'fieldid:logfile_status', 'fieldid:subscriber.play'],
       options: ['yes', 'no'],
     },
   ],
