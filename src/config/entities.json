@@ -1,6 +1,7 @@
 {
   "service": {
     "collection": "services",
+    "audited": true,
     "uniqueField": "name",
     "itemName": "service",
     "itemsName": "services",
@@ -10,6 +11,7 @@
   },
   "plan": {
     "collection": "plans",
+    "audited": true,
     "uniqueField": "name",
     "itemName": "plan",
     "itemsName": "plans",
@@ -19,6 +21,7 @@
   },
   "charging_plan": {
     "collection": "prepaidgroups",
+    "audited": true,
     "uniqueField": "name",
     "itemName": "buckets group",
     "itemsName": "buckets groups",
@@ -27,6 +30,7 @@
   },
   "prepaid_plan": {
     "collection": "plans",
+    "audited": true,
     "uniqueField": "name",
     "itemName": "prepaid plan",
     "itemsName": "prepaid plans",
@@ -35,6 +39,7 @@
   },
   "prepaid_include": {
     "collection": "prepaidincludes",
+    "audited": true,
     "uniqueField": "name",
     "itemName": "prepaid bucket",
     "itemsName": "prepaid buckets",
@@ -43,6 +48,7 @@
   },
   "product": {
     "collection": "rates",
+    "audited": true,
     "uniqueField": "key",
     "itemName": "product",
     "itemsName": "products",
@@ -52,6 +58,7 @@
   },
   "discount": {
     "collection": "discounts",
+    "audited": true,
     "uniqueField": "key",
     "itemName": "discount",
     "itemsName": "discounts",
@@ -61,6 +68,7 @@
   },
   "charge": {
     "collection": "charges",
+    "audited": true,
     "uniqueField": "key",
     "itemName": "Conditional Charge",
     "itemsName": "Conditional Charges",
@@ -70,6 +78,7 @@
   },
   "subscription": {
     "collection": "subscribers",
+    "audited": true,
     "uniqueField": ["sid", "aid"],
     "itemName": "subscriber",
     "itemsName": "subscribers",
@@ -79,6 +88,7 @@
   },
   "customer": {
     "collection": "accounts",
+    "audited": true,
     "uniqueField": "aid",
     "itemName": "customer",
     "itemsName": "customers",
@@ -88,6 +98,7 @@
   },
   "report": {
     "collection": "reports",
+    "audited": true,
     "uniqueField": "key",
     "itemName": "report",
     "itemsName": "reports",
@@ -113,6 +124,7 @@
   },
   "tax": {
     "collection": "taxes",
+    "audited": true,
     "uniqueField": "key",
     "itemName": "tax",
     "itemsName": "tax rates",
