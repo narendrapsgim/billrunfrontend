@@ -5,7 +5,6 @@ import {
   getFieldName,
   getFieldNameType,
   getConfig,
-  createRateListNameByArgs,
   sortFieldOption,
 } from '@/common/Util';
 import {
@@ -14,23 +13,8 @@ import {
   accountFieldsSelector,
   linesFieldsSelector,
   rateCategoriesSelector,
-  usageTypeSelector,
-  fileTypeSelector,
-  eventCodeSelector,
   isPlaysEnabledSelector,
 } from './settingsSelector';
-import {
-  listByNameSelector,
-  productsOptionsSelector,
-  cyclesOptionsSelector,
-  plansOptionsSelector,
-  servicesOptionsSelector,
-  groupsOptionsSelector,
-  calcNameSelector,
-  bucketsNamesSelector,
-  bucketsExternalIdsSelector,
-  getPlayTypeOptions,
-} from './listSelectors';
 
 
 const getReportEntityConfigFields = type => getConfig(['reports', 'fields', type], Immutable.List());
@@ -149,6 +133,8 @@ const mergeEntityAndReportConfigFields = (billrunConfigFields, type, isPlayEnabl
   .filter(field => (
     field.get('id') !== 'play' || (field.get('id') === 'play' && isPlayEnabled)
   ))
+  // filter hidden fields
+  .filter(field => field.get('show', true))
   .sort(sortFieldOption);
 };
 
@@ -157,6 +143,10 @@ const selectReportFields = (
   accountFields,
   linesFileds,
   logFileFields,
+  paymentsTransactionsRequestFields,
+  paymentsTransactionsResponseFields,
+  paymentDenialsFields,
+  paymentsFilesFields,
   queueFields,
   eventFields,
   billsFields,
@@ -196,11 +186,19 @@ const selectReportFields = (
   //   usage: linesFileds,
   // }), customerExcludeIds);
 
-  const logFile = logFileFields;
-  const queue = queueFields;
-  const event = eventFields;
-  const bills = billsFields;
-  return Immutable.Map({ usage, subscription, customer, logFile, queue, event, bills });
+  return Immutable.Map({
+    usage,
+    subscription,
+    customer,
+    logFile: logFileFields,
+    paymentsTransactionsRequest: paymentsTransactionsRequestFields,
+    paymentsTransactionsResponse: paymentsTransactionsResponseFields,
+    paymentDenials: paymentDenialsFields,
+    paymentsFiles: paymentsFilesFields,
+    queue: queueFields,
+    event: eventFields,
+    bills: billsFields,
+  });
 };
 
 const reportLinesFieldsSelector = createSelector(
@@ -210,14 +208,14 @@ const reportLinesFieldsSelector = createSelector(
   selectReportLinesFields,
 );
 
-const reportSubscriberFieldsSelector = createSelector(
+export const reportSubscriberFieldsSelector = createSelector(
   subscriberFieldsWithPlaySelector,
   () => 'subscribers',
   isPlaysEnabledSelector,
   mergeEntityAndReportConfigFields,
 );
 
-const reportAccountFieldsSelector = createSelector(
+export const reportAccountFieldsSelector = createSelector(
   accountFieldsSelector,
   () => 'account',
   () => true,
@@ -227,6 +225,34 @@ const reportAccountFieldsSelector = createSelector(
 const reportlogFileFieldsSelector = createSelector(
   () => Immutable.List(),
   () => 'logFile',
+  () => true,
+  mergeEntityAndReportConfigFields,
+);
+
+const reportPaymentsTransactionsRequestFieldsSelector = createSelector(
+  () => Immutable.List(),
+  () => 'paymentsTransactionsRequest',
+  () => true,
+  mergeEntityAndReportConfigFields,
+);
+
+const reportPaymentsTransactionsResponseFieldsSelector = createSelector(
+  () => Immutable.List(),
+  () => 'paymentsTransactionsResponse',
+  () => true,
+  mergeEntityAndReportConfigFields,
+);
+
+const reportPaymentDenialsFieldsSelector = createSelector(
+  () => Immutable.List(),
+  () => 'paymentDenials',
+  () => true,
+  mergeEntityAndReportConfigFields,
+);
+
+const reportPaymentsFilesFieldsSelector = createSelector(
+  () => Immutable.List(),
+  () => 'paymentsFiles',
   () => true,
   mergeEntityAndReportConfigFields,
 );
@@ -269,39 +295,12 @@ export const reportEntitiesFieldsSelector = createSelector(
   reportAccountFieldsSelector,
   reportUsageFieldsSelector,
   reportlogFileFieldsSelector,
+  reportPaymentsTransactionsRequestFieldsSelector,
+  reportPaymentsTransactionsResponseFieldsSelector,
+  reportPaymentDenialsFieldsSelector,
+  reportPaymentsFilesFieldsSelector,
   reportQueueFieldsSelector,
   reportEventFileFieldsSelector,
   reportBillsSelector,
   selectReportFields,
-);
-
-const getOptionCallback = (state, props) => {
-  const callback = props.config.getIn(['inputConfig', 'callback']);
-  switch (callback) {
-    case 'getCyclesOptions': return cyclesOptionsSelector(state, props);
-    case 'getProductsOptions': {
-      const callbackArgument = props.config.getIn(['inputConfig', 'callbackArgument'], Immutable.Map());
-      if (!callbackArgument.isEmpty()) {
-        const listName = createRateListNameByArgs(callbackArgument);
-        return listByNameSelector(state, props, listName);
-      }
-      return productsOptionsSelector(state, props);
-    }
-    case 'getPlansOptions': return plansOptionsSelector(state, props);
-    case 'getServicesOptions': return servicesOptionsSelector(state, props);
-    case 'getGroupsOptions': return groupsOptionsSelector(state, props);
-    case 'getUsageTypesOptions': return usageTypeSelector(state, props);
-    case 'getBucketsOptions': return bucketsNamesSelector(state, props);
-    case 'getBucketsExternalIdsOptions': return bucketsExternalIdsSelector(state, props);
-    case 'getFileTypeOptions': return fileTypeSelector(state, props);
-    case 'getPlayTypeOptions': return getPlayTypeOptions(state, props);
-    case 'getCalcNameOptions': return calcNameSelector(state, props);
-    case 'getEventCodeOptions': return eventCodeSelector(state, props);
-    default: return undefined;
-  }
-};
-
-export const selectOptionSelector = createSelector(
-  getOptionCallback,
-  options => options,
 );
