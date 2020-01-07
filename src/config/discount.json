@@ -29,9 +29,9 @@
       { "id": "@cycle_start_date@", "title": "Cycle Start Date", "include": ["date"], "exclude": [] },
       { "id": "@cycle_end_date@", "title": "Cycle End Date", "include": ["date"], "exclude": [] },
       { "id": "@plan_activation@", "title": "Plan Activation Date", "include": ["date"], "exclude": ["fieldid:plan_activation"] },
-      { "id": "@plan_deactivation@", "title": "Plan Deactivatio Date", "include": ["date"], "exclude": ["fieldid:plan_deactivation"] },
+      { "id": "@plan_deactivation@", "title": "Plan Deactivation Date", "include": ["date"], "exclude": ["fieldid:plan_deactivation"] },
       { "id": "@activation_date@", "title": "Activation Date", "include": ["date"], "exclude": ["fieldid:activation_date"] },
-      { "id": "@deactivation_date@", "title": "Deactivatio Date", "include": ["date"], "exclude": ["fieldid:deactivation_date"] }
+      { "id": "@deactivation_date@", "title": "Deactivation Date", "include": ["date"], "exclude": ["fieldid:deactivation_date"] }
     ],
     "operators" : [
       { "id": "eq", "title": "Equals", "include": ["date", "datetime"] },

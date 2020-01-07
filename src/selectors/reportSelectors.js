@@ -143,6 +143,10 @@ const selectReportFields = (
   accountFields,
   linesFileds,
   logFileFields,
+  paymentsTransactionsRequestFields,
+  paymentsTransactionsResponseFields,
+  paymentDenialsFields,
+  paymentsFilesFields,
   queueFields,
   eventFields,
   billsFields,
@@ -182,11 +186,19 @@ const selectReportFields = (
   //   usage: linesFileds,
   // }), customerExcludeIds);
 
-  const logFile = logFileFields;
-  const queue = queueFields;
-  const event = eventFields;
-  const bills = billsFields;
-  return Immutable.Map({ usage, subscription, customer, logFile, queue, event, bills });
+  return Immutable.Map({
+    usage,
+    subscription,
+    customer,
+    logFile: logFileFields,
+    paymentsTransactionsRequest: paymentsTransactionsRequestFields,
+    paymentsTransactionsResponse: paymentsTransactionsResponseFields,
+    paymentDenials: paymentDenialsFields,
+    paymentsFiles: paymentsFilesFields,
+    queue: queueFields,
+    event: eventFields,
+    bills: billsFields,
+  });
 };
 
 const reportLinesFieldsSelector = createSelector(
@@ -213,6 +225,34 @@ export const reportAccountFieldsSelector = createSelector(
 const reportlogFileFieldsSelector = createSelector(
   () => Immutable.List(),
   () => 'logFile',
+  () => true,
+  mergeEntityAndReportConfigFields,
+);
+
+const reportPaymentsTransactionsRequestFieldsSelector = createSelector(
+  () => Immutable.List(),
+  () => 'paymentsTransactionsRequest',
+  () => true,
+  mergeEntityAndReportConfigFields,
+);
+
+const reportPaymentsTransactionsResponseFieldsSelector = createSelector(
+  () => Immutable.List(),
+  () => 'paymentsTransactionsResponse',
+  () => true,
+  mergeEntityAndReportConfigFields,
+);
+
+const reportPaymentDenialsFieldsSelector = createSelector(
+  () => Immutable.List(),
+  () => 'paymentDenials',
+  () => true,
+  mergeEntityAndReportConfigFields,
+);
+
+const reportPaymentsFilesFieldsSelector = createSelector(
+  () => Immutable.List(),
+  () => 'paymentsFiles',
   () => true,
   mergeEntityAndReportConfigFields,
 );
@@ -255,6 +295,10 @@ export const reportEntitiesFieldsSelector = createSelector(
   reportAccountFieldsSelector,
   reportUsageFieldsSelector,
   reportlogFileFieldsSelector,
+  reportPaymentsTransactionsRequestFieldsSelector,
+  reportPaymentsTransactionsResponseFieldsSelector,
+  reportPaymentDenialsFieldsSelector,
+  reportPaymentsFilesFieldsSelector,
   reportQueueFieldsSelector,
   reportEventFileFieldsSelector,
   reportBillsSelector,
