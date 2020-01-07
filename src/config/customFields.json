@@ -2,7 +2,7 @@
   "entities": {
     "customer": "account",
     "subscription":"subscriber",
-    "product": "product",
+    "product": "rate",
     "service": "service",
     "plan":"plan",
     "tax":"tax",

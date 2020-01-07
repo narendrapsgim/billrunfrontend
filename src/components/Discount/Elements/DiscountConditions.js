@@ -320,7 +320,6 @@ const DiscountConditions = ({
       <div className="pull-right">{addNewConditionsBtn}</div>
     </div>
   ), [addNewConditionsBtn, conditionsHeaderDescription]);
-console.log("render errors:", errors);
   return (
     <Panel header={conditionsHeader}>
       {discount.getIn(conditionsPath, Immutable.List()).map((conditions, idx) => (
