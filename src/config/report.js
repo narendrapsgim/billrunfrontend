@@ -204,6 +204,9 @@ export default {
       { id: 'last_file', type: 'boolean', title: 'Last File' },
       { id: 'file_count', title: 'Files Count', type: 'number' },
       { id: 'related_request_file', title: 'Related Request File' },
+      { id: 'total_denied_amount', title: 'Total Denied Amount In The File' },
+      { id: 'total_confirmed_amount', title: 'Total Confirmed Amount In The File' },
+      { id: 'total_rejected_amount', title: 'Total Rejected Amount In The File' }
     ],
     'paymentDenials': [
       { id: 'fetching_time', type: 'date' },
@@ -231,6 +234,9 @@ export default {
       { id: 'last_file', type: 'boolean', title: 'Last File' },
       { id: 'file_count', title: 'Files Count', type: 'number' },
       { id: 'related_request_file', title: 'Related Request File' },
+      { id: 'total_denied_amount', title: 'Total Denied Amount In The File' },
+      { id: 'total_confirmed_amount', title: 'Total Confirmed Amount In The File' },
+      { id: 'total_rejected_amount', title: 'Total Rejected Amount In The File' }
     ],
     'paymentsFiles': [
       { id: 'fetching_time', type: 'date' },
@@ -258,6 +264,9 @@ export default {
       { id: 'last_file', type: 'boolean', title: 'Last File' },
       { id: 'file_count', title: 'Files Count', type: 'number' },
       { id: 'related_request_file', title: 'Related Request File' },
+      { id: 'total_denied_amount', title: 'Total Denied Amount In The File' },
+      { id: 'total_confirmed_amount', title: 'Total Confirmed Amount In The File' },
+      { id: 'total_rejected_amount', title: 'Total Rejected Amount In The File' }
     ],
     queue: [
       // use all usage fields
