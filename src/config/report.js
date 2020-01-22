@@ -176,7 +176,7 @@ export default {
       { id: 'transactions', title: 'Transactions', type: 'number' },
       { id: 'parameters_string', title: 'Parameter String' },
       { id: 'correlation_value', title: 'Correlation Value' },
-      
+
     ],
     'paymentsTransactionsResponse': [
       { id: 'fetching_time', type: 'date' },
@@ -349,10 +349,10 @@ export default {
       { id: 'original_txid', type: 'string', title: 'Original BillRun Transaction ID' },
       { id: 'rejection_code', type: 'string', title: 'Rejection Code' },
       { id: 'denial.transaction_date', type: 'datetime', title: 'Denial Transaction Date' },
-      { id: 'denial.amount', type: 'number', title: 'Denied Amount' },
       { id: 'denial.is_payments', type: 'boolean', title: 'Is Denied Payments' },
       { id: 'denial.credit_date', type: 'datetime', title: 'Denial Credit Date' },
       { id: 'denial.credit_date', type: 'string', title: 'Card Type' },
+      { id: 'is_denial', type: 'boolean', title: 'Is denial?' },
       { id: 'installments.total_amount', type: 'number', title: 'Installments Total Amount' },
       { id: 'installments.number_of_payments', type: 'number', title: 'Number Of Installments' },
       { id: 'installments.first_payment', type: 'number', title: 'Installments First Payment' },
