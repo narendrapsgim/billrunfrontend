@@ -638,6 +638,7 @@ export const computedConditionFieldsOptionsSelector = createSelector(
       .push({ value: 'type', label: 'Type' })
       .push({ value: 'usaget', label: 'Usage Type' })
       .push({ value: 'file', label: 'File name' })
+      .push({ value: 'installments', label: 'Installments' })
       .toArray());
 
 export const computedValueWhenOptionsSelector = createSelector(
