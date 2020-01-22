@@ -212,27 +212,6 @@ export const postpaidBalancesListQuery = (query, page, sort, size) => ({
   ],
 });
 
-/* Aggregate API */
-export const auditTrailEntityTypesQuery = () => {
-  const revenueQuery = [{
-    $match: { source: 'audit' },
-  }, {
-    $group: { _id: '$collection' },
-  }, {
-    $project: { name: '$_id', _id: 0 },
-  }, {
-    $sort: { name: 1 },
-  }];
-  return {
-    api: 'aggregate',
-    params: [
-      { collection: 'log' },
-      { pipelines: JSON.stringify(revenueQuery) },
-    ],
-  };
-};
-
-
 /* Settings API */
 export const savePaymentGatewayQuery = gateway => ({
   api: 'settings',
@@ -463,7 +442,7 @@ export const searchPlansByKeyQuery = (name, project = {}) => ({
 
 export const auditTrailListQuery = (query, page, fields, sort, size) => ({
   action: 'get',
-  entity: 'log',
+  entity: 'audit',
   params: [
     { size },
     { page },
