@@ -14,12 +14,13 @@ const TaxList = () => {
   const tableFields = [
     { id: 'description', title: 'Title', sort: true },
     { id: 'key', title: 'Key', sort: true },
-
+    { id: 'rate', title: 'Rate', sort: true, type: 'percentage' },
   ];
 
   const projectFields = {
     key: 1,
     description: 1,
+    rate: 1,
   };
 
   const actions = [
