@@ -180,7 +180,7 @@ export default {
       { id: 'transactions', title: 'Transactions', type: 'number' },
       { id: 'parameters_string', title: 'Parameter String' },
       { id: 'correlation_value', title: 'Correlation Value' },
-      
+
     ],
     'paymentsTransactionsResponse': [
       { id: 'fetching_time', type: 'date' },
@@ -367,10 +367,6 @@ export default {
       { id: 'payment_agreement.installments_num', type: 'number', title: 'Payments Agreement - Number of installments' },
       { id: 'payment_agreement.total_amount', type: 'number', title: 'Payments Agreement Total Amount' },
       { id: 'payment_agreement.first_due_date', type: 'datetime', title: 'Payments Agreement Current Installment Due Date' },
-      { id: 'installments.total_amount', type: 'number', title: 'Installments Total Amount' },
-      { id: 'installments.number_of_payments', type: 'number', title: 'Number Of Installments' },
-      { id: 'installments.first_payment', type: 'number', title: 'Installments First Payment' },
-      { id: 'installments.periodical_payments', type: 'number', title: 'Installments Periodical Payment' },
       { id: 'generated_pg_file_log', type: 'string', title: 'Payment Gateway File ID' },
     ],
   },
