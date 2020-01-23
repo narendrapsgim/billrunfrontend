@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import Immutable from 'immutable';
 import moment from 'moment';
 import classNames from 'classnames';
+import isNumber from 'is-number';
 import { titleCase } from 'change-case';
 import { OverlayTrigger, Tooltip } from 'react-bootstrap/lib';
 import { Button } from 'react-bootstrap';
@@ -36,6 +37,9 @@ class List extends Component {
 
   displayByType(field, entity) {
     switch (field.type) {
+      case 'percentage':
+          const value = entity.get(field.id, '');
+          return isNumber(value) ? `${parseFloat((parseFloat(value) * 100).toFixed(3))}%` : value;
       case 'date':
         return (
           <ZoneDate value={moment(entity.get(field.id, 0))} format={getConfig('dateFormat', 'DD/MM/YYYY')} />
