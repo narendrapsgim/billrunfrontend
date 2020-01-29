@@ -29,7 +29,11 @@ export default class GatewayParamsModal extends Component {
       const currentDenialsConnection = gateway.getIn(['denials', 'receiver', 'connections', 0]) === undefined ? {} :
         gateway.getIn(['denials', 'receiver', 'connections', 0]).toJS();
 
-      return this.setState({ transactionsConnection: currentTransactionsConnection, denialsConnection: currentDenialsConnection, gateway: gateway.toJS()});
+      return this.setState({
+        transactionsConnection: currentTransactionsConnection,
+        denialsConnection: currentDenialsConnection,
+        gateway: gateway.toJS(),
+      });
     }
     return this.setState({gateway: {name: settings.get('name'), params: {}}});
   }
@@ -118,10 +122,14 @@ export default class GatewayParamsModal extends Component {
     const { settings } = this.props;
     const { gateway, activeTab } = this.state;
     const exportValue = gateway.export !== undefined ? gateway.export : [];
-    const transactionsReceiverValue = gateway.transactions.receiver !== undefined ? gateway.transactions.receiver : [];
-    const transactionsConnections = transactionsReceiverValue.connections !== undefined ? transactionsReceiverValue.connections : [];
+    const gatewayTransactions = gateway.transactions !== undefined ? gateway.transactions : {};
+    const transactionsReceiverValue = gatewayTransactions.receiver !== undefined ? gatewayTransactions.receiver : [];
+    const transactionsConnections = transactionsReceiverValue.connections !== undefined
+      ? transactionsReceiverValue.connections 
+      : [];
     const transactionsConnection = transactionsConnections[0] !== undefined ? transactionsConnections[0] : [];
-    const denialsReceiverValue = gateway.denials.receiver !== undefined ? gateway.denials.receiver : [];
+    const gatewayDenials = gateway.denials !== undefined ? gateway.denials : {};
+    const denialsReceiverValue = gatewayDenials.receiver !== undefined ? gatewayDenials.receiver : [];
     const denialsConnections = denialsReceiverValue.connections !== undefined ? denialsReceiverValue.connections : [];
     const denialsConnection = denialsConnections[0] !== undefined ? denialsConnections[0] : [];
 
