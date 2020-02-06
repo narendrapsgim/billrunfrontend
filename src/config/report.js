@@ -90,7 +90,7 @@ export default {
       { id: 'tax_data.total_amount', type: 'number', title: 'Total taxes' },
       { id: 'tax_data.total_embedded_amount', type: 'number', title: 'Tax embedded amount' },
       { id: 'installments', type: 'number', title: 'Number of payments' },
-      { id: 'installment_number', type: 'number', title: 'Current payment' },
+      { id: 'installment_no', type: 'number', title: 'Current payment' },
       { id: 'first_installment', type: 'string', title: 'Installments batch identifier' },
     ],
     subscribers: [
