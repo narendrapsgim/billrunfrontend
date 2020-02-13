@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { withRouter } from 'react-router';
 import Immutable from 'immutable';
-import changeCase from 'change-case';
+import { noCase, upperCaseFirst } from 'change-case';
 import { Col, Row, Panel } from 'react-bootstrap';
 import { LoadingItemPlaceholder, Actions } from '@/components/Elements';
 import { ExporterPopup } from '@/components/Exporter';
@@ -23,6 +23,12 @@ import {
   // clearList,
   // clearItem,
 } from '@/actions/entityListActions';
+import {
+  importTypesOptionsSelector,
+} from '@/selectors/importSelectors';
+import {
+  getSettings,
+} from '@/actions/settingsActions';
 import { getConfig } from '@/common/Util';
 
 
@@ -37,6 +43,7 @@ class EntityList extends Component {
     items: PropTypes.instanceOf(Immutable.List),
     tableFields: PropTypes.array,
     filterFields: PropTypes.array,
+    typeSelectOptions: PropTypes.array,
     baseFilter: PropTypes.object,
     projectFields: PropTypes.object,
     page: PropTypes.number,
@@ -81,6 +88,7 @@ class EntityList extends Component {
     baseFilter: {},
     tableFields: [],
     filterFields: [],
+    typeSelectOptions: [],
     projectFields: {},
     sort: Immutable.Map(),
     defaultSort: Immutable.Map(),
@@ -102,6 +110,14 @@ class EntityList extends Component {
     }
     if (sort.isEmpty() && !defaultSort.isEmpty()) {
       this.props.dispatch(setListSort(itemsType, defaultSort));
+    }
+  }
+
+  componentDidMount() {
+    const { itemsType } = this.props;
+    if (this.isImportEnabled()) {
+      const importName = `import${upperCaseFirst(itemsType)}`;
+      this.props.dispatch(getSettings('plugin_actions', { actions: [importName] }));
     }
   }
 
@@ -267,6 +283,11 @@ class EntityList extends Component {
     return getConfig(['import', 'allowed_entities'], Immutable.List()).includes(itemType);
   }
 
+  showImportEnabled = () => {
+    const { typeSelectOptions } = this.props;
+    return this.isImportEnabled() && typeSelectOptions.length > 0;
+  }
+
   isExportEnabled = () => {
     const { itemType } = this.props;
     if (window.import_export === true) {
@@ -288,7 +309,7 @@ class EntityList extends Component {
       type: 'import',
       label: 'Import',
       onClick: this.onClickImport,
-      show: this.isImportEnabled,
+      show: this.showImportEnabled(),
       actionStyle: 'primary',
       actionSize: 'xsmall'
     }, {
@@ -335,7 +356,7 @@ class EntityList extends Component {
 
   renderPanelHeader = () => {
     const { itemType, itemsType } = this.props;
-    const itemsTypeName = getConfig(['systemItems', itemType, 'itemsName'], changeCase.noCase(itemsType));
+    const itemsTypeName = getConfig(['systemItems', itemType, 'itemsName'], noCase(itemsType));
     return (
       <div>
         List of all available {itemsTypeName}
@@ -459,6 +480,7 @@ const mapStateToProps = (state, props) => {
     filter: state.entityList.filter.get(itemsType),
     size: state.entityList.size.get(itemsType),
     inProgress: state.progressIndicator > 0,
+    typeSelectOptions: importTypesOptionsSelector(state, props, 'importer', itemType),
   })
 }
 export default withRouter(connect(mapStateToProps)(EntityList));

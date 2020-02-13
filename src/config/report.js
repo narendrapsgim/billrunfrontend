@@ -28,7 +28,8 @@ export default {
       { id: 'stamp' },
       { id: 'in_group', type: 'number' },
       { id: 'full_price', type: 'number', title: 'Plan / Service Full Price' },
-      { id: 'name', type: 'string', title: 'Plan / Service / Discount key' },
+      { id: 'name', type: 'string', title: 'Plan / Service key' },
+      { id: 'key', title: 'Discount key' },
       { id: 'aprice', type: 'number' },
       { id: 'final_charge', type: 'number' },
       { id: 'file' },
@@ -80,6 +81,10 @@ export default {
       { id: 'balance_normalized', type: 'number' },
       { id: 'start', title: 'Proration start date', type: 'datetime' },
       { id: 'end', title: 'Proration end date', type: 'datetime' },
+      { id: 'subscriber.play', title: 'Subscriber Play', inputConfig: {
+        inputType: 'select',
+        callback: 'getPlayTypeOptions',
+      } },
       { id: 'tax_data.taxes.key', title: 'Tax key', inputConfig: { inputType: 'select', callback: 'getTaxesOptions' } },
       { id: 'tax_data.total_tax', type: 'number', title: 'Tax rate' },
       { id: 'tax_data.total_amount', type: 'number', title: 'Total taxes' },
@@ -100,22 +105,25 @@ export default {
       { id: 'aid', type: 'number' },
     ],
     event: [
-      { id: 'type',
-        inputConfig: {
+      { id: 'extra_params.aid', type: 'number' },
+      { id: 'extra_params.sid', type: 'number' },
+      { id: 'before', type: 'number' },
+      { id: 'after', type: 'number' },
+      { id: 'event_type', inputConfig: {
           inputType: 'select',
-          options: ['is', 'in', 'is_not', 'is_less_than', 'is_less_than_or_equal', 'is_greater_than', 'is_greater_than_or_equal', 'reached_constant', 'reached_constant_recurring', 'has_changed', 'has_changed_to', 'has_changed_from'],
-        },
-      },
-      { id: 'aid', type: 'number' },
-      { id: 'sid', type: 'number' },
-      { id: 'creation_time', type: 'date' },
-      { id: 'notify_time', type: 'date' },
-      { id: 'value' },
-      { id: 'stamp' },
+        options: ['balance', 'fraud'],
+      } },
+      { id: 'based_on', inputConfig: {
+        inputType: 'select',
+        options: ['usage', 'monetary'],
+      } },
       { id: 'event_code', inputConfig: {
          inputType: 'select',
-         callback: 'getEventCodeOptions', /* callback function + should be implementation */
+        callback: 'getEventCodeOptions',
       } },
+      { id: 'creation_time', type: 'datetime' },
+      { id: 'notify_time', type: 'datetime' },
+      { id: 'stamp' },
       { id: 'returned_value', searchable: false },
     ],
     logFile: [
@@ -168,7 +176,7 @@ export default {
       { id: 'transactions', title: 'Transactions', type: 'number' },
       { id: 'parameters_string', title: 'Parameter String' },
       { id: 'correlation_value', title: 'Correlation Value' },
-      
+
     ],
     'paymentsTransactionsResponse': [
       { id: 'fetching_time', type: 'date' },
@@ -196,6 +204,9 @@ export default {
       { id: 'last_file', type: 'boolean', title: 'Last File' },
       { id: 'file_count', title: 'Files Count', type: 'number' },
       { id: 'related_request_file', title: 'Related Request File' },
+      { id: 'total_denied_amount', title: 'Total Denied Amount In The File' },
+      { id: 'total_confirmed_amount', title: 'Total Confirmed Amount In The File' },
+      { id: 'total_rejected_amount', title: 'Total Rejected Amount In The File' }
     ],
     'paymentDenials': [
       { id: 'fetching_time', type: 'date' },
@@ -223,6 +234,9 @@ export default {
       { id: 'last_file', type: 'boolean', title: 'Last File' },
       { id: 'file_count', title: 'Files Count', type: 'number' },
       { id: 'related_request_file', title: 'Related Request File' },
+      { id: 'total_denied_amount', title: 'Total Denied Amount In The File' },
+      { id: 'total_confirmed_amount', title: 'Total Confirmed Amount In The File' },
+      { id: 'total_rejected_amount', title: 'Total Rejected Amount In The File' }
     ],
     'paymentsFiles': [
       { id: 'fetching_time', type: 'date' },
@@ -250,6 +264,9 @@ export default {
       { id: 'last_file', type: 'boolean', title: 'Last File' },
       { id: 'file_count', title: 'Files Count', type: 'number' },
       { id: 'related_request_file', title: 'Related Request File' },
+      { id: 'total_denied_amount', title: 'Total Denied Amount In The File' },
+      { id: 'total_confirmed_amount', title: 'Total Confirmed Amount In The File' },
+      { id: 'total_rejected_amount', title: 'Total Rejected Amount In The File' }
     ],
     queue: [
       // use all usage fields
@@ -281,7 +298,7 @@ export default {
       { id: 'aid', type: 'number', title: 'Customer ID' },
       { id: 'invoice_id', type: 'number', title: 'Invoice ID' },
       { id: 'due_date', type: 'date', title: 'Due Date' },
-      { id: 'due', type: 'number', title: 'Due Amount' },
+      { id: 'due', type: 'number', title: 'Original Due Amount' },
       { id: 'payer_name', type: 'string', title: 'Payer Name' },
       { id: 'amount', type: 'number', title: 'Original Absolute Due Amount' },
       { id: 'lastname', type: 'string', title: 'Customer\'s Last Name' },
@@ -332,10 +349,10 @@ export default {
       { id: 'original_txid', type: 'string', title: 'Original BillRun Transaction ID' },
       { id: 'rejection_code', type: 'string', title: 'Rejection Code' },
       { id: 'denial.transaction_date', type: 'datetime', title: 'Denial Transaction Date' },
-      { id: 'denial.amount', type: 'number', title: 'Denied Amount' },
       { id: 'denial.is_payments', type: 'boolean', title: 'Is Denied Payments' },
       { id: 'denial.credit_date', type: 'datetime', title: 'Denial Credit Date' },
       { id: 'denial.credit_date', type: 'string', title: 'Card Type' },
+      { id: 'is_denial', type: 'boolean', title: 'Is denial?' },
       { id: 'installments.total_amount', type: 'number', title: 'Installments Total Amount' },
       { id: 'installments.number_of_payments', type: 'number', title: 'Number Of Installments' },
       { id: 'installments.first_payment', type: 'number', title: 'Installments First Payment' },
@@ -355,14 +372,14 @@ export default {
     { id: 'lte', title: '<=', include: ['number', 'date', 'datetime', 'fieldid:billrun'], exclude: [] }, // 'Less than or equals'
     { id: 'gt', title: '>', include: ['number', 'date', 'datetime', 'fieldid:billrun'], exclude: [] }, // 'Greater than'
     { id: 'gte', title: '>=', include: ['number', 'date', 'datetime', 'fieldid:billrun'], exclude: [] }, // 'Greater than or equals'
-    { id: 'like', title: 'Contains', include: ['string', 'number'], exclude: ['fieldid:logfile_status', 'fieldid:errors','fieldid:warnings', 'fieldid:info'] },
-    { id: 'starts_with', title: 'Starts with', include: ['string'], exclude: ['fieldid:logfile_status', 'fieldid:errors','fieldid:warnings', 'fieldid:info'] },
-    { id: 'ends_with', title: 'Ends with', include: ['string'], exclude: ['fieldid:logfile_status', 'fieldid:errors','fieldid:warnings', 'fieldid:info'] },
+    { id: 'like', title: 'Contains', include: ['string', 'number'], exclude: ['fieldid:logfile_status', 'fieldid:errors','fieldid:warnings', 'fieldid:info', 'fieldid:subscriber.play'] },
+    { id: 'starts_with', title: 'Starts with', include: ['string'], exclude: ['fieldid:logfile_status', 'fieldid:errors','fieldid:warnings', 'fieldid:info', 'fieldid:subscriber.play'] },
+    { id: 'ends_with', title: 'Ends with', include: ['string'], exclude: ['fieldid:logfile_status', 'fieldid:errors','fieldid:warnings', 'fieldid:info', 'fieldid:subscriber.play'] },
     { id: 'in_range', title: 'Include‎', include: ['ranges', 'range', 'daterange'] },
     { id: 'nin_range', title: 'Does not include‎', include: ['ranges', 'range', 'daterange'] },
     { id: 'exists', title: 'Exists', type: 'boolean',
       include: ['string', 'number', 'boolean', 'date', 'datetime', 'ranges', 'range', 'daterange'],
-      exclude: [ 'fieldid:billrun_status', 'fieldid:logfile_status'],
+      exclude: [ 'fieldid:billrun_status', 'fieldid:logfile_status', 'fieldid:subscriber.play'],
       options: ['yes', 'no'],
     },
   ],

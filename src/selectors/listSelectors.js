@@ -15,9 +15,9 @@ const getCyclesOptions = state => state.list.get('cycles_list', null);
 
 const getUserNamesOptions = state => state.list.get('autocompleteUser', null);
 
-const getAuditEntityTypesOptions = state => state.list.get('autocompleteAuditTrailEntityTypes', null);
+const getAuditEntityTypesOptions = () => getConfig('systemItems');
 
-const getAuditLogs = state => state.list.get('log');
+const getAuditLogs = state => state.list.get('audit');
 
 const selectCyclesOptions = (options) => {
   if (options === null) {
@@ -83,10 +83,17 @@ const selectEntityTypesOptions = (options) => {
   if (options === null) {
     return undefined;
   }
-  return options.map(type => ({
-    key: type.get('name', ''),
-    val: sentenceCase(type.get('name', '')),
-  }));
+  return options
+    .filter(entity => entity.get('audited', false))
+    .map(entity => ({
+      key: entity.get('collection', ''),
+      val: sentenceCase(entity.get('itemsName', '')),
+    }))
+    .toList()
+    .push({
+      key: 'Login',
+      val: 'Login',
+    });
 };
 
 const getPlansOptions = state => state.list.get('available_plans', null);
