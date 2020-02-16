@@ -53,6 +53,7 @@ class RunCycle extends Component {
     showRefreshButton: false,
     ChargedAllClicked: false,
     generatePdf: null,
+    hideChargeButtton: true
   }
 
   componentDidMount() {
@@ -474,7 +475,7 @@ class RunCycle extends Component {
   }
 
   render() {
-    const { selectedCycle } = this.state;
+    const { selectedCycle, hideChargeButtton } = this.state;
     const { cycleAdditionalData } = this.props;
     const billrunKey = selectedCycle.get('billrun_key', '');
     const shouldDisplayBillrunData = List(['running', 'finished', 'confirmed', 'to_rerun']).contains(this.getSelectedCycleStatus());
@@ -489,7 +490,7 @@ class RunCycle extends Component {
         <Row>
           <Col lg={12}>
             <div className="pull-right" style={{ paddingBottom: 10 }}>
-              {this.renderChargeAllButton()}
+              {!hideChargeButtton ? this.renderChargeAllButton(): false}
             </div>
           </Col>
         </Row>
