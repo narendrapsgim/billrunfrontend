@@ -178,9 +178,15 @@ class BalanceEventCondition extends Component {
 
   filterRelevantGroups = (group) => {
     const { trigger, usageTypesData, item, groupsData } = this.props;
-    const isRelevant = item.get('property_type', '') === getUsagePropertyType(usageTypesData, groupsData.getIn([group, 'usage_types']).keySeq().first());
-    return (trigger === 'usagev' && !this.props.groupsData.hasIn([group, 'cost']) && isRelevant) ||
-      (trigger === 'cost' && !this.props.groupsData.hasIn([group, 'cost']) && isRelevant);
+    const isGroupHasCost = this.props.groupsData.hasIn([group, 'cost']);
+    if (trigger === 'cost' && isGroupHasCost) {
+      return true;
+    }
+    if (trigger === 'usagev' && !isGroupHasCost) {
+      const isRelevantUsageType = item.get('property_type', '') === getUsagePropertyType(usageTypesData, groupsData.getIn([group, 'usage_types'], Immutable.Map()).keySeq().first());
+      return isRelevantUsageType;
+    }
+    return false;
   }
 
   getGroupNamesOptions = () => this.props.groupsOptions
@@ -286,17 +292,21 @@ class BalanceEventCondition extends Component {
             />
           </Col>
           <Col sm={10} smOffset={2} xsOffset={2} xs={10}>
-            <Col sm={4} componentClass={ControlLabel}> Property Type:</Col>
-            <Col sm={8} className="form-inner-edit-row pr0">
-              <Field
-                fieldType="select"
-                id={`condition-limitation-property-type-${index}`}
-                onChange={this.onChangePropertyType}
-                value={propertyType}
-                options={this.getPropertyTypesOptions()}
-                disabled={limitation !== 'group'}
-              />
-            </Col>
+            { trigger === 'usagev' && (
+              <>
+                <Col sm={4} componentClass={ControlLabel}> Property Type:</Col>
+                <Col sm={8} className="form-inner-edit-row pr0">
+                  <Field
+                    fieldType="select"
+                    id={`condition-limitation-property-type-${index}`}
+                    onChange={this.onChangePropertyType}
+                    value={propertyType}
+                    options={this.getPropertyTypesOptions()}
+                    disabled={limitation !== 'group'}
+                  />
+                </Col>
+              </>
+            )}
 
             <Col sm={4} componentClass={ControlLabel}> Groups Included:</Col>
             <Col sm={8} className="form-inner-edit-row pr0">
@@ -305,7 +315,7 @@ class BalanceEventCondition extends Component {
                 onChange={this.onChangeGroupNames}
                 value={groupNames}
                 options={this.getGroupNamesOptions()}
-                disabled={limitation !== 'group' || propertyType === ''}
+                disabled={limitation !== 'group' || (propertyType === '' && trigger === 'usagev')}
                 multi={true}
               />
             </Col>

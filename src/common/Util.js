@@ -681,7 +681,9 @@ export const getPlayOptions = availablePlays => availablePlays.map(play => ({
  */
 export const inferPropTypeFromUsageType = (propertyTypes, usageTypes) => {
   const uom = Immutable.List().withMutations((listWithMutations) => {
-    usageTypes.forEach(usaget => listWithMutations.push(usaget.get('unit', '')));
+    if (usageTypes && !usageTypes.isEmpty()) {
+      usageTypes.forEach(usaget => listWithMutations.push(usaget.get('unit', '')));
+    }
   });
   const props = Immutable.List().withMutations((listWithMutations) => {
     propertyTypes.forEach((p) => {
