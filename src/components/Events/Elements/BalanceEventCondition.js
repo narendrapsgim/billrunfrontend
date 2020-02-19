@@ -78,6 +78,12 @@ class BalanceEventCondition extends Component {
 
   componentDidMount() {
     this.props.dispatch(getGroupsOptions());
+    const { trigger } = this.props;
+    // if event condition trigger property not set, set USAGE as default
+    if (trigger === '') {
+      const e = {target: {value: 'usagev'} };
+      this.onChangeTrigger(e);
+    }
   }
 
   onChangeTrigger = (e) => {
