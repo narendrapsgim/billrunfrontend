@@ -534,7 +534,7 @@ export const getCyclesQuery = (from, to, newestFirst = true, timeStatus = false)
       params['params'].push({to});
   }
   params['params'].push({newestFirst: newestFirst? 1 : 0});
-  params['params'].push({timeStatus: timeStatus ? true : false });
+  params['params'].push({timeStatus: timeStatus ? 1 : 0 });
   return params;
 };
 
