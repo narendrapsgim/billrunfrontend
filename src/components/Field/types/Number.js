@@ -42,7 +42,7 @@ const Number = (props) => {
     <div className="non-editable-field">
       <span>
         {(preffix !== null) && preffix}
-        {parseFloat(value)}
+        {value}
         {(suffix !== null) && suffix}
       </span>
     </div>

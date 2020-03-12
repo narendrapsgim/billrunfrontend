@@ -212,27 +212,6 @@ export const postpaidBalancesListQuery = (query, page, sort, size) => ({
   ],
 });
 
-/* Aggregate API */
-export const auditTrailEntityTypesQuery = () => {
-  const revenueQuery = [{
-    $match: { source: 'audit' },
-  }, {
-    $group: { _id: '$collection' },
-  }, {
-    $project: { name: '$_id', _id: 0 },
-  }, {
-    $sort: { name: 1 },
-  }];
-  return {
-    api: 'aggregate',
-    params: [
-      { collection: 'log' },
-      { pipelines: JSON.stringify(revenueQuery) },
-    ],
-  };
-};
-
-
 /* Settings API */
 export const savePaymentGatewayQuery = gateway => ({
   api: 'settings',
@@ -463,7 +442,7 @@ export const searchPlansByKeyQuery = (name, project = {}) => ({
 
 export const auditTrailListQuery = (query, page, fields, sort, size) => ({
   action: 'get',
-  entity: 'log',
+  entity: 'audit',
   params: [
     { size },
     { page },
@@ -543,7 +522,7 @@ export const getRebalanceAccountQuery = (aid, billrunKey = '') => {
   };
 };
 
-export const getCyclesQuery = (from, to, newestFirst = true) => {
+export const getCyclesQuery = (from, to, newestFirst = true, timeStatus = false) => {
   const params = {
     api: 'billrun',
     action: 'cycles',
@@ -556,6 +535,7 @@ export const getCyclesQuery = (from, to, newestFirst = true) => {
       params['params'].push({to});
   }
   params['params'].push({newestFirst: newestFirst? 1 : 0});
+  params['params'].push({timeStatus: timeStatus ? 1 : 0 });
   return params;
 };
 
