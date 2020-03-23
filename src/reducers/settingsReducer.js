@@ -60,6 +60,19 @@ export default function (state = defaultState, action) {
           if (setting.name === 'taxation.vat' && data !== '') {
             data *= 100;
           }
+          if (setting.name === 'plugins' && Immutable.List.isList(data)) {
+            data = data.map(plugin => {
+              if (typeof plugin === 'string') {
+                return Immutable.Map({
+                  name: plugin,
+                  enabled: true,
+                  system: true,
+                  hide_from_ui: false
+                });
+              }
+              return plugin;
+            })
+          }
           stateWithMutations.setIn(setting.name.split('.'), data);
         });
       });

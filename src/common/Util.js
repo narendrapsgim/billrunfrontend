@@ -674,4 +674,14 @@ export const getPlayOptions = availablePlays => availablePlays.map(play => ({
 })).toArray();
 
 
-export const test = () => {console.log('cool !!');}
+export const formatPluginLabel = (plugin) => {
+  const plugin_key = 'Plugin';
+  if (!Immutable.Map.isMap(plugin)) {
+    return plugin_key;
+  }
+  const name = plugin.get('name', plugin_key);
+  if (name === plugin_key) {
+    return plugin_key;
+  }
+  return titleCase(name.substring(0, name.lastIndexOf(plugin_key)));
+}
