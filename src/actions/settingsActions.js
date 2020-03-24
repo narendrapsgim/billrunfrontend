@@ -183,3 +183,14 @@ export const saveSharedSecret = (secret, mode) => (dispatch) => {
     })
     .catch(error => dispatch(apiBillRunErrorHandler(error, 'Error saving Secret')));
 };
+
+export const savePlugin = (plugin) => (dispatch) => {
+  dispatch(startProgressIndicator());
+  const successMessage = `Plugin ${plugin.get('label','')} was successfuly updated!`;
+  const errorMessage = `Error saving plugin ${plugin.get('label','')}`;
+  const queries = saveSettingsQuery(plugin, 'plugin');
+  return apiBillRun(queries)
+    .then(success => dispatch(apiBillRunSuccessHandler(success, successMessage)))
+    .catch(error => dispatch(apiBillRunErrorHandler(error, errorMessage)))
+    .finally(() => dispatch(getSettings('plugins')));
+}

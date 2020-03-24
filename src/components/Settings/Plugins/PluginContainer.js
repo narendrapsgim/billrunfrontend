@@ -5,7 +5,7 @@ import {
   showConfirmModal,
   showFormModal,
 } from '@/actions/guiStateActions/pageActions';
-import { saveSettings, getSettings } from '@/actions/settingsActions';
+import { saveSettings, getSettings, savePlugin } from '@/actions/settingsActions';
 
 const mapStateToProps = (state, props) => ({
   showEnableAction: !props.plugin.get('enabled', true),
@@ -16,13 +16,7 @@ const mapDispatchToProps = (dispatch, { index, plugin, plugins, onChange, onRemo
   onEdit: (item) => {
     const onOk = (editedItem) => {
       onChange([index], editedItem);
-      return dispatch(saveSettings(['plugins']))
-        .then(success => (success.status ? true : Promise.reject()))
-        .then(() => dispatch(getSettings('plugins')))
-        .catch(() => {
-          dispatch(getSettings('plugins'));
-          return Promise.reject();
-        });
+      return dispatch(savePlugin(item));
     };
     const config = {
       title: `Edit Plugin ${item.get('label', '')}`,
@@ -33,17 +27,15 @@ const mapDispatchToProps = (dispatch, { index, plugin, plugins, onChange, onRemo
   },
 
 
-  onEnable: () => {
+  onEnable: (item) => {
     onChange([index, 'enabled'], true);
-    return dispatch(saveSettings('plugins'))
-      .then(() => dispatch(getSettings('plugins')));
+    return dispatch(savePlugin(item));
   },
 
   onDisable: (item) => {
     const onOk = () => {
       onChange([index, 'enabled'], false);
-      return dispatch(saveSettings(['plugins']))
-        .then(() => dispatch(getSettings('plugins')));
+      return dispatch(savePlugin(item));
     };
     const confirm = {
       message: `Are you sure you want to disable plugin "${item.get('label', '')}"?`,
