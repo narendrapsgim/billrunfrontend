@@ -2,8 +2,10 @@ import Immutable from 'immutable';
 import { actions } from '@/actions/settingsActions';
 import { ADD_USAGET_MAPPING } from '@/actions/inputProcessorActions';
 import { LOGOUT } from '@/actions/userActions';
-import { getConfig } from '@/common/Util';
-
+import {
+  getConfig,
+  formatPluginLabel,
+ } from '@/common/Util';
 
 const LogoImg = `${process.env.PUBLIC_URL}/assets/img/${getConfig('defaultLogo', 'billRun-cloud-logo.png')}`;
 const defaultState = Immutable.fromJS({
@@ -61,7 +63,7 @@ export default function (state = defaultState, action) {
             data *= 100;
           }
           if (setting.name === 'plugins' && Immutable.List.isList(data)) {
-            data = data.map(plugin => {
+            data = data.map((plugin) => {
               if (typeof plugin === 'string') {
                 return Immutable.Map({
                   name: plugin,
@@ -73,6 +75,12 @@ export default function (state = defaultState, action) {
               return plugin;
             })
             .filter(plugin => !plugin.get('hide_from_ui', false))
+            .map((plugin) => {
+              if (plugin.get('label', '') === '') {
+                return plugin.set('label', formatPluginLabel(plugin))
+              }
+              return plugin;
+            });
           }
           stateWithMutations.setIn(setting.name.split('.'), data);
         });

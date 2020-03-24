@@ -6,9 +6,6 @@ import {
   showFormModal,
 } from '@/actions/guiStateActions/pageActions';
 import { saveSettings, getSettings } from '@/actions/settingsActions';
-import {
-  formatPluginLabel,
-} from '@/common/Util';
 
 const mapStateToProps = (state, props) => ({
   showEnableAction: !props.plugin.get('enabled', true),
@@ -28,7 +25,7 @@ const mapDispatchToProps = (dispatch, { index, plugin, plugins, onChange, onRemo
         });
     };
     const config = {
-      title: `Edit Plugin ${formatPluginLabel(item)}`,
+      title: `Edit Plugin ${item.get('label', '')}`,
       onOk,
       mode: 'edit',
     };
@@ -49,7 +46,7 @@ const mapDispatchToProps = (dispatch, { index, plugin, plugins, onChange, onRemo
         .then(() => dispatch(getSettings('plugins')));
     };
     const confirm = {
-      message: `Are you sure you want to disable plugin "${item.get('name', '')}"?`,
+      message: `Are you sure you want to disable plugin "${item.get('label', '')}"?`,
       onOk,
       type: 'delete',
       labelOk: 'Disable',

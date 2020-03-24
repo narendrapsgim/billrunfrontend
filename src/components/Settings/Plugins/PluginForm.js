@@ -7,7 +7,6 @@ import Field from '@/components/Field';
 
 const PluginForm = ({
   item,
-  isAllowedDisableAction,
   onChangeEnabled,
 }) => (
   <Form horizontal>
@@ -18,7 +17,6 @@ const PluginForm = ({
           label="Enabled"
           value={item.get('enabled', false)}
           onChange={onChangeEnabled}
-          disabled={!isAllowedDisableAction}
         />
       </Col>
     </FormGroup>
@@ -27,13 +25,11 @@ const PluginForm = ({
 
 PluginForm.propTypes = {
   item: PropTypes.instanceOf(Immutable.Map),
-  isAllowedDisableAction: PropTypes.bool,
   onChangeEnabled: PropTypes.func.isRequired,
 };
 
 PluginForm.defaultProps = {
   item: Immutable.Map(),
-  isAllowedDisableAction: true,
 };
 
 export default PluginForm;

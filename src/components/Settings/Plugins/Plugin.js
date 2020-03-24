@@ -2,10 +2,6 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import Immutable from 'immutable';
 import { Actions, StateIcon } from '@/components/Elements';
-import {
-  formatPluginLabel,
-} from '@/common/Util';
-
 
 const Plugin = ({
   plugin,
@@ -25,7 +21,7 @@ const Plugin = ({
       <td>
         <StateIcon status={plugin.get('enabled', true) ? 'active' : 'expired'} />
       </td>
-      <td>{formatPluginLabel(plugin)}</td>
+      <td>{plugin.get('label', '')}</td>
       <td className="td-actions">
         <Actions actions={getListActions} data={plugin} />
       </td>
