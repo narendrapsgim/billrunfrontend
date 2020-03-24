@@ -11,6 +11,18 @@ const mapDispatchToProps = (dispatch, props) => ({
     updateField('enabled', value);
   },
 
+  onChange: (key, value) => {
+    const { updateField } = props;
+    const path = Array.isArray(key) ? key : [key];
+    updateField(['configuration', 'values', ...path], value)
+  },
+
+  onRemove: (key) => {
+    const { removeField } = props;
+    const path = Array.isArray(key) ? key : [key];
+    removeField(['configuration', 'values', ...path]);
+  },
+
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(PluginForm);

@@ -69,7 +69,8 @@ export default function (state = defaultState, action) {
                   name: plugin,
                   enabled: true,
                   system: true,
-                  hide_from_ui: false
+                  hide_from_ui: false,
+                  configuration: Immutable.Map({}),
                 });
               }
               return plugin;
