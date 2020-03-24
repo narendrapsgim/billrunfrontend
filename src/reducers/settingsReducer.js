@@ -72,6 +72,7 @@ export default function (state = defaultState, action) {
               }
               return plugin;
             })
+            .filter(plugin => !plugin.get('hide_from_ui', false))
           }
           stateWithMutations.setIn(setting.name.split('.'), data);
         });
