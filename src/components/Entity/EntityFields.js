@@ -183,7 +183,7 @@ class EntityFields extends Component {
 }
 
 const mapStateToProps = (state, props) => ({
-  fields: entityFieldSelector(state, props),
+  fields: props.fields || entityFieldSelector(state, props),
   isPlaysEnabled: isPlaysEnabledSelector(state, props),
 });
 
