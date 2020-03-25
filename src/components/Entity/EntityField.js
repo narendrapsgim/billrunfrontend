@@ -7,6 +7,7 @@ import Field from '../Field';
 import Help from '../Help';
 import { getConfig, formatSelectOptions } from '@/common/Util';
 
+const checkboxStyle = { height: 29, marginTop: 8 };
 
 class EntityField extends Component {
 
@@ -29,6 +30,7 @@ class EntityField extends Component {
     isRemoveField: PropTypes.bool,
     fieldPath: PropTypes.array,
     onChange: PropTypes.func,
+    onRemove: PropTypes.func,
   };
 
   static defaultProps = {
@@ -46,6 +48,7 @@ class EntityField extends Component {
     fieldPath: [],
     error: '',
     onChange: () => {},
+    onRemove: () => {},
   }
 
   componentDidMount() {
@@ -158,12 +161,8 @@ class EntityField extends Component {
   }
 
   onClickRemoveInput = () => {
-    const { entity, fieldPath } = this.props;
-    if (fieldPath.length > 1) {
-      const lastElement = fieldPath.splice(fieldPath.length - 1, 1);
-      const withoutField = entity.getIn(fieldPath).delete(...lastElement);
-      this.props.onChange(fieldPath, withoutField);
-    }
+    const { fieldPath } = this.props;
+    this.props.onRemove(fieldPath);
   }
 
   renderRemovableField = (input) => {
@@ -211,7 +210,6 @@ class EntityField extends Component {
       );
     }
     if (isFieldBoolean) {
-      const checkboxStyle = { height: 29, marginTop: 8 };
       return (
         <Field
           fieldType="checkbox"

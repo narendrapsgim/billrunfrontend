@@ -53,6 +53,15 @@ class EntityFields extends Component {
     if (entity.has('params') && Immutable.is(entity.get('params', Immutable.List()), Immutable.List())) {
       this.props.onChangeField(['params'], Immutable.Map());
     }
+    // same fix for nullable fields (empty object converted to array)
+    let updated_layers = [];
+    fields.forEach(field => {
+      const firstLayer = field.get('field_name', '').split('.')[0];
+      if (!updated_layers.includes(firstLayer) && entity.has(firstLayer) && field.get('nullable', false) && Immutable.is(entity.get(firstLayer, Immutable.List()), Immutable.List())) {
+        updated_layers.push(firstLayer);
+        this.props.onChangeField([firstLayer], Immutable.Map());
+      }
+    })
   }
 
   componentDidUpdate(prevProps, prevState) { // eslint-disable-line no-unused-vars
@@ -83,7 +92,7 @@ class EntityFields extends Component {
       .filter(field => !this.filterParamsFields(field))
       .map(field => ({
         label: titleCase(field.get('title', '')),
-        value: field.get('field_name', '').split('.')[1],
+        value: field.get('field_name', ''),
       }))
       .sortBy(field => field.label)
       .sortBy(field =>
@@ -92,7 +101,8 @@ class EntityFields extends Component {
   }
 
   onAddParam = (key) => {
-    this.props.onChangeField(['params', key], null);
+    const path = Array.isArray(key) ? key : key.split('.');
+    this.props.onChangeField(path, null);
   }
 
   filterPrintableFields = field => (
@@ -105,7 +115,8 @@ class EntityFields extends Component {
   filterParamsFields = (field) => {
     const { entity } = this.props;
     const fieldPath = field.get('field_name', '').split('.');
-    return (!(fieldPath[0] === 'params' && !entity.hasIn(fieldPath))) || field.get('mandatory', false);
+    const isParam = fieldPath[0] === 'params' || field.get('nullable', false);
+    return (!(isParam && !entity.hasIn(fieldPath))) || field.get('mandatory', false);
   }
 
   filterPlayFields = (field) => {
@@ -121,7 +132,7 @@ class EntityFields extends Component {
   }
 
   renderField = (field, key) => {
-    const { entity, editable, onChangeField, errors } = this.props;
+    const { entity, editable, onChangeField, onRemoveField, errors } = this.props;
     return (
       <EntityField
         key={`key_${field.get('field_name', key)}`}
@@ -129,6 +140,7 @@ class EntityFields extends Component {
         entity={entity}
         editable={editable}
         onChange={onChangeField}
+        onRemove={onRemoveField}
         error={errors.get(field.get('field_name', ''), false)}
       />
     );
