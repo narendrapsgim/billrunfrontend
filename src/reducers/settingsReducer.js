@@ -23,6 +23,13 @@ const defaultState = Immutable.fromJS({
   payment_gateways: [],
 });
 
+const defaultPlugin = Immutable.Map({
+  enabled: true,
+  system: true,
+  hide_from_ui: false,
+  configuration: Immutable.Map({}),
+});
+
 export default function (state = defaultState, action) {
   const { name, value, category, settings, gateway } = action;
 
@@ -63,25 +70,11 @@ export default function (state = defaultState, action) {
             data *= 100;
           }
           if (setting.name === 'plugins' && Immutable.List.isList(data)) {
-            data = data.map((plugin) => {
-              if (typeof plugin === 'string') {
-                return Immutable.Map({
-                  name: plugin,
-                  enabled: true,
-                  system: true,
-                  hide_from_ui: false,
-                  configuration: Immutable.Map({}),
-                });
-              }
-              return plugin;
-            })
-            .filter(plugin => !plugin.get('hide_from_ui', false))
-            .map((plugin) => {
-              if (plugin.get('label', '') === '') {
-                return plugin.set('label', formatPluginLabel(plugin))
-              }
-              return plugin;
-            });
+            data = data
+              .map(convertPluginToNewStructure)
+              .filter(getVisiblePlugins)
+              .map(setPluginLabel)
+              .map(sortPluginFields);
           }
           stateWithMutations.setIn(setting.name.split('.'), data);
         });
@@ -121,3 +114,14 @@ export default function (state = defaultState, action) {
       return state;
   }
 }
+
+
+const convertPluginToNewStructure = plugin => (typeof plugin === 'string' ? defaultPlugin.set('name', plugin) : plugin);
+
+const sortPluginFields = plugin => plugin.updateIn(['configuration', 'fields'], Immutable.List(), fields =>
+  fields.sortBy(field => field.get('field_name', ''))
+);
+
+const setPluginLabel = plugin => (plugin.get('label', '') === '' ? plugin.set('label', formatPluginLabel(plugin)) : plugin);
+   
+const getVisiblePlugins = plugin => !plugin.get('hide_from_ui', false);
