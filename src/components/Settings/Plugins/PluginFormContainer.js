@@ -3,22 +3,20 @@ import PluginForm from './PluginForm';
 
 const mapStateToProps = null;
 
-const mapDispatchToProps = (dispatch, props) => ({
+const mapDispatchToProps = (dispatch, {updateField, removeField}) => ({
 
   onChangeEnabled: (e) => {
-    const { updateField } = props;
     const { value } = e.target;
-    updateField('enabled', value);
+    const newState = value === 'yes';
+    updateField('enabled', newState);
   },
 
   onChange: (key, value) => {
-    const { updateField } = props;
     const path = Array.isArray(key) ? key : [key];
     updateField(['configuration', 'values', ...path], value)
   },
 
   onRemove: (key) => {
-    const { removeField } = props;
     const path = Array.isArray(key) ? key : [key];
     removeField(['configuration', 'values', ...path]);
   },
