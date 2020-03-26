@@ -9,6 +9,7 @@ import { EntityFields } from '@/components/Entity';
 const PluginForm = ({
   item,
   onChangeEnabled,
+  errors,
   onChange,
   onRemove,
 }) => (
@@ -31,9 +32,10 @@ const PluginForm = ({
     <EntityFields
       entityName="plugins"
       entity={item.getIn(['configuration', 'values'], Immutable.Map())}
+      errors={errors}
+      fields={item.getIn(['configuration', 'fields'], Immutable.List())}
       onChangeField={onChange}
       onRemoveField={onRemove}
-      fields={item.getIn(['configuration', 'fields'], Immutable.List())}
     />
 
   </Form>

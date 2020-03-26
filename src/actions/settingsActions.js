@@ -1,5 +1,4 @@
 import moment from 'moment';
-import Immutable from 'immutable';
 import { startProgressIndicator } from './progressIndicatorActions';
 import { apiBillRun, apiBillRunErrorHandler, apiBillRunSuccessHandler } from '../common/Api';
 import {
@@ -184,24 +183,3 @@ export const saveSharedSecret = (secret, mode) => (dispatch) => {
     })
     .catch(error => dispatch(apiBillRunErrorHandler(error, 'Error saving Secret')));
 };
-
-export const savePluginByName = (pluginName, messages = {}) => (dispatch, getState) => {
-  const { settings } = getState();
-  const plugins = settings.get('plugins', Immutable.List());
-  const plugin = plugins.find(plugin => plugin.get('name', '') === pluginName, null, Immutable.Map());
-  return dispatch(savePlugin(plugin, messages));
-}
-
-export const savePlugin = (plugin, messages = {}) => (dispatch) => {
-  const {
-    success: successMessage = `Plugin ${plugin.get('label','')} was successfuly updated!`,
-    error: errorMessage = `Error saving plugin ${plugin.get('label','')}`,
-  } = messages;
-  dispatch(startProgressIndicator());
-  const convertedPlugin = plugin.deleteIn(['configuration', 'fields']);
-  const queries = saveSettingsQuery(convertedPlugin, 'plugin');
-  return apiBillRun(queries)
-    .then(success => dispatch(apiBillRunSuccessHandler(success, successMessage)))
-    .catch(error => dispatch(apiBillRunErrorHandler(error, errorMessage)))
-    .finally(() => dispatch(getSettings('plugins')));
-}

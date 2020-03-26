@@ -2,9 +2,9 @@ import Immutable from 'immutable';
 import { actions } from '@/actions/settingsActions';
 import { ADD_USAGET_MAPPING } from '@/actions/inputProcessorActions';
 import { LOGOUT } from '@/actions/userActions';
+import { parsePlugins } from '@/actions/pluginActions';
 import {
   getConfig,
-  formatPluginLabel,
  } from '@/common/Util';
 
 const LogoImg = `${process.env.PUBLIC_URL}/assets/img/${getConfig('defaultLogo', 'billRun-cloud-logo.png')}`;
@@ -21,13 +21,6 @@ const defaultState = Immutable.fromJS({
     logo: LogoImg,
   },
   payment_gateways: [],
-});
-
-const defaultPlugin = Immutable.Map({
-  enabled: true,
-  system: true,
-  hide_from_ui: false,
-  configuration: Immutable.Map({}),
 });
 
 export default function (state = defaultState, action) {
@@ -70,11 +63,7 @@ export default function (state = defaultState, action) {
             data *= 100;
           }
           if (setting.name === 'plugins' && Immutable.List.isList(data)) {
-            data = data
-              .map(convertPluginToNewStructure)
-              .filter(getVisiblePlugins)
-              .map(setPluginLabel)
-              .map(sortPluginFields);
+            data = parseGotPlugins(data);
           }
           stateWithMutations.setIn(setting.name.split('.'), data);
         });
@@ -114,14 +103,3 @@ export default function (state = defaultState, action) {
       return state;
   }
 }
-
-
-const convertPluginToNewStructure = plugin => (typeof plugin === 'string' ? defaultPlugin.set('name', plugin) : plugin);
-
-const sortPluginFields = plugin => plugin.updateIn(['configuration', 'fields'], Immutable.List(), fields =>
-  fields.sortBy(field => field.get('field_name', ''))
-);
-
-const setPluginLabel = plugin => (plugin.get('label', '') === '' ? plugin.set('label', formatPluginLabel(plugin)) : plugin);
-   
-const getVisiblePlugins = plugin => !plugin.get('hide_from_ui', false);

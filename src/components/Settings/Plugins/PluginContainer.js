@@ -5,7 +5,7 @@ import {
   showConfirmModal,
   showFormModal,
 } from '@/actions/guiStateActions/pageActions';
-import { savePlugin, savePluginByName } from '@/actions/settingsActions';
+import { savePlugin, savePluginByName, validatePlugin } from '@/actions/pluginActions';
 
 const mapStateToProps = (state, props) => ({
   showEnableAction: !props.plugin.get('enabled', true),
@@ -15,6 +15,9 @@ const mapDispatchToProps = (dispatch, { index, plugin, plugins, onChange, onRemo
 
   onEdit: (item) => {
     const onOk = (editedItem) => {
+      if (!dispatch(validatePlugin(editedItem))) {
+        return false;
+      }
       return dispatch(savePlugin(editedItem));
     };
     const config = {

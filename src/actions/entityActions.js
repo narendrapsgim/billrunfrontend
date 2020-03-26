@@ -1,5 +1,6 @@
 import moment from 'moment';
 import Immutable from 'immutable';
+import isNumber from 'is-number';
 import { upperCaseFirst } from 'change-case';
 import { apiBillRun, apiBillRunErrorHandler, apiBillRunSuccessHandler, buildRequestUrl } from '../common/Api';
 import { getEntityByIdQuery, apiEntityQuery, getEntityCSVQuery, getEntitesQuery } from '../common/ApiQueries';
@@ -271,4 +272,31 @@ export const entitySearchByQuery = (collection, query, project, sort, options) =
       throw new Error();
     })
     .catch(error => false);
+}
+
+export const validateFieldByType = (value, config) => {
+  const isMulti = config.get('multiple', false);
+  if (value === '' || (isMulti && ( (Array.isArray(value) && value.length === 0) || Immutable.is(value, Immutable.List())))) {
+    return true;
+  }
+
+  if (isMulti && Array.isArray(value)) {
+    const notMultiConfig = config.set('multiple', false);
+    return value.reduce((acc, val) => {
+      if (acc !== true) {
+        return acc;
+      }
+      return validateFieldByType(val, notMultiConfig);
+    }, true);
+  }
+ 
+  switch (config.get('type', '')) {
+    case 'number':
+    case 'decimal':
+      return isNumber(value) ? true : 'Value must be numeric';
+    case 'integer':
+      return isNumber(value) && `${parseInt(value)}` === `${value}` ? true : 'Value must be integer';
+    default:
+      return true;
+  }
 }
