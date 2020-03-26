@@ -107,7 +107,7 @@ class EntityFields extends Component {
 
   filterPrintableFields = field => (
     field.get('display', false) !== false
-    && field.get('editable', false) !== false
+    // && field.get('editable', false) !== false
     && field.get('field_name', '') !== 'tariff_category'
     && field.get('field_name', '') !== 'play'
   );
@@ -133,12 +133,13 @@ class EntityFields extends Component {
 
   renderField = (field, key) => {
     const { entity, editable, onChangeField, onRemoveField, errors } = this.props;
+    const isFieldEditabe = editable && field.get('editable', false);
     return (
       <EntityField
         key={`key_${field.get('field_name', key)}`}
         field={field}
         entity={entity}
-        editable={editable}
+        editable={isFieldEditabe}
         onChange={onChangeField}
         onRemove={onRemoveField}
         error={errors.get(field.get('field_name', ''), false)}
