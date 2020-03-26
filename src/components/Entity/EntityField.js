@@ -273,6 +273,7 @@ class EntityField extends Component {
           addOnPaste
           pasteSplit={this.pasteSplit}
           disabled={disabled}
+          inputProps={{fieldType: field.get('type', undefined)}}
         />
       );
     }

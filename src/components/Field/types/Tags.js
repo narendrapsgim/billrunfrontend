@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import TagsInput from 'react-tagsinput';
+import Field from '@/components/Field';
 
 const Tags = (props) => {
   const { editable, value, disabled, placeholder, onChange, inputProps, onlyUnique, ...otherProps } = props;
@@ -13,6 +14,7 @@ const Tags = (props) => {
       </div>
     );
   }
+  const renderCustomInput = ({ addTag, ...other }) => (<Field {...other} />);
   const renderTag = (args) => {
     const { tag, key, disabled: allowRemove, onRemove, classNameRemove, getTagDisplayValue, ...other } = args;
     const remove = () => { onRemove(key); };
@@ -39,6 +41,7 @@ const Tags = (props) => {
       disabled={disabled}
       renderTag={renderTag}
       onlyUnique={onlyUnique}
+      renderInput={typeof inputProps.fieldType === 'undefined' ? undefined : renderCustomInput}
     />
   );
 };
