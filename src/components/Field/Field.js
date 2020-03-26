@@ -55,6 +55,8 @@ class Field extends PureComponent {
     const { fieldType, style, className, ...inputProps } = this.props;
     switch (fieldType) {
       case 'number':
+      case 'integer':
+      case 'decimal':
         return (<Number {...inputProps} />);
       case 'price':
         return (<Price {...inputProps} />);
