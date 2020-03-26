@@ -39,7 +39,7 @@ export const savePlugin = (plugin, messages = {}) => (dispatch) => {
     .finally(() => dispatch(getSettings('plugins')));
 }
 
-export const parsePlugins = plugins => plugins
+export const parseGotPlugins = plugins => plugins
   .map(convertPluginToNewStructure)
   .filter(getVisiblePlugins)
   .map(setPluginLabel)

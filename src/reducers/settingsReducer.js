@@ -2,7 +2,7 @@ import Immutable from 'immutable';
 import { actions } from '@/actions/settingsActions';
 import { ADD_USAGET_MAPPING } from '@/actions/inputProcessorActions';
 import { LOGOUT } from '@/actions/userActions';
-import { parsePlugins } from '@/actions/pluginActions';
+import { parseGotPlugins } from '@/actions/pluginActions';
 import {
   getConfig,
  } from '@/common/Util';
