@@ -274,29 +274,42 @@ export const entitySearchByQuery = (collection, query, project, sort, options) =
     .catch(error => false);
 }
 
+/**
+ * Validate value by field configuration and return if value has error.
+ * Supported for multi values
+ * 
+ * @param {any} value value to validate
+ * @param {Immutable.Map()} config with field configuration
+ * @return (boolean|string)
+ *    TRUE or string with error message if error
+ *    FALE if no error or value is empty
+ */
 export const validateFieldByType = (value, config) => {
   const isMulti = config.get('multiple', false);
   if (value === '' || (isMulti && ( (Array.isArray(value) && value.length === 0) || Immutable.is(value, Immutable.List())))) {
-    return true;
+    return false;
   }
 
-  if (isMulti && Array.isArray(value)) {
+  if (isMulti && (Array.isArray(value) || Immutable.Iterable.isIterable(value))) {
     const notMultiConfig = config.set('multiple', false);
     return value.reduce((acc, val) => {
-      if (acc !== true) {
+      if (acc !== false) {
         return acc;
       }
       return validateFieldByType(val, notMultiConfig);
-    }, true);
+    }, false);
   }
  
   switch (config.get('type', '')) {
     case 'number':
     case 'decimal':
-      return isNumber(value) ? true : 'Value must be numeric';
+      return isNumber(value) ? false : 'Value must be numeric';
     case 'integer':
-      return isNumber(value) && `${parseInt(value)}` === `${value}` ? true : 'Value must be integer';
+      console.log("value: ", value);
+      return isNumber(value) && `${parseInt(value)}` === `${value}` ? false : 'Value must be integer';
+    case 'json':
+      return value === false; // no need for the message, current json field dispaly message in the editbox
     default:
-      return true;
+      return false;
   }
 }

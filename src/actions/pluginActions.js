@@ -76,10 +76,10 @@ export const validatePlugin = (plugin) => (dispatch) => {
       const path_array = path.split('.').filter(part => part !== '');
       if (values.hasIn(path_array)) {
         const value = values.getIn(path_array)
-        const isFieldValid = validateFieldByType(value, config)
-        if (isFieldValid !== true) {
+        const hasError = validateFieldByType(value, config)
+        if (hasError !== false) {
           isPluginValid = false;
-          dispatch(setFormModalError(path, isFieldValid));
+          dispatch(setFormModalError(path, hasError));
         }
       }
     }

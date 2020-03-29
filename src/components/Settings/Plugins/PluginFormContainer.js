@@ -21,9 +21,9 @@ const mapDispatchToProps = (dispatch, {
     const field_config = item
       .getIn(['configuration', 'fields'], List())
       .find(field => field.get('field_name', '') === pathString, null, Map());
-    const isValid = validateFieldByType(value, field_config);
-    if (isValid !== true) {
-      setError(pathString, isValid);
+    const hasError = validateFieldByType(value, field_config);
+    if (hasError !== false) {
+      setError(pathString, hasError);
     } else {
       setError(pathString);
     }
