@@ -4,9 +4,11 @@ import Immutable from 'immutable';
 import { connect } from 'react-redux';
 import { FormGroup, Col, ControlLabel, InputGroup } from 'react-bootstrap';
 import { upperCaseFirst } from 'change-case';
+import isNumber from 'is-number';
 import Field from '@/components/Field';
 import UsageTypesSelector from '../../UsageTypes/UsageTypesSelector';
 import { getGroupsOptions } from '@/actions/reportsActions';
+import { showWarning } from '@/actions/alertsActions';
 import {
   groupsOptionsSelector,
   groupsDataSelector,
@@ -83,6 +85,28 @@ class BalanceEventCondition extends Component {
     if (trigger === '') {
       const e = {target: {value: 'usagev'} };
       this.onChangeTrigger(e);
+    }
+  }
+
+  componentDidUpdate(prevProps, prevState) {
+    const { onChangeField, index, item } = this.props;
+    const newConditionType = item.get('type', '')
+    const oldConditionType = prevProps.item.get('type', '');
+    if (oldConditionType !== newConditionType) {
+      const convertedCondition = item.withMutations((conditionWithMutations) => {
+        const selectedConditionData = getBalanceConditionData(newConditionType);
+        const newValueType = selectedConditionData.get('type', 'text');
+        const oldSelectedConditionData = getBalanceConditionData(oldConditionType);
+        const oldValueType = oldSelectedConditionData.get('type', 'text');
+        if (newValueType !== oldValueType) {
+          conditionWithMutations.set('value', '');
+        }
+        if (newConditionType === 'reached_percentage') {
+          conditionWithMutations.set('unit', '');
+          conditionWithMutations.set('value', '');
+        }
+      });
+      onChangeField(['conditions', index], convertedCondition);
     }
   }
 
@@ -174,15 +198,40 @@ class BalanceEventCondition extends Component {
     onChangeField(['conditions', index, 'value'], value);
   };
 
-  onChangeTagValue = (e) => {
-    const { onChangeField, index } = this.props;
-    onChangeField(['conditions', index, 'value'], e);
+  onChangeTagValue = (value) => {
+    const { onChangeField, index, item } = this.props;
+    if (item.get('type', '') === 'reached_percentage') {
+      const filterPercentageMultiValues = this.filterPercentageMultiValues(value);
+      return onChangeField(['conditions', index, 'value'], filterPercentageMultiValues);
+    }
+    return onChangeField(['conditions', index, 'value'], value);
   };
 
   onChangeUnit = (unit) => {
     const { onChangeField, index } = this.props;
     onChangeField(['conditions', index, 'unit'], unit);
   };
+
+  filterPercentageMultiValues = values => values
+    .split(",")
+    .filter(val => val !== '')
+    .filter((val) => {
+      if (!isNumber(val)) {
+        this.props.dispatch(showWarning('Condition value must be numeric'));
+        return false;
+      }
+      const mumericValue = parseFloat(val);
+      if (mumericValue <= 0) {
+        this.props.dispatch(showWarning('Condition value should be greater than zero'));
+        return false
+      }
+      if (mumericValue > 100) {
+        this.props.dispatch(showWarning('Condition value cannot be greater than 100'));
+        return false;
+      }
+      return true;
+    })
+    .join(',');
 
   filterRelevantGroups = (group) => {
     const { trigger, usageTypesData, item, groupsData } = this.props;
@@ -327,7 +376,7 @@ class BalanceEventCondition extends Component {
                 multi={true}
               />
             </Col>
-            {trigger === 'usagev' && (
+            {trigger === 'usagev' && item.get('type', '') !== 'reached_percentage' ? (
               <>
                 <Col sm={4} componentClass={ControlLabel}>Units of Measure:</Col>
                 <Col sm={8} className="form-inner-edit-row pr0">
@@ -343,6 +392,8 @@ class BalanceEventCondition extends Component {
                   />
                 </Col>
               </>
+            ) : (
+              <Col sm={12} className="form-inner-edit-row pr0 pn10 input-min-line-height">&nbsp;</Col>
             )}
 
           </Col>
