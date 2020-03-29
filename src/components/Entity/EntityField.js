@@ -27,6 +27,7 @@ class EntityField extends Component {
     isFieldRanges: PropTypes.bool,
     isFieldDate: PropTypes.bool,
     isFieldDateRange: PropTypes.bool,
+    isFieldJson: PropTypes.bool,
     isRemoveField: PropTypes.bool,
     fieldPath: PropTypes.array,
     onChange: PropTypes.func,
@@ -45,6 +46,7 @@ class EntityField extends Component {
     isFieldRanges: false,
     isFieldDate: false,
     isFieldDateRange: false,
+    isFieldJson: false,
     fieldPath: [],
     error: '',
     onChange: () => {},
@@ -68,10 +70,13 @@ class EntityField extends Component {
 
   getNoDefaultValueVal = (byConfig = true) => {
     const {
-      field, isFieldBoolean, isFieldTags, isFieldSelect, isFieldRanges, isFieldDateRange,
+      field, isFieldBoolean, isFieldTags, isFieldSelect, isFieldRanges, isFieldDateRange, isFieldJson,
     } = this.props;
     if (isFieldBoolean) {
       return false;
+    }
+    if (isFieldJson) {
+      return undefined;
     }
     if (isFieldRanges || isFieldDateRange) {
       // const defaultRangeValue = Immutable.Map({ from: '', to: '' });
@@ -124,18 +129,29 @@ class EntityField extends Component {
   }
 
   onChangeRange = (val) => {
-    const { fieldPath } = this.props;
-    this.props.onChange(fieldPath, val);
+    this.onChangeValue(val);
   }
 
   onChangeTags = (val) => {
+    this.onChangeValue(val);
+  }
+
+  onChangeValue = (val) => {
     const { fieldPath } = this.props;
     this.props.onChange(fieldPath, val);
   }
 
   getFieldValue = () => {
     const {
-      entity, editable, fieldPath, isFieldTags, isFieldBoolean, isFieldRanges, isFieldDate, isFieldDateRange,
+      entity,
+      editable,
+      fieldPath,
+      isFieldTags,
+      isFieldBoolean,
+      isFieldRanges,
+      isFieldDate,
+      isFieldDateRange,
+      isFieldJson,
     } = this.props;
     if (isFieldDate) {
       const value = entity.getIn(fieldPath, '');
@@ -144,6 +160,17 @@ class EntityField extends Component {
     if (isFieldDateRange) {
       const value = entity.getIn(fieldPath, undefined);
       return ([undefined, null, ''].includes(value)) ? undefined : value;
+    }
+    if (isFieldJson) {
+      const value = entity.getIn(fieldPath, undefined);
+      if (Immutable.Map.isMap(value)
+        || Immutable.List.isList(value)
+        || value instanceof Object
+        || Array.isArray(value)
+      ) {
+        return value
+      }
+      return undefined;
     }
     if (isFieldRanges) {
       return entity.getIn(fieldPath, undefined);
@@ -192,7 +219,8 @@ class EntityField extends Component {
       isFieldBoolean,
       isFieldRanges,
       isFieldDate,
-      isFieldDateRange
+      isFieldDateRange,
+      isFieldJson,
     } = this.props;
     const value = this.getFieldValue();
     if (isFieldRanges) {
@@ -274,6 +302,16 @@ class EntityField extends Component {
           pasteSplit={this.pasteSplit}
           disabled={disabled}
           inputProps={{fieldType: field.get('type', undefined)}}
+        />
+      );
+    }
+    if (isFieldJson) {
+      return (
+        <Field
+          fieldType="json"
+          value={value}
+          onChange={this.onChangeValue}
+          disabled={disabled}
         />
       );
     }

@@ -19,6 +19,7 @@ import TextEditor from './types/TextEditor';
 import Ranges from './types/Ranges';
 import Range from './types/Range';
 import Percentage from './types/Percentage';
+import Json from './types/Json';
 
 
 class Field extends PureComponent {
@@ -90,6 +91,8 @@ class Field extends PureComponent {
         return (<Range {...inputProps} />);
       case 'percentage':
         return (<Percentage {...inputProps} />);
+      case 'json':
+        return (<Json {...inputProps} />);
       default:
         return (<Text {...inputProps} />);
     }
