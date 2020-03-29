@@ -117,6 +117,8 @@ class BalanceEventCondition extends Component {
     onChangeField(['conditions', index, 'property_type'], '');
     onChangeField(['conditions', index, 'unit'], '');
     onChangeField(['conditions', index, 'usaget'], '');
+    onChangeField(['conditions', index, 'type'], '');
+    onChangeField(['conditions', index, 'value'], '');
   };
 
   onChangePropertyType = (propertyType) => {
@@ -450,6 +452,12 @@ const mapStateToProps = (state, props) => {
   const {
     trigger, limitation, activityType, groupNames, overGroup
   } = getPathParams(props.item.get('paths', Immutable.List()));
+
+  let conditionsOperators = eventConditionsOperatorsSelectOptionsSelector(null, BalanceEventCondition.defaultProps);
+  if (limitation === 'activity_type') {
+    conditionsOperators = conditionsOperators.filter(conditionsOperator => conditionsOperator.value !== 'reached_percentage');
+  }
+
   return {
     trigger,
     limitation,
@@ -461,7 +469,7 @@ const mapStateToProps = (state, props) => {
     groupsData: groupsDataSelector(state, props) || Immutable.Map(),
     currency: currencySelector(state, props),
     servicesData: servicesDataSelector(state, props) || Immutable.Map(),
-    conditionsOperators: eventConditionsOperatorsSelectOptionsSelector(null, BalanceEventCondition.defaultProps),
+    conditionsOperators,
   };
 };
 
