@@ -19,10 +19,10 @@ const PluginForm = ({
       <Col sm={3} lg={2} componentClass={ControlLabel}>Status</Col>
       <Col sm={8} lg={9}>
         <span>
-          <span style={{ display: 'inline-block', marginRight: 20 }}>
+          <span className="inline mr10">
             <Field fieldType="radio" onChange={onChangeEnabled} name="type" value="yes" label="Enable" checked={item.get('enabled', false)} />
           </span>
-          <span style={{ display: 'inline-block' }}>
+          <span className="inline">
             <Field fieldType="radio" onChange={onChangeEnabled} name="type" value="no" label="Disable" checked={!item.get('enabled', false)} />
           </span>
         </span>
