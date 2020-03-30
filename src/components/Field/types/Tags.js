@@ -38,7 +38,7 @@ const Tags = (props) => {
       addOnBlur={true}
       value={valueArr}
       onChange={onChange}
-      inputProps={otherTagInputProps}
+      inputProps={typeof fieldTypeInputProps === 'undefined' ? otherTagInputProps : tagInputProps}
       disabled={disabled}
       renderTag={renderTag}
       onlyUnique={onlyUnique}
