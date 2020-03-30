@@ -89,7 +89,7 @@ class BalanceEventCondition extends Component {
   }
 
   componentDidUpdate(prevProps, prevState) {
-    const { onChangeField, index, item } = this.props;
+    const { onChangeField, index, item, conditionsOperators } = this.props;
     const newConditionType = item.get('type', '')
     const oldConditionType = prevProps.item.get('type', '');
     if (oldConditionType !== newConditionType) {
@@ -107,6 +107,10 @@ class BalanceEventCondition extends Component {
         }
       });
       onChangeField(['conditions', index], convertedCondition);
+    }
+
+    if (conditionsOperators.findIndex(conditionsOperator => conditionsOperator.value === item.get('type', '')) === -1) {
+      this.onChangeType('');
     }
   }
 
@@ -141,8 +145,6 @@ class BalanceEventCondition extends Component {
     onChangeField(['conditions', index, 'property_type'], '');
     onChangeField(['conditions', index, 'unit'], '');
     onChangeField(['conditions', index, 'usaget'], '');
-    onChangeField(['conditions', index, 'type'], '');
-    onChangeField(['conditions', index, 'value'], '');
   };
 
   onChangePropertyType = (propertyType) => {
