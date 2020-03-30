@@ -20,6 +20,7 @@ import Ranges from './types/Ranges';
 import Range from './types/Range';
 import Percentage from './types/Percentage';
 import Json from './types/Json';
+import Password from './types/Password';
 
 
 class Field extends PureComponent {
@@ -93,6 +94,8 @@ class Field extends PureComponent {
         return (<Percentage {...inputProps} />);
       case 'json':
         return (<Json {...inputProps} />);
+      case 'password':
+        return (<Password {...inputProps} />);
       default:
         return (<Text {...inputProps} />);
     }
