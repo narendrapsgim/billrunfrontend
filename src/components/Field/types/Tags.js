@@ -31,17 +31,18 @@ const Tags = (props) => {
     placeholder: placeholderText,
   };
   const tagInputProps = Object.assign(defautlInputProps, inputProps);
+  const { fieldType : fieldTypeInputProps, ...otherTagInputProps } = tagInputProps;
   return (
     <TagsInput
       {...otherProps}
       addOnBlur={true}
       value={valueArr}
       onChange={onChange}
-      inputProps={tagInputProps}
+      inputProps={otherTagInputProps}
       disabled={disabled}
       renderTag={renderTag}
       onlyUnique={onlyUnique}
-      renderInput={typeof inputProps.fieldType === 'undefined' ? undefined : renderCustomInput}
+      renderInput={typeof fieldTypeInputProps === 'undefined' ? undefined : renderCustomInput}
     />
   );
 };
