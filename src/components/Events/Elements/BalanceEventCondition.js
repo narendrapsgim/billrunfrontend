@@ -108,8 +108,8 @@ class BalanceEventCondition extends Component {
       });
       onChangeField(['conditions', index], convertedCondition);
     }
-
-    if (conditionsOperators.findIndex(conditionsOperator => conditionsOperator.value === item.get('type', '')) === -1) {
+    // reset condition type and values if selected condition type not exists in options
+    if (item.get('type', '') !== '' && conditionsOperators.findIndex(conditionsOperator => conditionsOperator.value === item.get('type', '')) === -1) {
       this.onChangeType('');
     }
   }
