@@ -26,6 +26,7 @@ class EntityField extends Component {
     isFieldBoolean: PropTypes.bool,
     isFieldRanges: PropTypes.bool,
     isFieldDate: PropTypes.bool,
+    isFieldDateTime: PropTypes.bool,
     isFieldDateRange: PropTypes.bool,
     isFieldJson: PropTypes.bool,
     isRemoveField: PropTypes.bool,
@@ -45,6 +46,7 @@ class EntityField extends Component {
     isFieldBoolean: false,
     isFieldRanges: false,
     isFieldDate: false,
+    isFieldDateTime: false,
     isFieldDateRange: false,
     isFieldJson: false,
     fieldPath: [],
@@ -150,10 +152,11 @@ class EntityField extends Component {
       isFieldBoolean,
       isFieldRanges,
       isFieldDate,
+      isFieldDateTime,
       isFieldDateRange,
       isFieldJson,
     } = this.props;
-    if (isFieldDate) {
+    if (isFieldDate || isFieldDateTime) {
       const value = entity.getIn(fieldPath, '');
       return ([undefined, null, ''].includes(value)) ? undefined : moment(value);
     }
@@ -219,6 +222,7 @@ class EntityField extends Component {
       isFieldBoolean,
       isFieldRanges,
       isFieldDate,
+      isFieldDateTime,
       isFieldDateRange,
       isFieldJson,
     } = this.props;
@@ -266,15 +270,17 @@ class EntityField extends Component {
           />
       );
     }
-    if (isFieldDate) {
+    if (isFieldDate || isFieldDateTime) {
       const mandatory = field.get('mandatory', false);
       return (
         <Field
-          fieldType="date"
+          fieldType={isFieldDate ? "date" : "datetime"}
           value={value}
           onChange={this.onChangeDate}
           editable={editable}
           isClearable={!mandatory}
+          dateFormat={field.get('date_format', undefined)}
+          timeFormat={field.get('time_format', undefined)}
         />
       );
     }
