@@ -305,7 +305,6 @@ export const validateFieldByType = (value, config) => {
     case 'decimal':
       return isNumber(value) ? false : 'Value must be numeric';
     case 'integer':
-      console.log("value: ", value);
       return isNumber(value) && `${parseInt(value)}` === `${value}` ? false : 'Value must be integer';
     case 'json':
       return value === false; // no need for the message, current json field dispaly message in the editbox
