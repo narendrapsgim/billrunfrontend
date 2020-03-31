@@ -50,16 +50,28 @@ class EntityFields extends Component {
       this.props.dispatch(getSettings(entityName));
     }
     // fix problem when empty params object converted to array
-    if (entity.has('params') && Immutable.is(entity.get('params', Immutable.List()), Immutable.List())) {
-      this.props.onChangeField(['params'], Immutable.Map());
-    }
-    // same fix for nullable fields (empty object converted to array)
-    let updated_layers = [];
+    //if (entity.has('params') && Immutable.is(entity.get('params', Immutable.List()), Immutable.List())) {
+      // this.props.onChangeField(['params'], Immutable.Map());
+    //}
+    // fix problem when empty params object converted to array
+    let updated_levels = [];
     fields.forEach(field => {
-      const firstLayer = field.get('field_name', '').split('.')[0];
-      if (!updated_layers.includes(firstLayer) && entity.has(firstLayer) && field.get('nullable', false) && Immutable.is(entity.get(firstLayer, Immutable.List()), Immutable.List())) {
-        updated_layers.push(firstLayer);
-        this.props.onChangeField([firstLayer], Immutable.Map());
+      const levels = field.get('field_name', '').split('.');
+      levels.pop(); // remove last element from the path
+      if (levels.length) {
+        let levelsArray = [];
+        levels.forEach((level) => {
+          levelsArray.push(level);
+          const laterString = levelsArray.join('.');
+          const isAlreadyUpdated = !updated_levels.includes(laterString);
+          const isPresentInEntity = entity.hasIn(levelsArray);
+          const isWrongType = Immutable.is(entity.getIn(levelsArray, Immutable.List()), Immutable.List());
+          if (isAlreadyUpdated && isPresentInEntity && isWrongType) {
+            updated_levels.push(laterString);
+            console.log('update level: ', levelsArray);
+            this.props.onChangeField(levelsArray, Immutable.Map());
+          }
+        });
       }
     })
   }
