@@ -32,9 +32,23 @@ const mapDispatchToProps = (dispatch, {
 
   onRemove: (key) => {
     const path = Array.isArray(key) ? key : [key];
-    const pathString = path.join('.');
-    setError(pathString);
-    removeField(['configuration', 'values', ...path]);
+    // remove error from the current path
+    setError(path.join('.'));
+    // remove all the tree if to prevent saving empty tree parts
+    const minPathLevelToRemove = path.reduce((acc) => {
+      const prevLevel = [...acc];
+      prevLevel.pop();
+      const levelValue = item.getIn(['configuration', 'values', ...prevLevel], Map());
+      // check if prev tree level has only the removed value
+      if (Map.isMap(levelValue) && levelValue.size > 1) {
+        return acc;
+      }
+      // if no edition values exists, all levels above can be removed
+      // remove mor error for this level if exists
+      setError(prevLevel.join('.'));
+      return prevLevel;
+    }, path);
+    removeField(['configuration', 'values', ...minPathLevelToRemove]);
   },
 
 });
