@@ -20,12 +20,19 @@ import {
 import {
   effectOnEventUsagetFieldsSelector,
 } from '@/selectors/eventSelectors';
-import { apiBillRun, apiBillRunErrorHandler, apiBillRunSuccessHandler } from '../common/Api';
+import {
+  servicesDataSelector,
+} from '@/selectors/listSelectors';
+import { apiBillRun, apiBillRunErrorHandler, apiBillRunSuccessHandler } from '@/common/Api';
 import {
   getProductsByKeysQuery,
   saveSettingsQuery,
-} from '../common/ApiQueries';
+} from '@/common/ApiQueries';
 import { getValueByUnit } from '@/common/Util';
+import {
+	getPathParams,
+	buildBalanceConditionPath,
+} from '@/components/Events/EventsUtil.js';
 
 
 const getEventConvertedConditions = (propertyTypes, usageTypes, item, toBaseUnit = true) => {
@@ -77,6 +84,31 @@ const getEventConvertedThreshold = (propertyTypes, usageTypes, item, toBaseUnit 
     : Immutable.List();
 };
 
+
+const isOldEventStructure = (event) => event
+    .get('conditions', Immutable.List())
+    .reduce((acc, condition, key) => (acc === true ? acc : condition.has('path')), false);
+
+const convertOldEventCondition = (condition, servicesData) => {
+  const { trigger, limitation, activityType, groupNames, overGroup } = getPathParams(Immutable.List([Immutable.Map({'path': condition.get('path', '')})]));
+  const params = { activityType, groupNames, overGroup, servicesData };
+  const paths = buildBalanceConditionPath(trigger, limitation, params); 
+  return condition
+    .set('paths', paths)
+    .set('property_type', condition.get('usaget', ''))
+    .delete('path');
+}
+
+const convertOldEventStructure = (event, servicesData) => {
+  if (!isOldEventStructure(event)) {
+    return event;
+  }
+  return event.update(
+    'conditions', Immutable.List(),
+    conditions => conditions.map(condition => convertOldEventCondition(condition, servicesData))
+  );
+}
+
 const convertFromApiToUi = (event, eventType, params) => event.withMutations((eventWithMutations) => {
   const { propertyTypes, usageTypesData, effectOnUsagetFields } = params;
   const eventUsageTypeFromEvent = Immutable.Map().withMutations((eventUsageTypeWithMutations) => {
@@ -118,11 +150,14 @@ export const getEvents = (eventCategory = '') => (dispatch, getState) => {
     const usageTypesData = usageTypesDataSelector(state);
     const propertyTypes = propertyTypeSelector(state);
     const effectOnUsagetFields = effectOnEventUsagetFieldsSelector(state, { eventType: 'fraud' });
+    const servicesData = servicesDataSelector(state, {}) || Immutable.Map();
     const params = ({ usageTypesData, propertyTypes, effectOnUsagetFields });
     const settingsEvents = state.settings.get('events', Immutable.List());
     settingsEvents.forEach((events, eventType) => {
       if (!['settings'].includes(eventType) && (eventCategory === '' || eventCategory === eventType)) {
-        const eventsWithId = events.map(event => convertFromApiToUi(event, eventType, params));
+        const eventsWithId = events
+          .map(event => convertFromApiToUi(event, eventType, params))
+          .map(event => convertOldEventStructure(event, servicesData));
         dispatch(updateSetting('events', eventType, eventsWithId));
       }
     });
