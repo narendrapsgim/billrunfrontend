@@ -75,6 +75,7 @@ ReduxFormModal.propTypes = {
   show: PropTypes.bool,
   item: PropTypes.instanceOf(Immutable.Map),
   component: PropTypes.oneOfType([
+    PropTypes.object,
     PropTypes.element,
     PropTypes.func,
   ]),
