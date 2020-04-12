@@ -175,7 +175,7 @@ class Importer extends Component {
     const entity = item.get('entity', '');
     const operation = item.get('operation', 'create');
     const rows = (item.get('importType', '') === 'manual_mapping')
-      ? this.alterData(this.getFormatedRows())
+      ? this.alterData(this.getFormattedRows())
       : item;
     if (rows.size > 0 && entity !== '') {
       this.setState({ status: 'progress' });
@@ -464,7 +464,7 @@ class Importer extends Component {
     return importerStep.okAction || this.onNextStep;
   }
 
-  getFormatedRows = (limit = -1) => {
+  getFormattedRows = (limit = -1) => {
     const {
       item,
       predefinedValues,
@@ -647,7 +647,7 @@ class Importer extends Component {
         <StepValidate
           entity={entity}
           fields={importFields}
-          rows={this.alterData(this.getFormatedRows())}
+          rows={this.alterData(this.getFormattedRows())}
           selectedMapper={mapperName === '' ? null : mapperName }
           defaultMappedName={item.get('fileName', '') === '' ? undefined : item.get('fileName')}
           saveMapper={this.onSaveMapping}
