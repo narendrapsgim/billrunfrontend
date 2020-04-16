@@ -6,7 +6,7 @@ import {
 
 
 const mapStateToProps = (state, props) => ({
-  isFieldTags: props.field && props.field.get('multiple', false) && !props.field.get('select_list', false),
+  isFieldTags: props.field && props.field.get('multiple', false) && !props.field.get('select_list', false) && !props.field.get('type', '') === 'password',
   isFieldSelect: props.field && props.field.get('select_list', false),
   isFieldBoolean: props.field && props.field.get('type', '') === 'boolean',
   isFieldRanges: props.field && props.field.get('type', '') === 'ranges',
