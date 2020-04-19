@@ -4,9 +4,10 @@ import {
   isEditableFiledProperty,
 } from '@/common/Util';
 
+const monMultipleTypes = ['password'];
 
 const mapStateToProps = (state, props) => ({
-  isFieldTags: props.field && props.field.get('multiple', false) && !props.field.get('select_list', false) && !props.field.get('type', '') === 'password',
+  isFieldTags: props.field && props.field.get('multiple', false) && !props.field.get('select_list', false) && !monMultipleTypes.includes(props.field.get('type', '')),
   isFieldSelect: props.field && props.field.get('select_list', false),
   isFieldBoolean: props.field && props.field.get('type', '') === 'boolean',
   isFieldRanges: props.field && props.field.get('type', '') === 'ranges',
