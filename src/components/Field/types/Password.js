@@ -3,14 +3,14 @@ import PropTypes from 'prop-types';
 import { InputGroup } from 'react-bootstrap';
 
 
-const Text = ({
+const Password = ({
   onChange, value, editable, disabled, suffix, preffix, ...otherProps
 }) => {
   if (editable) {
     const input = (
       <input
         {...otherProps}
-        type="text"
+        type="password"
         className="form-control"
         value={value}
         onChange={onChange}
@@ -33,7 +33,7 @@ const Text = ({
     <div className="non-editable-field">
       <span>
         {(preffix !== null) && `${preffix} `}
-        {value}
+        ******
         {(suffix !== null) && ` ${suffix}`}
       </span>
     </div>
@@ -41,7 +41,7 @@ const Text = ({
 };
 
 
-Text.defaultProps = {
+Password.defaultProps = {
   value: '',
   required: false,
   disabled: false,
@@ -52,7 +52,7 @@ Text.defaultProps = {
   onChange: () => {},
 };
 
-Text.propTypes = {
+Password.propTypes = {
   value: PropTypes.oneOfType([
     PropTypes.string,
     PropTypes.number,
@@ -66,4 +66,4 @@ Text.propTypes = {
   onChange: PropTypes.func,
 };
 
-export default Text;
+export default Password;
