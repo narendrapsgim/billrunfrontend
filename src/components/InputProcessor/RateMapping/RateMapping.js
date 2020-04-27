@@ -27,6 +27,7 @@ import {
 import {
   inputProcessorlineKeyOptionsSelector,
   getFieldsWithPreFunctions,
+  inputProcessorComputedlineKeyOptionsSelector,
 } from '@/selectors/settingsSelector';
 
 
@@ -40,6 +41,7 @@ class RateMapping extends Component {
     customRatingFields: PropTypes.instanceOf(Immutable.List),
     rateCalculators: PropTypes.instanceOf(Immutable.List),
     plays: PropTypes.instanceOf(Immutable.Set),
+    computedlineKeyOptions: PropTypes.array,
   }
   static defaultProps = {
     settings: Immutable.Map(),
@@ -47,6 +49,7 @@ class RateMapping extends Component {
     customRatingFields: Immutable.List(),
     rateCalculators: Immutable.List(),
     plays: Immutable.Set(),
+    computedlineKeyOptions: [],
   };
 
   state = {
@@ -344,6 +347,7 @@ class RateMapping extends Component {
   }
 
   renderComputedLineKeyDesc = (calc, rateCategory, usaget, priority, index) => {
+    const { computedlineKeyOptions } = this.props;
     if (calc.get('line_key', '') !== 'computed') {
       return null;
     }
@@ -351,10 +355,18 @@ class RateMapping extends Component {
     const opLabel = getConfig(['rates', 'conditions'], Immutable.Map())
       .find(cond => cond.get('id', '') === op, null, Immutable.Map())
       .get('title', '');
+    const selectedOptionFirst = computedlineKeyOptions.find(computedlineKeyOption => computedlineKeyOption.value === calc.getIn(['computed', 'line_keys', 0, 'key'], ''))
+    const defaultLabelFirst = (typeof selectedOptionFirst !== 'undefined') ? selectedOptionFirst.label : calc.getIn(['computed', 'line_keys', 0, 'key'], '')
+    const lineKeyLabel_first = getFieldsWithPreFunctions().find(preFunctionField => (
+      preFunctionField.get('preFunction') === calc.getIn(['computed', 'line_keys', 0, 'preFunction'], '')
+      && preFunctionField.get('preFunctionValue') === calc.getIn(['computed', 'line_keys', 0, 'key'], '')
+    ), null, Immutable.Map()).get('label', defaultLabelFirst);
+    const selectedOptionSecond = computedlineKeyOptions.find(computedlineKeyOption => computedlineKeyOption.value === calc.getIn(['computed', 'line_keys', 1, 'key'], ''))
+    const defaultLabelSecond = (typeof selectedOptionSecond !== 'undefined') ? selectedOptionSecond.label : calc.getIn(['computed', 'line_keys', 1, 'key'], '')
     return (
       <h4>
         <small>
-          {`${calc.getIn(['computed', 'line_keys', 0, 'key'], '')} ${opLabel} ${calc.getIn(['computed', 'line_keys', 1, 'key'], '')}`}
+          {`${lineKeyLabel_first} ${opLabel} ${defaultLabelSecond}`}
           <Button onClick={this.onEditComputedLineKey(calc, rateCategory, usaget, priority, index)} bsStyle="link">
             <i className="fa fa-fw fa-pencil" />
           </Button>
@@ -605,6 +617,7 @@ const mapStateToProps = (state, props) => ({
   plays: customerIdentificationFieldsPlaySelector(state, props),
   rateCalculators: props.settings.getIn(['rate_calculators', props.rateCategory, props.usaget]),
   lineKeyOptions: inputProcessorlineKeyOptionsSelector(state, props),
+  computedlineKeyOptions: inputProcessorComputedlineKeyOptionsSelector(state, props),
 });
 
 export default connect(mapStateToProps)(RateMapping);
