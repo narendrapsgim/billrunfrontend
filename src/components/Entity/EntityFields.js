@@ -50,9 +50,30 @@ class EntityFields extends Component {
       this.props.dispatch(getSettings(entityName));
     }
     // fix problem when empty params object converted to array
-    if (entity.has('params') && Immutable.is(entity.get('params', Immutable.List()), Immutable.List())) {
-      this.props.onChangeField(['params'], Immutable.Map());
-    }
+    //if (entity.has('params') && Immutable.is(entity.get('params', Immutable.List()), Immutable.List())) {
+      // this.props.onChangeField(['params'], Immutable.Map());
+    //}
+    // fix problem when empty params object converted to array
+    let updated_levels = [];
+    fields.forEach(field => {
+      const levels = field.get('field_name', '').split('.');
+      levels.pop(); // remove last element from the path
+      if (levels.length) {
+        let levelsArray = [];
+        levels.forEach((level) => {
+          levelsArray.push(level);
+          const laterString = levelsArray.join('.');
+          const isAlreadyUpdated = !updated_levels.includes(laterString);
+          const isPresentInEntity = entity.hasIn(levelsArray);
+          const isWrongType = Immutable.is(entity.getIn(levelsArray, Immutable.List()), Immutable.List());
+          if (isAlreadyUpdated && isPresentInEntity && isWrongType) {
+            updated_levels.push(laterString);
+            console.log('update level: ', levelsArray);
+            this.props.onChangeField(levelsArray, Immutable.Map());
+          }
+        });
+      }
+    })
   }
 
   componentDidUpdate(prevProps, prevState) { // eslint-disable-line no-unused-vars
@@ -83,7 +104,7 @@ class EntityFields extends Component {
       .filter(field => !this.filterParamsFields(field))
       .map(field => ({
         label: titleCase(field.get('title', '')),
-        value: field.get('field_name', '').split('.')[1],
+        value: field.get('field_name', ''),
       }))
       .sortBy(field => field.label)
       .sortBy(field =>
@@ -92,12 +113,13 @@ class EntityFields extends Component {
   }
 
   onAddParam = (key) => {
-    this.props.onChangeField(['params', key], null);
+    const path = Array.isArray(key) ? key : key.split('.');
+    this.props.onChangeField(path, undefined);
   }
 
   filterPrintableFields = field => (
     field.get('display', false) !== false
-    && field.get('editable', false) !== false
+    // && field.get('editable', false) !== false
     && field.get('field_name', '') !== 'tariff_category'
     && field.get('field_name', '') !== 'play'
   );
@@ -105,7 +127,8 @@ class EntityFields extends Component {
   filterParamsFields = (field) => {
     const { entity } = this.props;
     const fieldPath = field.get('field_name', '').split('.');
-    return (!(fieldPath[0] === 'params' && !entity.hasIn(fieldPath))) || field.get('mandatory', false);
+    const isParam = fieldPath[0] === 'params' || field.get('nullable', false);
+    return (!(isParam && !entity.hasIn(fieldPath))) || field.get('mandatory', false);
   }
 
   filterPlayFields = (field) => {
@@ -121,14 +144,16 @@ class EntityFields extends Component {
   }
 
   renderField = (field, key) => {
-    const { entity, editable, onChangeField, errors } = this.props;
+    const { entity, editable, onChangeField, onRemoveField, errors } = this.props;
+    const isFieldEditabe = editable && field.get('editable', false);
     return (
       <EntityField
         key={`key_${field.get('field_name', key)}`}
         field={field}
         entity={entity}
-        editable={editable}
+        editable={isFieldEditabe}
         onChange={onChangeField}
+        onRemove={onRemoveField}
         error={errors.get(field.get('field_name', ''), false)}
       />
     );
@@ -183,7 +208,7 @@ class EntityFields extends Component {
 }
 
 const mapStateToProps = (state, props) => ({
-  fields: entityFieldSelector(state, props),
+  fields: props.fields || entityFieldSelector(state, props),
   isPlaysEnabled: isPlaysEnabledSelector(state, props),
 });
 
