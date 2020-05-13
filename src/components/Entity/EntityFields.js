@@ -92,7 +92,7 @@ class EntityFields extends Component {
   }
 
   onAddParam = (key) => {
-    this.props.onChangeField(['params', key], null);
+    this.props.onChangeField(['params', key], undefined);
   }
 
   filterPrintableFields = field => (
