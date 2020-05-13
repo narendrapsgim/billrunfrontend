@@ -16,7 +16,8 @@
   "paramsConditions": [
     { "id": "match", "title": "Equals" },
     { "id": "equalFalse", "title": "Does Not Equal" },
-    { "id": "longestPrefix", "title": "Longest Prefix" }
+    { "id": "longestPrefix", "title": "Longest Prefix" },
+    { "id": "range", "title": "In Range" }
   ],
   "preFunctions": [
     { "id": "minute_of_hour", "title": "Minute of hour (MM)", "values": ["urt"] },

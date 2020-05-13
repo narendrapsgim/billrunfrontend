@@ -7,7 +7,7 @@ import changeCase from 'change-case';
 import ComputedRate from './ComputedRate';
 import Field from '@/components/Field';
 import Help from '../../Help';
-import { getConfig } from '@/common/Util';
+import { getConfig, parseConfigSelectOptions } from '@/common/Util';
 import { updateSetting, saveSettings } from '@/actions/settingsActions';
 import { showWarning } from '@/actions/alertsActions';
 import { ModalWrapper } from '@/components/Elements';
@@ -92,11 +92,9 @@ class RateMapping extends Component {
       .toJS();
   }
 
-  getRatingTypes = () => ([
-    { value: 'match', label: 'Equals' },
-    { value: 'equalFalse', label: 'Does Not Equal' },
-    { value: 'longestPrefix', label: 'Longest Prefix' },
-  ]);
+  getRatingTypes = () => getConfig(['rates', 'paramsConditions'], Immutable.List())
+    .map(parseConfigSelectOptions)
+    .toArray();
 
   onChangeAdditionalParamRating = (rateCategory, usaget, priority, index, type) => (value) => {
     const eModified = {
