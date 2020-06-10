@@ -145,14 +145,17 @@ class DiscountServiceValue extends Component {
     return discountWithoutOperations;
   }
 
-  getDiscountValue = () => {
-    const { service } = this.props;
-    return service.get('value', '');
-  }
-
-  getDiscountSequential = () => {
-    const { service } = this.props;
-    return service.get('sequential', '');
+  getDiscountDisplayValue = () => {
+    const { service, isPercentage, currency } = this.props;
+    let value = service.get('value', '');
+    if (isPercentage && isNumber(value)) {
+      value *= 100;
+      value = `${value}%`;
+    }
+    if (!isPercentage && isNumber(value)) {
+      value = `${value}${getSymbolFromCurrency(currency)}`;
+    }
+    return value;
   }
 
   getDiscountAmount = () => {
@@ -165,8 +168,8 @@ class DiscountServiceValue extends Component {
   }
 
   getActions = () => {
-    const { mode, isQuantitative } = this.props;
-    const value = this.getDiscountValue();
+    const { mode, isQuantitative, service } = this.props;
+    const value = service.get('value', '');
     return ([{
       type: 'settings',
       onClick: this.onOpenModal,
@@ -198,7 +201,7 @@ class DiscountServiceValue extends Component {
                   disabledDisplayValue=""
                   disabledValue=""
                   onChange={this.onChangeAmount}
-                  label={`Apply discount value ${this.getDiscountValue()} for every`}
+                  label={`Apply discount value ${this.getDiscountDisplayValue()} for every`}
                   editable={editable}
                   suffix="units"
                   style={{ width: 300 }}
@@ -214,7 +217,7 @@ class DiscountServiceValue extends Component {
 
   renderQuantitativeDescription = () => {
     const discountAmount = this.getDiscountAmount();
-    const discountValue = this.getDiscountValue();
+    const discountValue = this.getDiscountDisplayValue();
     if (['', null].includes(discountAmount) && discountValue) {
       return (
         <HelpBlock>
@@ -222,7 +225,7 @@ class DiscountServiceValue extends Component {
         </HelpBlock>
       );
     }
-    if (discountValue) {
+    if (!['', null].includes(discountValue)) {
       return (
         <HelpBlock>
           Apply discount value {discountValue} for every {discountAmount} units
@@ -250,7 +253,7 @@ class DiscountServiceValue extends Component {
       return null;
     }
     const editable = (mode !== 'view');
-    const value = this.getDiscountValue();
+    const value = this.getDiscountDisplayValue();
     if (!editable && value === null) {
       return null;
     }
@@ -266,7 +269,7 @@ class DiscountServiceValue extends Component {
         <Col sm={8} lg={9}>
           <InputGroup className="full-width">
             <Field
-              value={value}
+              value={service.get('value', '')}
               onChange={this.onChangeValue}
               fieldType={isPercentage ? "percentage" : "number"}
               editable={editable}
@@ -286,7 +289,7 @@ class DiscountServiceValue extends Component {
             { showSequential && (
               <InputGroup.Addon>
                 <Field
-                  value={this.getDiscountSequential()}
+                  value={service.get('sequential', '')}
                   onChange={this.onChangeSequential}
                   fieldType="checkbox"
                   label={this.renderSequentialLabel()}
