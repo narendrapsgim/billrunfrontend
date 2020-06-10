@@ -170,6 +170,7 @@
     "monthly_fees": "Plans and included services",
     "matched_plans": "Matched Plans",
     "panel_plan_discount": "Plans Discount Values",
+    "sequential": "Sequential",
     "panel_service_discount": "Services Discount Values"
   },
   "charge": {

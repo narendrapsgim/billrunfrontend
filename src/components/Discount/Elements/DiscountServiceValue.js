@@ -4,8 +4,11 @@ import Immutable from 'immutable';
 import isNumber from 'is-number';
 import { Form, FormGroup, ControlLabel, Col, HelpBlock, InputGroup } from 'react-bootstrap';
 import getSymbolFromCurrency from 'currency-symbol-map';
+import { getFieldName } from '@/common/Util';
 import { ModalWrapper, Actions } from '@/components/Elements';
 import Field from '@/components/Field';
+import Help from '@/components/Help';
+import { DiscountDescription } from '@/language/FieldDescriptions';
 
 class DiscountServiceValue extends Component {
 
@@ -14,7 +17,7 @@ class DiscountServiceValue extends Component {
     label: PropTypes.string,
     service: PropTypes.instanceOf(Immutable.Map),
     isQuantitative: PropTypes.bool.isRequired,
-    isPercentaget: PropTypes.bool.isRequired,
+    isPercentage: PropTypes.bool.isRequired,
     mode: PropTypes.string.isRequired,
     currency: PropTypes.string,
     onChange: PropTypes.func.isRequired,
@@ -25,7 +28,7 @@ class DiscountServiceValue extends Component {
     label: '',
     service: Immutable.Map(),
     isQuantitative: false,
-    isPercentaget: false,
+    isPercentage: false,
     currency: '',
   };
 
@@ -38,6 +41,13 @@ class DiscountServiceValue extends Component {
     const { name, service } = this.props;
     const newValue = service.set('value', value);
     this.props.onChange(name, newValue);
+  }
+
+  onChangeSequential = (e) => {
+    const { value } = e.target;
+    const { name, service } = this.props;
+    const newSequential = service.set('sequential', value);
+    this.props.onChange(name, newSequential);
   }
 
   onChangeAmount = (value) => {
@@ -140,6 +150,11 @@ class DiscountServiceValue extends Component {
     return service.get('value', '');
   }
 
+  getDiscountSequential = () => {
+    const { service } = this.props;
+    return service.get('sequential', '');
+  }
+
   getDiscountAmount = () => {
     const { service } = this.props;
     return service.get('operations', Immutable.List())
@@ -147,6 +162,19 @@ class DiscountServiceValue extends Component {
       .get('params', Immutable.List())
       .find(param => param.get('name', '') === 'quantity', null, Immutable.Map())
       .get('value', '');
+  }
+
+  getActions = () => {
+    const { mode, isQuantitative } = this.props;
+    const value = this.getDiscountValue();
+    return ([{
+      type: 'settings',
+      onClick: this.onOpenModal,
+      show: mode !== 'view' && isQuantitative,
+      actionSize: 'small',
+      enable: ![null, ''].includes(value),
+      helpText: 'Advanced Options',
+    }]);
   }
 
   renderAdvancedEdit = () => {
@@ -205,25 +233,19 @@ class DiscountServiceValue extends Component {
   }
 
   renderSuffix = () => {
-    const { isPercentaget, currency } = this.props;
-    return isPercentaget ? undefined : getSymbolFromCurrency(currency);
+    const { isPercentage, currency } = this.props;
+    return isPercentage ? undefined : getSymbolFromCurrency(currency);
   }
 
-  getActions = () => {
-    const { mode, isQuantitative } = this.props;
-    const value = this.getDiscountValue();
-    return ([{
-      type: 'settings',
-      onClick: this.onOpenModal,
-      show: mode !== 'view' && isQuantitative,
-      actionSize: 'small',
-      enable: ![null, ''].includes(value),
-      helpText: 'Advanced Options',
-    }]);
-  }
+  renderSequentialLabel = () => (
+    <span>
+      {getFieldName('sequential', 'discount')}
+      <Help contents={DiscountDescription.sequential} />
+    </span>
+  )
 
   render() {
-    const { name, label, mode, service, isQuantitative, isPercentaget } = this.props;
+    const { name, label, mode, service, isQuantitative, isPercentage } = this.props;
     if (name === '') {
       return null;
     }
@@ -235,23 +257,40 @@ class DiscountServiceValue extends Component {
     const actions = this.getActions();
     const hasEnabledActions = actions
       .reduce((acc, action) => (action.show !== false ? true : acc), false);
+    const showSequential = isPercentage && !isQuantitative;
     return (
       <FormGroup>
         <Col componentClass={ControlLabel} sm={3} lg={2}>
           { label }
         </Col>
         <Col sm={8} lg={9}>
-          <InputGroup style={{ width: '100%' }}>
+          <InputGroup className="full-width">
             <Field
               value={value}
               onChange={this.onChangeValue}
-              fieldType={isPercentaget ? "percentage" : "number"}
+              fieldType={isPercentage ? "percentage" : "number"}
               editable={editable}
               suffix={this.renderSuffix()}
             />
             { hasEnabledActions && (
-              <InputGroup.Addon style={{ padind: 0 }}>
-                <Actions actions={actions} data={service} />
+              <InputGroup.Addon className="input-group-space pr0 pl5"> </InputGroup.Addon>
+            )}
+            { hasEnabledActions && (
+                <InputGroup.Addon className="not-left-border">
+                  <Actions actions={actions} data={service} />
+                </InputGroup.Addon>
+            )}
+            { showSequential && (
+                <InputGroup.Addon className="input-group-space pr0 pl5"> </InputGroup.Addon>
+            )}
+            { showSequential && (
+              <InputGroup.Addon>
+                <Field
+                  value={this.getDiscountSequential()}
+                  onChange={this.onChangeSequential}
+                  fieldType="checkbox"
+                  label={this.renderSequentialLabel()}
+                />
               </InputGroup.Addon>
             )}
           </InputGroup>
