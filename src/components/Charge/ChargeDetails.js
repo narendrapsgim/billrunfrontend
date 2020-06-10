@@ -398,7 +398,6 @@ class ChargeDetails extends Component {
     }
     const editable = (mode !== 'view');
     const isPercentage = this.isPercentage();
-    const suffix = isPercentage ? undefined : getSymbolFromCurrency(currency);
     return plans
       .filter(value => (
         editable || (!editable && Immutable.Map.isMap(value) && value.get('value', '') !== '')
