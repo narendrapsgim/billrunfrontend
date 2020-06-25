@@ -14,6 +14,7 @@ const GeneratePaymentFileForm = ({
 			<EntityFields
 							entityName="payments"
 							entity={item.get('values', Immutable.Map())}
+							errors={errors}
 							fields={item.get('fields', Immutable.List())}
 							onChangeField={onChange}
 						/>
