@@ -5,23 +5,25 @@ import {
 import { validateGeneratePaymentFile } from '@/actions/generatePaymentFileActions';
 import GeneratePaymentFile from './GeneratePaymentFile';
 import GeneratePaymentFileForm from './GeneratePaymentFileFormContainer';
+import Immutable from 'immutable';
 
 const mapStateToProps = null;
 
 const mapDispatchToProps = (dispatch, { data, onGenerate }) => ({ // eslint-disable-line no-unused-vars
 
   onClick: () => {
-    const onOk = (generateValues) => {
-      if (!dispatch(validateGeneratePaymentFile(data, generateValues))) {
-        return false;
+    const onOk = (paymentFile) => {
+      if (!dispatch(validateGeneratePaymentFile(paymentFile))) {
+				return false;
       }
-      onGenerate(generateValues);
+      onGenerate(paymentFile.get('values', Immutable.Map()));
     };
     const config = {
       title: 'Generate Payment File',
       onOk,
     };
-    return dispatch(showFormModal(data, GeneratePaymentFileForm , config));
+		const item = Immutable.Map({'fields' : data});
+    return dispatch(showFormModal(item, GeneratePaymentFileForm , config));
   },
 });
 

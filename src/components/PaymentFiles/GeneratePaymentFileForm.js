@@ -6,31 +6,27 @@ import { EntityFields } from '@/components/Entity';
 
 
 const GeneratePaymentFileForm = ({
-  data,
+  item,
   errors,
   onChange,
-	values
 }) => (
     <Form horizontal>
 			<EntityFields
-				entityName="payments"
-				entity={values}
-				errors={errors}
-				fields={data}
-				onChangeField={onChange}
-			/>
+							entityName="payments"
+							entity={item.get('values', Immutable.Map())}
+							fields={item.get('fields', Immutable.List())}
+							onChangeField={onChange}
+						/>
 		</Form>
 );
 
 GeneratePaymentFileForm.propTypes = {
-  data: PropTypes.instanceOf(Immutable.List),
-	values: PropTypes.instanceOf(Immutable.Map),
+  item: PropTypes.instanceOf(Immutable.Map),
   onChange: PropTypes.func.isRequired,
 };
 
 GeneratePaymentFileForm.defaultProps = {
-  data: Immutable.List(),
-	values: Immutable.Map()
+  item: Immutable.Map(),
 };
 
 export default GeneratePaymentFileForm;
