@@ -46,19 +46,19 @@ class List extends Component {
           <ZoneDate value={moment(entity.getIn(path, 0))} format={getConfig('dateFormat', 'DD/MM/YYYY')} />
         );
       case 'time':
-        return moment(entity.getIn(path, 0)).format(getConfig('datetimeFormat', 'DD/MM/YYYY HH:mm'));
+        return entity.hasIn(path) ? moment(entity.getIn(path, 0)).format(getConfig('datetimeFormat', 'DD/MM/YYYY HH:mm')) : '';
       case 'datetime':
-        return moment(entity.getIn(path, 0)).format(getConfig('datetimeFormat', 'DD/MM/YYYY HH:mm'));
+        return entity.hasIn(path) ? moment(entity.getIn(path, 0)).format(getConfig('datetimeFormat', 'DD/MM/YYYY HH:mm')) : '';
       case 'mongodate':
-        return moment.unix(entity.getIn([...path, 'sec'], 0)).format(getConfig('dateFormat', 'DD/MM/YYYY'));
+        return entity.hasIn([...path, 'sec']) ? moment.unix(entity.getIn([...path, 'sec'], 0)).format(getConfig('dateFormat', 'DD/MM/YYYY')) : '';
       case 'mongotime':
-        return moment.unix(entity.getIn([...path, 'sec'], 0)).format(getConfig('datetimeFormat', 'DD/MM/YYYY HH:mm'));
+        return entity.hasIn([...path, 'sec']) ? moment.unix(entity.getIn([...path, 'sec'], 0)).format(getConfig('datetimeFormat', 'DD/MM/YYYY HH:mm')) : '';
       case 'mongodatetime':
-        return moment.unix(entity.getIn([...path, 'sec'], 0)).format(getConfig('datetimeFormat', 'DD/MM/YYYY HH:mm'));
+        return entity.hasIn([...path, 'sec']) ? moment.unix(entity.getIn([...path, 'sec'], 0)).format(getConfig('datetimeFormat', 'DD/MM/YYYY HH:mm')) : '';
       case 'timestamp':
-        return moment.unix(entity.getIn(path, 0)).format(getConfig('datetimeFormat', 'DD/MM/YYYY HH:mm'));
+        return entity.hasIn(path) ? moment.unix(entity.getIn(path, 0)).format(getConfig('datetimeFormat', 'DD/MM/YYYY HH:mm')) : '';
       case 'fullDate':
-        return moment.unix(entity.getIn([...path, 'sec'])).format(getConfig('datetimeLongFormat', 'DD/MM/YYYY HH:mm:ss'));
+        return entity.hasIn([...path, 'sec']) ? moment.unix(entity.getIn([...path, 'sec'])).format(getConfig('datetimeLongFormat', 'DD/MM/YYYY HH:mm:ss')) : '';
       case 'text':
       default:
         return entity.getIn(path, '');
