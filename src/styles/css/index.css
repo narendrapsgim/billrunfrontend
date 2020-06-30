@@ -57,7 +57,7 @@ fieldset[disabled] .btn {
   cursor: not-allowed;
 }
 /* https://github.com/react-bootstrap/react-bootstrap/issues/2428#issuecomment-407800236 */
-.action-button .btn[disabled] {
+.disabled-elements-hack .btn[disabled] {
   pointer-events: none;
 }
 .actions button.btn-sm {
@@ -138,6 +138,7 @@ fieldset[disabled] .btn {
 
 /* General colors */
 .danger-red { color: #d9534f; }
+.success-green { color: #7AC943;}
 .btn-danger .danger-red { color: #ffffff; }
 .disable-label {
   opacity: 0.3;
