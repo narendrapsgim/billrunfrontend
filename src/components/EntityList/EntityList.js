@@ -369,6 +369,9 @@ class EntityList extends Component {
 
   renderFilter = () => {
     const { filter, filterFields } = this.props;
+    if (filterFields.length === 0) {
+      return null;
+    }
     return (
       <Filter filter={filter} fields={filterFields} onFilter={this.onFilter}>
         { this.renderStateFilter() }
