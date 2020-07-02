@@ -3,7 +3,8 @@ import { validateMandatoryField } from '@/actions/entityActions';
 import { setFormModalError } from './guiStateActions/pageActions';
 import { getList, clearList } from '@/actions/listActions';
 import { clearList as entityClearList } from '@/actions/entityListActions';
-import { runningPaymentFilesListQuery } from '@/common/ApiQueries';
+import { apiBillRun, apiBillRunErrorHandler, apiBillRunSuccessHandler } from '../common/Api';
+import { runningPaymentFilesListQuery, sendGenerateNewFileQuery } from '@/common/ApiQueries';
 
 
 export const getRunningPaymentFiles = (paymentGateway, fileType) => (dispatch) => 
@@ -34,4 +35,15 @@ export const validateGeneratePaymentFile = (paymentFile) => (dispatch) => {
     }
   });
   return isValid;
+}
+
+export const sendGenerateNewFile = (paymentGateway, fileType, data) => (dispatch) => {
+  const query = sendGenerateNewFileQuery(paymentGateway, fileType, data);
+  const successMessage = 'File successfully sent, new file record will be updated in the table in a few seconds';
+  return apiBillRun(query)
+    .then(success => dispatch(apiBillRunSuccessHandler(success, successMessage)))
+    .catch(error => {
+      dispatch(apiBillRunErrorHandler(error, 'Error'));
+      return Promise.reject();
+    });
 }

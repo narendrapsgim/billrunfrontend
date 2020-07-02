@@ -458,6 +458,19 @@ export const runningPaymentFilesListQuery = (paymentGateway, fileType) => ({
   ],
 });
 
+export const sendGenerateNewFileQuery = (paymentGateway, fileType, data) => {
+  const params = [
+    { cpg_type: 'transactions__request' },
+    { payment_gateway: paymentGateway },
+    { file_type: fileType },
+    { parameters: JSON.stringify(data) },
+  ];
+  return {
+    api: 'custompaymentgateway',
+    params,
+  };
+}
+
 export const auditTrailListQuery = (query, page, fields, sort, size) => ({
   action: 'get',
   entity: 'audit',
