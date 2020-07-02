@@ -60,8 +60,13 @@ class List extends Component {
       case 'fullDate':
         return entity.hasIn([...path, 'sec']) ? moment.unix(entity.getIn([...path, 'sec'])).format(getConfig('datetimeLongFormat', 'DD/MM/YYYY HH:mm:ss')) : '';
       case 'text':
-      default:
-        return entity.getIn(path, '');
+      default: {
+        const value = entity.getIn(path, '');
+        if (Array.isArray(value) || Immutable.List.isList(value)) {
+          return value.join(', ');
+        }
+        return value;
+      }
     }
   }
 
