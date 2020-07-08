@@ -61,7 +61,7 @@ const getLinesFields = (state, props) => // eslint-disable-line no-unused-vars
   state.settings.getIn(['lines', 'fields']);
 	
 const getBillsFields = (state, props) => // eslint-disable-line no-unused-vars
-  state.settings.getIn(['bills', 'fields']);
+  state.settings.getIn(['bills', 'fields'], Immutable.List());
 
 const getServiceFields = (state, props) => // eslint-disable-line no-unused-vars
   state.settings.getIn(['services', 'fields']);
