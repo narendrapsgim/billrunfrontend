@@ -410,7 +410,7 @@ export const subscriberFieldsWithPlaySelector = createSelector(
 );
 
 export const linesFieldsSelector = createSelector(
-	getLinesFields,
+  getLinesFields,
   (fields) => {
     if (fields) {
       return fields.map((field) => {

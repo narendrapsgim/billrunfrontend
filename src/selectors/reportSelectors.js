@@ -12,7 +12,7 @@ import {
   inputProssesorfilteredFieldsSelector,
   accountFieldsSelector,
   linesFieldsSelector,
-	billsFieldsSelector,
+  billsFieldsSelector,
   rateCategoriesSelector,
   isPlaysEnabledSelector,
 } from './settingsSelector';
