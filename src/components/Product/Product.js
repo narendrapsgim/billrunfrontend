@@ -331,7 +331,7 @@ class Product extends Component {
                 entity={product}
                 onChangeField={this.onChangeAdditionalField}
                 onRemoveField={this.onRemoveAdditionalField}
-                highlightPramas={ratingParams}
+                highlightParams={ratingParams}
                 editable={editable}
               />
 

@@ -87,8 +87,8 @@ const buildRequestData = (item, action) => {
     case 'create': {
       const formData = new FormData();
       const newFrom = getItemDateValue(item, 'from').format(apiDateFormat);
-      const update = item.withMutations((itemwithMutations) => {
-        itemwithMutations
+      const update = item.withMutations((itemWithMutations) => {
+        itemWithMutations
           .set('from', newFrom)
           .delete('originalValue');
       });
@@ -116,8 +116,8 @@ const buildRequestData = (item, action) => {
     case 'update': {
       const formData = new FormData();
       const query = { _id: item.getIn(['_id', '$id'], 'undefined') };
-      const update = item.withMutations((itemwithMutations) => {
-        itemwithMutations
+      const update = item.withMutations((itemWithMutations) => {
+        itemWithMutations
           .delete('_id')
           .delete('originalValue');
       });
@@ -128,14 +128,14 @@ const buildRequestData = (item, action) => {
 
     case 'closeandnew': {
       const formData = new FormData();
-      const update = item.withMutations((itemwithMutations) => {
+      const update = item.withMutations((itemWithMutations) => {
         const originalFrom = getItemDateValue(item, 'originalValue', null);
         if (originalFrom !== null) {
           if (originalFrom.isSame(getItemDateValue(item, 'from', moment(0)), 'days')) {
-            itemwithMutations.delete('from');
+            itemWithMutations.delete('from');
           }
         }
-        itemwithMutations
+        itemWithMutations
           .delete('_id')
           .delete('originalValue');
       });
@@ -212,7 +212,7 @@ const fetchEntity = (collection, query) => (dispatch) => {
       dispatch(gotEntity(collection, success.data[0].data.details[0]));
       return dispatch(apiBillRunSuccessHandler(success));
     })
-    .catch(error => dispatch(apiBillRunErrorHandler(error, 'Error retreiving Entity')));
+    .catch(error => dispatch(apiBillRunErrorHandler(error, 'Error retrieving Entity')));
 };
 
 export const getEntity = (collection, query) => dispatch =>
@@ -282,7 +282,7 @@ export const entitySearchByQuery = (collection, query, project, sort, options) =
  * @param {Immutable.Map()} config with field configuration
  * @return (boolean|string)
  *    TRUE or string with error message if error
- *    FALE if no error or value is empty
+ *    FALSE if no error or value is empty
  */
 export const validateFieldByType = (value, config) => {
   const isMulti = config.get('multiple', false);
@@ -307,7 +307,7 @@ export const validateFieldByType = (value, config) => {
     case 'integer':
       return isNumber(value) && `${parseInt(value)}` === `${value}` ? false : 'Value must be integer';
     case 'json':
-      return value === false; // no need for the message, current json field dispaly message in the editbox
+      return value === false; // no need for the message, current json field display message in the editbox
     default:
       return false;
   }
