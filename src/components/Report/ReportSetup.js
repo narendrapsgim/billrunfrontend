@@ -102,7 +102,9 @@ class ReportSetup extends Component {
       'subscribers.account',
       'taxation.tax_type',
       'lines',
+      'bills.fields',
       'rates.fields',
+      'payment_gateways',
     ]));
   }
 
