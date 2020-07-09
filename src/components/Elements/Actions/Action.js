@@ -46,6 +46,7 @@ const Action = (props) => {
   }, [onClick, data, type]);
 
   const iconClass = useMemo(() => classNames('fa fa-fw', {
+    'fa-list-alt': type === 'report',
     'fa-eye': type === 'view',
     'fa-pencil': type === 'edit',
     'fa-files-o': type === 'clone',
