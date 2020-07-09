@@ -110,7 +110,8 @@ class ReportSetup extends Component {
 
   componentDidMount() {
     const { mode } = this.props;
-    if (mode === 'create') {
+    const { type = false } = this.props.location.query;
+    if (mode === 'create' && type !== 'predefined') {
       const pageTitle = buildPageTitle(mode, 'report');
       this.props.dispatch(setPageTitle(pageTitle));
     }
@@ -131,8 +132,8 @@ class ReportSetup extends Component {
 
   componentDidUpdate(prevProps) {
     const { page, size, mode } = this.props;
-    const { page: oldPage, size: oldiSize, mode: oldMode } = prevProps;
-    if (page !== oldPage || size !== oldiSize || (mode !== oldMode && mode === 'view')) {
+    const { page: oldPage, size: oldSize, mode: oldMode } = prevProps;
+    if (page !== oldPage || size !== oldSize || (mode !== oldMode && mode === 'view')) {
       this.getReportData();
     }
   }
@@ -290,7 +291,7 @@ class ReportSetup extends Component {
       this.props.dispatch(showDanger('Please select at least one column'));
       return false;
     }
-    if (item.get('type', reportTypes.SIMPLE) === reportTypes.GROPPED
+    if (item.get('type', reportTypes.SIMPLE) === reportTypes.GROPED
       && item.get('columns', Immutable.List()).some(this.validateEmptyAggregateOp)
     ) {
       this.props.dispatch(showDanger('Please select column function'));
@@ -361,7 +362,7 @@ class ReportSetup extends Component {
 
   isExportEnable = () => {
     const { itemId, item, itemSource } = this.props;
-    // dont allow to export new unsevaed reort
+    // don't allow to export new unserved report
     if (!itemId || itemId === '') {
       return false;
     }
@@ -373,8 +374,6 @@ class ReportSetup extends Component {
     if (this.isExportEnable()) {
       return 'Export Report to CSV';
     }
-    // due the bug too, tip will not show on disabled button
-    // https://github.com/react-bootstrap/react-bootstrap/issues/1588
     return 'Reports was changed, please save report before export.';
   }
 

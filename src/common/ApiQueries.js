@@ -440,6 +440,37 @@ export const searchPlansByKeyQuery = (name, project = {}) => ({
   ],
 });
 
+export const runningPaymentFilesListQuery = (paymentGateway, fileType) => ({
+  action: 'get',
+  entity: 'log',
+  params: [
+    { page: 0 },
+    { size: 9999 },
+    { project: JSON.stringify({ stamp: 1}) },
+    { sort: JSON.stringify({}) },
+    { query: JSON.stringify({
+      source: "custom_payment_files",
+      cpg_name: paymentGateway,
+      cpg_file_type: fileType,
+      start_process_time:{ $exists: true },
+      process_time :{ $exists: false },
+    }) },
+  ],
+});
+
+export const sendGenerateNewFileQuery = (paymentGateway, fileType, data) => {
+  const params = [
+    { cpg_type: 'transactions__request' },
+    { payment_gateway: paymentGateway },
+    { file_type: fileType },
+    { parameters: JSON.stringify(data) },
+  ];
+  return {
+    api: 'custompaymentgateway',
+    params,
+  };
+}
+
 export const auditTrailListQuery = (query, page, fields, sort, size) => ({
   action: 'get',
   entity: 'audit',

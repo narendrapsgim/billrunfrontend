@@ -89,6 +89,7 @@ const selectReportLinesFields = (
           field_name: `pg_request.${saveToBillsField.get('field_name', '')}`,
           title: `${saveToBillsField.get('payment_gateway')}: ${getFieldName(saveToBillsField.get('field_name', ''), 'bills')}`,
           type: saveToBillsField.getIn(['type'], 'text'),
+          payment_gateway: saveToBillsField.get('payment_gateway')
         }));
       });
       // Set fields from billrun settings
@@ -304,7 +305,7 @@ const reportQueueFieldsSelector = createSelector(
   mergeEntityAndReportConfigFields,
 );
 
-const reportBillsFieldsSelector = createSelector(
+export const reportBillsFieldsSelector = createSelector(
   billsFieldsSelector,
   saveToBillPaymentGatewaySelector,
   selectReportBillsFields,
