@@ -108,7 +108,8 @@ class ReportSetup extends Component {
 
   componentDidMount() {
     const { mode } = this.props;
-    if (mode === 'create') {
+    const { type = false } = this.props.location.query;
+    if (mode === 'create' && type !== 'predefined') {
       const pageTitle = buildPageTitle(mode, 'report');
       this.props.dispatch(setPageTitle(pageTitle));
     }
@@ -371,8 +372,6 @@ class ReportSetup extends Component {
     if (this.isExportEnable()) {
       return 'Export Report to CSV';
     }
-    // due the bug too, tip will not show on disabled button
-    // https://github.com/react-bootstrap/react-bootstrap/issues/1588
     return 'Reports was changed, please save report before export.';
   }
 

@@ -1,8 +1,10 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
 import { connect } from "react-redux";
+import { withRouter } from "react-router";
 import { List, Map, fromJS } from "immutable";
 import moment from "moment";
+import uuid from 'uuid';
 import pluralize from "pluralize";
 import { titleCase } from "change-case";
 import { Form, FormGroup, ControlLabel, Col, Panel } from "react-bootstrap";
@@ -16,14 +18,20 @@ import { getSettings } from "@/actions/settingsActions";
 import { showFormModal } from "@/actions/guiStateActions/pageActions";
 import { getRunningPaymentFiles, cleanRunningPaymentFiles, sendGenerateNewFile } from "@/actions/paymentFilesActions";
 import { validateGeneratePaymentFile } from "@/actions/paymentFilesActions";
+import { gotEntity } from '@/actions/entityActions';
+import { setPageTitle } from '@/actions/guiStateActions/pageActions';
 import { getFieldName } from "@/common/Util";
 
 class PaymentFiles extends Component {
+
   static propTypes = {
     paymentFiles: PropTypes.instanceOf(List),
     paymentGatewayOptions: PropTypes.array,
     fileTypeOptionsOptions: PropTypes.instanceOf(Map),
     isRunningPaymentFiles: PropTypes.number,
+    router: PropTypes.shape({
+      push: PropTypes.func.isRequired,
+    }).isRequired,
     dispatch: PropTypes.func.isRequired,
   };
 
@@ -150,11 +158,53 @@ class PaymentFiles extends Component {
 
   getListActions = () => [{ type: "refresh" }];
 
-  getRowActions = () => [{ type: "view", onClick: this.onShowDetails, helpText: "Details", onClickColumn: "stamp" }];
+  getRowActions = () => [
+    { type: "view", onClick: this.onShowDetails, helpText: "Details", onClickColumn: "stamp" },
+    { type: "report", onClick: this.goToReport, helpText: "Report", show: this.isFinished },
+  ];
 
   getFilterFields = () => [{ id: "creation_time", placeholder: this.getLabel("creation_time") }];
 
   getLabel = (key) => getFieldName(key, "payment_files", titleCase(key));
+
+  getPredefinedReportConfiguration = (line) => {
+    const keyCreationTime = uuid.v4()
+    let report = {
+      key: `File name: ${line.get('file_name', '')}`,
+      entity: "bills",
+      type: 0,
+      columns: [
+        { key: keyCreationTime, field_name: "urt", label: "Creation Time", op: "", entity: "bills"},
+      ],
+      conditions: [
+        { field: "generated_pg_file_log", op: "in", value: line.get('stamp', ''), type: "string", entity: "bills" }
+      ],
+      sorts: [
+        { "field": keyCreationTime, "op": -1 },
+      ],
+      formats: [
+        { field: keyCreationTime, op: "datetime_format", value: "d/m/Y H:i" },
+      ],
+    };
+
+    // TODO:: Need to add addition field to columns array
+    // const test_col = {...};
+    // report.columns.push(test_col);
+
+    return report;
+  }
+
+  goToReport = (data) => {    
+    this.props.dispatch(gotEntity('reports', this.getPredefinedReportConfiguration(data)));
+    // TODO:: check if the report page title is OK
+    this.props.dispatch(setPageTitle('Payment Files Report'));
+    this.props.router.push({
+      pathname: 'reports/report',
+      query: {
+        type: 'predefined', // TODO:: this flag will help to understand is allowed to export unsaved report, In use it in the componentDidMount function in reportSetup
+      }
+    });
+  };
 
   isRunning = (item) => item.get("start_process_time", "") !== "" && item.get("process_time", "") === "";
 
@@ -177,16 +227,16 @@ class PaymentFiles extends Component {
 
   getDetailsFields = () => [
     { field_name: 'stamp' },
-    { field_name: 'creation_time', type : 'datetime' },
+    { field_name: 'creation_time', type: 'datetime' },
     { field_name: 'parameters_string' },
     { field_name: 'transactions' },
-    { field_name: 'start_process_time', type : 'datetime' },
-    { field_name: 'process_time', type : 'datetime' },
+    { field_name: 'start_process_time', type: 'datetime' },
+    { field_name: 'process_time', type: 'datetime' },
     { field_name: 'file_name' },
     { field_name: 'created_by' },
-    { field_name: 'errors', type : 'multiple' },
-    { field_name: 'warnings', type : 'multiple' },
-    { field_name: 'info', type : 'multiple' },
+    { field_name: 'errors', type: 'multiple' },
+    { field_name: 'warnings', type: 'multiple' },
+    { field_name: 'info', type: 'multiple' },
   ];
 
   getTableFields = () => [
@@ -216,9 +266,7 @@ class PaymentFiles extends Component {
     info: 1,
   });
 
-  getDefaultSort = () => Map({
-    creation_time: -1,
-  });
+  getDefaultSort = () => Map({ creation_time: -1 });
 
   getGeneratePaymentFileTooltipText = () => {
     const { paymentGateway, fileType } = this.state;
@@ -237,7 +285,7 @@ class PaymentFiles extends Component {
 
   fixDetailsFields = (field) => this.fixGeneratePaymentFileFields(field);
 
-  fixDetailsValues = (value) => (Map.isMap(value) && value.has('sec')) ? moment.unix(value.get('sec')) : value;
+  fixDetailsValues = (value) => Map.isMap(value) && value.has('sec') ? moment.unix(value.get('sec')) : value;
 
   fixGeneratePaymentFileFields = (field) =>
     field.withMutations((fieldWithMutations) => {
@@ -263,7 +311,7 @@ class PaymentFiles extends Component {
       title: "Generate Payment File",
       labelOk: "Generate Payment File",
       onOk: this.onGenerateNewFileClickOK,
-    };    
+    };
     const item = Map({ fields, values: Map() });
     return this.props.dispatch(showFormModal(item, GeneratePaymentFileForm, config));
   };
@@ -391,4 +439,4 @@ const mapStateToProps = (state, props) => ({
   isRunningPaymentFiles: isRunningPaymentFilesSelector(state, props) || undefined,
 });
 
-export default connect(mapStateToProps)(PaymentFiles);
+export default withRouter(connect(mapStateToProps)(PaymentFiles));
