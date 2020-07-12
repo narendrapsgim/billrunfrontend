@@ -83,7 +83,6 @@ const selectReportLinesFields = (
   ) =>
     Immutable.List().withMutations((optionsWithMutations) => {
       // set fields from IP
-      console.log(billrunFields);
       saveToBillsFields.forEach((saveToBillsField) => {
         optionsWithMutations.push(Immutable.Map({
           field_name: `pg_request.${saveToBillsField.get('field_name', '')}`,
