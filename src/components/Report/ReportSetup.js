@@ -15,10 +15,11 @@ import {
 } from '@/common/Util';
 import {
   buildRequestUrl,
+  openWindowWithPost
 } from '../../common/Api';
 import {
   getReportCSVQuery,
-  getReportQuery
+  getReportCSV
  } from '../../common/ApiQueries';
 import { showSuccess, showDanger } from '@/actions/alertsActions';
 import {
@@ -390,10 +391,12 @@ class ReportSetup extends Component {
   onClickExportCSV = () => {
     const { item } = this.props;
     const { type = false } = this.props.location.query;
-   if (type === 'predefined') {
-      const csvQuery = getReportQuery({report: item, page: 0, size: 99999});
-      window.open(buildRequestUrl(csvQuery));
+    if (type === 'predefined') {
+      // export csv report
+      const csvQuery = getReportCSV({report: item, page: 0, size: 99999});
+      openWindowWithPost(csvQuery);
     } else {
+      // export csv report by name 
       const csvQuery = getReportCSVQuery(item.get('key', ''));
       window.open(buildRequestUrl(csvQuery));
     }
