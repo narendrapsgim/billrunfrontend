@@ -70,7 +70,7 @@ class EntityFields extends Component {
             updated_levels.push(laterString);
             console.log('update level: ', levelsArray);
             this.props.onChangeField(levelsArray, Immutable.Map());
-          }
+    }
         });
       }
     })

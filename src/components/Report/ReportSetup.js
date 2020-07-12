@@ -357,6 +357,11 @@ class ReportSetup extends Component {
     }
   }
 
+  isReportChanged = () => {
+    const { item, itemSource } = this.props;
+    return Immutable.is(item.delete('from').delete('user'), itemSource.delete('from').delete('user'));
+  }
+
   isExportEnable = () => {
     const { itemId, item, itemSource } = this.props;
     // dont allow to export new unsevaed reort
@@ -364,7 +369,7 @@ class ReportSetup extends Component {
       return false;
     }
     // Allow export only if report was not changed
-    return Immutable.is(item.delete('from').delete('user'), itemSource.delete('from').delete('user'));
+    return this.isReportChanged();
   }
 
   getExportReportHelpText = () => {
@@ -498,10 +503,11 @@ class ReportSetup extends Component {
   renderPanelHeader = () => {
     const { listActions, editActions } = this.state;
     const { mode } = this.props;
+    const isReportChanged = this.isReportChanged();
     return (
       <div>&nbsp;
         <div className="pull-right">
-          <Actions actions={(mode === 'view') ? listActions : editActions} />
+          <Actions actions={(mode === 'view') ? listActions : editActions} data={isReportChanged} />
         </div>
       </div>
     );
@@ -509,7 +515,7 @@ class ReportSetup extends Component {
 
   render() {
     const { progress, showPreview } = this.state;
-    const { item, mode, reportFileds, reportEntities, reportData, size, page, nextPage, taxType } = this.props;
+    const { item, mode, reportFileds, reportEntities, reportData, size, page, nextPage, taxType } = this.props;    
     if (mode === 'loading') {
       return (<LoadingItemPlaceholder onClick={this.handleBack} />);
     }
