@@ -618,7 +618,23 @@ export const emailTemplatesSelector = createSelector(
 export const eventsSelector = createSelector(
   getEvents,
   getEventType,
-  (events = Immutable.Map(), type) => events.get(type),
+  (events = Immutable.Map(), type) => {
+    // all balances types, Prepaid and Normal
+    if (type === 'balances') {
+      return events.get('balance');
+    }
+    if (type === 'balance') {
+      return events
+        .get('balance', Immutable.List())
+        .filter(event => !event.get('prepaid', false));
+    }
+    if (type === 'balancePrepaid') {
+      return events
+        .get('balance', Immutable.List())
+        .filter(event => event.get('prepaid', false));
+    }
+    return events.get(type);
+  },
 );
 
 export const taxParamsKeyOptionsSelector = createSelector(

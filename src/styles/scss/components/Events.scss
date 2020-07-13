@@ -1,0 +1,9 @@
+#EventsTab {
+  UL.nav-tabs {
+    li {
+      &:last-child {
+        float: right;
+      }
+    }
+  }
+}
