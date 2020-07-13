@@ -21,8 +21,8 @@
     },
     "balance": {
       "conditions" : [
-        { "id": "in", "title": "In" },
-        { "id": "not_in", "title": "Is Not" },
+        { "id": "in", "title": "In", "type": "tags" },
+        { "id": "not_in", "title": "Is Not In", "type": "tags" },
         { "id": "is", "title": "Is" },
         { "id": "is_not", "title": "Is Not" },
         { "id": "is_less_than", "title": "Is Less Than", "type": "number" },
@@ -39,8 +39,8 @@
     },
     "balancePrepaid": {
       "conditions" : [
-        { "id": "in", "title": "In" },
-        { "id": "not_in", "title": "Is Not" },
+        { "id": "in", "title": "In", "type": "tags" },
+        { "id": "not_in", "title": "Is Not In", "type": "tags" },
         { "id": "is", "title": "Is" },
         { "id": "is_not", "title": "Is Not" },
         { "id": "is_less_than", "title": "Is Less Than", "type": "number" },
