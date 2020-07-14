@@ -1,8 +1,9 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import Immutable from 'immutable';
-import { Panel, Col } from 'react-bootstrap';
+import { Panel, Col, Label } from 'react-bootstrap';
 import { sentenceCase } from 'change-case';
+import pluralize from 'pluralize';
 import { Actions, StateIcon } from '@/components/Elements';
 import List from '@/components/List';
 import { MiniFilter } from '@/components/EntityList/Filter';
@@ -98,7 +99,7 @@ class EventsList extends Component {
     return items.filter(item => item.get('event_code', '').includes(filter));
   }
 
-  renderPanelHeader = () => {
+  renderPanelHeader = (filterDetails) => {
     const { filter } = this.state;
     return (
       <div>&nbsp;
@@ -110,6 +111,7 @@ class EventsList extends Component {
             onClear={this.onClearFilter}
           />
         </div>
+        { filter !== '' && <Label className="filter-info">{filterDetails}</Label>}
         <div className="pull-right">
           <Actions actions={this.getPanelActions()} />
           </div>
@@ -118,13 +120,16 @@ class EventsList extends Component {
   }
 
   render() {
+    const { items } = this.props;
     const filteredItems = this.filterItems();
     const fields = this.getListFields();
     const actions = this.getListActions();
+    const nameEvent = pluralize('event', items.size);
+    const filterDetails = `Showing ${filteredItems.size} of ${items.size} ${nameEvent}`
     return (
       <div>
         <Col sm={12}>
-          <Panel header={this.renderPanelHeader()}>
+          <Panel header={this.renderPanelHeader(filterDetails)}>
             <List
               items={filteredItems}
               fields={fields}
