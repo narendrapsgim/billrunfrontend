@@ -24,7 +24,7 @@ const MiniFilter = ({ filter, placeholder, onChange, onClear }) => (
       </Button>
     </InputGroup.Addon>
   </InputGroup>
-  )
+)
 
 MiniFilter.propTypes = {
   filter: PropTypes.oneOfType([
