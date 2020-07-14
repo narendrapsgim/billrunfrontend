@@ -1,8 +1,8 @@
 {
   "entities": {
-    "balance": { "title": "balance postpaid" },
+    "balance": { "title": "postpaid balance " },
     "fraud": { "title": "fraud" },
-    "balancePrepaid": { "title": "balance prepaid" }
+    "balancePrepaid": { "title": "prepaid balance" }
   },
   "operators": {
     "fraud": {
