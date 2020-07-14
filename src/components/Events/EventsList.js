@@ -1,10 +1,11 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import Immutable from 'immutable';
-import { Panel, Col } from 'react-bootstrap';
+import { Panel, Col, Button, InputGroup } from 'react-bootstrap';
 import { sentenceCase } from 'change-case';
 import { Actions, StateIcon } from '@/components/Elements';
 import List from '@/components/List';
+import Field from '@/components/Field';
 
 
 class EventsList extends Component {
@@ -25,6 +26,19 @@ class EventsList extends Component {
     items: Immutable.List(),
     thresholdFields: Immutable.List(),
   };
+
+  state = {
+    filter: '',
+  };
+
+  onChangeFilter = (e) => {
+    const { value } = e.target;
+    this.setState(() => ({ filter: value }));
+  }
+
+  onClearFilter = (e) => {
+    this.setState(() => ({ filter: '' }));
+  }
 
   parseShowEnable = item => !item.get('active', true);
 
@@ -75,15 +89,43 @@ class EventsList extends Component {
     onClick: this.props.onNew,
   }];
 
-  renderPanelHeader = () => (
-    <div>
-      &nbsp;
-      <div className="pull-right"><Actions actions={this.getPanelActions()} /></div>
-    </div>
-  );
+  filterItems = () => {
+    const { items } = this.props;
+    const { filter } = this.state;
+    if (!filter) {
+      return items;
+    }
+    return items.filter(item => item.get('event_code', '').includes(filter));
+  }
+
+  renderPanelHeader = () => {
+    const { filter } = this.state;
+    return (
+      <div>&nbsp;
+        <div className="pull-left events-filter">
+          <InputGroup>
+            <Field
+              onChange={this.onChangeFilter}
+              value={filter}
+              placeholder="Filter by event code..."
+              autocomplete="off"
+            />
+            <InputGroup.Addon className="events-filter-reset">
+              <Button bsSize="xsmall" bsStyle="link" onClick={this.onClearFilter}>
+                <i className="fa fa-eraser" />
+              </Button>
+            </InputGroup.Addon>
+          </InputGroup>
+        </div>
+        <div className="pull-right">
+          <Actions actions={this.getPanelActions()} />
+          </div>
+      </div>
+    );
+  }
 
   render() {
-    const { items } = this.props;
+    const filteredItems = this.filterItems();
     const fields = this.getListFields();
     const actions = this.getListActions();
     return (
@@ -91,7 +133,7 @@ class EventsList extends Component {
         <Col sm={12}>
           <Panel header={this.renderPanelHeader()}>
             <List
-              items={items}
+              items={filteredItems}
               fields={fields}
               actions={actions}
             />
