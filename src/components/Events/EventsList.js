@@ -1,11 +1,11 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import Immutable from 'immutable';
-import { Panel, Col, Button, InputGroup } from 'react-bootstrap';
+import { Panel, Col } from 'react-bootstrap';
 import { sentenceCase } from 'change-case';
 import { Actions, StateIcon } from '@/components/Elements';
 import List from '@/components/List';
-import Field from '@/components/Field';
+import { MiniFilter } from '@/components/EntityList/Filter';
 
 
 class EventsList extends Component {
@@ -102,20 +102,13 @@ class EventsList extends Component {
     const { filter } = this.state;
     return (
       <div>&nbsp;
-        <div className="pull-left events-filter">
-          <InputGroup>
-            <Field
-              onChange={this.onChangeFilter}
-              value={filter}
-              placeholder="Filter by event code..."
-              autocomplete="off"
-            />
-            <InputGroup.Addon className="events-filter-reset">
-              <Button bsSize="xsmall" bsStyle="link" onClick={this.onClearFilter}>
-                <i className="fa fa-eraser" />
-              </Button>
-            </InputGroup.Addon>
-          </InputGroup>
+        <div className="pull-left">
+          <MiniFilter
+            filter={filter}
+            placeholder="Filter by event code..."
+            onChange={this.onChangeFilter}
+            onClear={this.onClearFilter}
+          />
         </div>
         <div className="pull-right">
           <Actions actions={this.getPanelActions()} />
