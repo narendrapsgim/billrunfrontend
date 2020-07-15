@@ -460,7 +460,7 @@ export const runningPaymentFilesListQuery = (paymentGateway, fileType) => ({
 
 export const sendGenerateNewFileQuery = (paymentGateway, fileType, data) => {
   const params = [
-    { cpg_type: 'transactions__request' },
+    { cpg_type: 'transactions_request' },
     { payment_gateway: paymentGateway },
     { file_type: fileType },
     { parameters: JSON.stringify(data) },
