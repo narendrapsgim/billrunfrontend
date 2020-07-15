@@ -12,6 +12,7 @@ import {
   inputProssesorfilteredFieldsSelector,
   accountFieldsSelector,
   linesFieldsSelector,
+  billsFieldsSelector,
   rateCategoriesSelector,
   isPlaysEnabledSelector,
 } from './settingsSelector';
@@ -283,7 +284,7 @@ const reportQueueFieldsSelector = createSelector(
 );
 
 const reportBillsSelector = createSelector(
-  () => Immutable.List(),
+  billsFieldsSelector,
   () => 'bills',
   isPlaysEnabledSelector,
   mergeEntityAndReportConfigFields,
