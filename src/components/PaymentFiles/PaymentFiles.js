@@ -220,14 +220,13 @@ class PaymentFiles extends Component {
     return report;
   }
 
-  goToReport = (data) => {    
+  goToReport = (data) => {
     this.props.dispatch(gotEntity('reports', this.getPredefinedReportConfiguration(data)));
-    // TODO:: check if the report page title is OK
     this.props.dispatch(setPageTitle('Payment Files Report'));
     this.props.router.push({
       pathname: 'reports/report',
       query: {
-        type: 'predefined', // TODO:: this flag will help to understand is allowed to export unsaved report, In use it in the componentDidMount function in reportSetup
+        type: 'predefined',
       }
     });
   };
@@ -325,9 +324,8 @@ class PaymentFiles extends Component {
         fieldWithMutations.set("display", true);
       }
       if (!field.has("title")) {
-        const label = this.getLabel(field.get("name", ""));
-        const field_name = fieldWithMutations.get("field_name", label);
-        fieldWithMutations.set("title", titleCase(field_name));
+        const label = this.getLabel(fieldWithMutations.get("field_name", ""));
+        fieldWithMutations.set("title", titleCase(label));
       }
     });
 
