@@ -13,6 +13,7 @@ import {
   accountFieldsSelector,
   linesFieldsSelector,
   billsFieldsSelector,
+  saveToBillPaymentGatewaySelector,
   rateCategoriesSelector,
   isPlaysEnabledSelector,
 } from './settingsSelector';
@@ -70,6 +71,26 @@ const selectReportLinesFields = (
       }));
     });
 
+    // Set fields from billrun settings
+    billrunFields.forEach((billrunField) => {
+      optionsWithMutations.push(billrunField);
+    });
+  });
+
+const selectReportBillsFields = (
+  billrunFields = Immutable.List(),
+  saveToBillsFields = Immutable.List(),
+) =>
+  Immutable.List().withMutations((optionsWithMutations) => {
+    // set fields from IP
+    console.log(billrunFields);
+    saveToBillsFields.forEach((saveToBillsField) => {
+      optionsWithMutations.push(Immutable.Map({
+        field_name: `pg_request.${saveToBillsField.get('field_name', '')}`,
+        title: `${saveToBillsField.get('payment_gateway')}: ${getFieldName(saveToBillsField.get('field_name', ''), 'bills')}`,
+        type: saveToBillsField.getIn(['type'], 'text'),
+      }));
+    });
     // Set fields from billrun settings
     billrunFields.forEach((billrunField) => {
       optionsWithMutations.push(billrunField);
@@ -283,8 +304,14 @@ const reportQueueFieldsSelector = createSelector(
   mergeEntityAndReportConfigFields,
 );
 
-const reportBillsSelector = createSelector(
+const reportBillsFieldsSelector = createSelector(
   billsFieldsSelector,
+  saveToBillPaymentGatewaySelector,
+  selectReportBillsFields,
+);
+
+const reportBillsSelector = createSelector(
+  reportBillsFieldsSelector,
   () => 'bills',
   isPlaysEnabledSelector,
   mergeEntityAndReportConfigFields,

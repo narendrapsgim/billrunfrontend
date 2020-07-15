@@ -59,9 +59,9 @@ const getSubscriberFields = (state, props) => // eslint-disable-line no-unused-v
 
 const getLinesFields = (state, props) => // eslint-disable-line no-unused-vars
   state.settings.getIn(['lines', 'fields']);
-	
+
 const getBillsFields = (state, props) => // eslint-disable-line no-unused-vars
-  state.settings.getIn(['bills', 'fields'], Immutable.List());
+  state.settings.getIn(['bills', 'fields']);
 
 const getServiceFields = (state, props) => // eslint-disable-line no-unused-vars
   state.settings.getIn(['services', 'fields']);
@@ -429,19 +429,39 @@ export const linesFieldsSelector = createSelector(
 
 export const billsFieldsSelector = createSelector(
   getBillsFields,
-  (fields) => {
-    if (fields) {
-      return fields.map((field) => {
-        if (field.get('title', '') !== '') {
-          return field;
-        }
-        if (field.has('foreign')) {
-          return field.set('title', getFieldName(field.getIn(['foreign', 'field'], ''), getFieldNameType(field.getIn(['foreign', 'entity'], ''))));
-        }
-        return field.set('title', getFieldName(field.get('field_name', ''), 'bills'));
+  (fields = Immutable.List()) => {
+    return fields.map((field) => {
+      if (field.get('title', '') !== '') {
+        return field;
+      }
+      if (field.has('foreign')) {
+        return field.set('title', getFieldName(field.getIn(['foreign', 'field'], ''), getFieldNameType(field.getIn(['foreign', 'entity'], ''))));
+      }
+      return field.set('title', getFieldName(field.get('field_name', ''), 'bills'));
+    });
+  },
+);
+
+export const saveToBillPaymentGatewaySelector = createSelector(
+  getPaymentGateways,
+  (paymentGateways = Immutable.List()) => {
+    return Immutable.List().withMutations((fieldsWithMutations) => {
+      paymentGateways.forEach((paymentGateway) => {
+        paymentGateway.getIn(['transactions_request'], Immutable.List()).forEach((transactionRequest) => {
+          transactionRequest.getIn(['generator', 'data_structure'], Immutable.List()).forEach((field) => {
+            if(field.getIn(['save_to_bill'], false) === true){
+              if (field.get('title', '') !== '') {
+                fieldsWithMutations.push(field.set('payment_gateway', paymentGateway.get('name', '')));
+              } else {
+                fieldsWithMutations.push(field
+                  .set('field_name', getFieldName(field.get('name', ''), 'bills'))
+                  .set('payment_gateway', paymentGateway.get('name', '')));
+              }
+            }
+          });
+        });
       });
-    }
-    return undefined;
+    })
   },
 );
 
