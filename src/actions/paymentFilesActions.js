@@ -6,6 +6,25 @@ import { clearList as entityClearList } from '@/actions/entityListActions';
 import { apiBillRun, apiBillRunErrorHandler, apiBillRunSuccessHandler } from '../common/Api';
 import { runningPaymentFilesListQuery, sendGenerateNewFileQuery } from '@/common/ApiQueries';
 
+export const actions = {
+  SET_FILE_TYPE: 'SET_FILE_TYPE',
+  SET_PAYMENT_GATEWAY: 'SET_PAYMENT_GATEWAY',
+  CLEAR: 'CLEAR',
+};
+
+export const setFileType = value => ({
+  type: actions.SET_FILE_TYPE,
+  value,
+});
+
+export const setPaymentGateway = value => ({
+  type: actions.SET_PAYMENT_GATEWAY,
+  value,
+});
+
+export const clear = () => ({
+  type: actions.CLEAR,
+});
 
 export const getRunningPaymentFiles = (paymentGateway, fileType) => (dispatch) => 
   dispatch(getList('payment_running_files_list', runningPaymentFilesListQuery(paymentGateway, fileType)));

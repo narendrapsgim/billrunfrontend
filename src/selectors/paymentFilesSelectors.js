@@ -9,6 +9,20 @@ import { paymentGatewaysSelector } from '@/selectors/settingsSelector'
 
 const getRunningPaymentFiles = state => state.list.get('payment_running_files_list');
 
+const getSelectedPaymentGateway = state => state.paymentsFiles.get('paymentGateway');
+
+const getSelectedFileType = state => state.paymentsFiles.get('fileType');
+
+export const selectedPaymentGatewaySelector = createSelector(
+  getSelectedPaymentGateway,
+  selectedPaymentGateway => selectedPaymentGateway,
+);
+
+export const selectedFileTypeSelector = createSelector(
+  getSelectedFileType,
+  selectedFileType => selectedFileType,
+);
+
 export const isRunningPaymentFilesSelector = createSelector(
   getRunningPaymentFiles,
   (files = List()) => files.size,
