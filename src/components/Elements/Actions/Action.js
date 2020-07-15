@@ -41,7 +41,7 @@ const Action = (props) => {
     renderFunc !== null && typeof renderFunc === 'function'
   ), [renderFunc]);
 
-  const onClickActino = useCallback(() => {
+  const onClickAction = useCallback(() => {
     onClick(data, type);
   }, [onClick, data, type]);
 
@@ -76,7 +76,7 @@ const Action = (props) => {
         eventKey={index}
         onKeyDown={onKeyDown}
         onSelect={onSelect}
-        onClick={onClickActino}
+        onClick={onClickAction}
         disabled={!isEnable}
         bsStyle={actionStyle === 'default' ? undefined : actionStyle}
         bsSize={actionSize}
@@ -96,7 +96,7 @@ const Action = (props) => {
         { isCustomRender ? props.renderFunc(props)
           : (
             <Button
-              onClick={onClickActino}
+              onClick={onClickAction}
               bsStyle={actionStyle === 'default' ? undefined : actionStyle}
               bsSize={actionSize}
               className={actionClass}

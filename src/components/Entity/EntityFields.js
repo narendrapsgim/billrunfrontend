@@ -69,7 +69,7 @@ class EntityFields extends Component {
           if (isAlreadyUpdated && isPresentInEntity && isWrongType) {
             updated_levels.push(laterString);
             this.props.onChangeField(levelsArray, Immutable.Map());
-          }
+    }
         });
       }
     })
