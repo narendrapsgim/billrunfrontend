@@ -32,8 +32,7 @@ class EventsList extends Component {
     filter: '',
   };
 
-  onChangeFilter = (e) => {
-    const { value } = e.target;
+  onChangeFilter = (value) => {
     this.setState(() => ({ filter: value }));
   }
 
