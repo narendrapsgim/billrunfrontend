@@ -39,7 +39,7 @@ export const validateGeneratePaymentFile = (paymentFile) => (dispatch) => {
 
 export const sendGenerateNewFile = (paymentGateway, fileType, data) => (dispatch) => {
   const query = sendGenerateNewFileQuery(paymentGateway, fileType, data);
-  const successMessage = 'File successfully sent, new file record will be updated in the table in a few seconds';
+  const successMessage = 'Payments file was successfully generated, it\'s record will be added to the table in a few seconds';
   return apiBillRun(query)
     .then(success => dispatch(apiBillRunSuccessHandler(success, successMessage)))
     .catch(error => {
