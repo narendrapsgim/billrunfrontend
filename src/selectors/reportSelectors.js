@@ -77,25 +77,25 @@ const selectReportLinesFields = (
     });
   });
 
-const selectReportBillsFields = (
-  billrunFields = Immutable.List(),
-  saveToBillsFields = Immutable.List(),
-) =>
-  Immutable.List().withMutations((optionsWithMutations) => {
-    // set fields from IP
-    console.log(billrunFields);
-    saveToBillsFields.forEach((saveToBillsField) => {
-      optionsWithMutations.push(Immutable.Map({
-        field_name: `pg_request.${saveToBillsField.get('field_name', '')}`,
-        title: `${saveToBillsField.get('payment_gateway')}: ${getFieldName(saveToBillsField.get('field_name', ''), 'bills')}`,
-        type: saveToBillsField.getIn(['type'], 'text'),
-      }));
+  const selectReportBillsFields = (
+    billrunFields = Immutable.List(),
+    saveToBillsFields = Immutable.List(),
+  ) =>
+    Immutable.List().withMutations((optionsWithMutations) => {
+      // set fields from IP
+      saveToBillsFields.forEach((saveToBillsField) => {
+        optionsWithMutations.push(Immutable.Map({
+          field_name: `pg_request.${saveToBillsField.get('field_name', '')}`,
+          title: `${saveToBillsField.get('payment_gateway')}: ${getFieldName(saveToBillsField.get('field_name', ''), 'bills')}`,
+          type: saveToBillsField.getIn(['type'], 'text'),
+          payment_gateway: saveToBillsField.get('payment_gateway')
+        }));
+      });
+      // Set fields from billrun settings
+      billrunFields.forEach((billrunField) => {
+        optionsWithMutations.push(billrunField);
+      });
     });
-    // Set fields from billrun settings
-    billrunFields.forEach((billrunField) => {
-      optionsWithMutations.push(billrunField);
-    });
-  });
 
 const concatJoinFields = (
   fields, joinFields = Immutable.Map(), excludeFields = Immutable.Map(),
@@ -304,7 +304,7 @@ const reportQueueFieldsSelector = createSelector(
   mergeEntityAndReportConfigFields,
 );
 
-const reportBillsFieldsSelector = createSelector(
+export const reportBillsFieldsSelector = createSelector(
   billsFieldsSelector,
   saveToBillPaymentGatewaySelector,
   selectReportBillsFields,

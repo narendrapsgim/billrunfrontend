@@ -709,6 +709,16 @@ export const getReportQuery = ({ report, page = 0, size = 10 }) => ({
   ],
 });
 
+export const getReportCSV = ({ report, page = 0, size = 10 }) => ({
+  api: 'report',
+  params: [
+    { action: 'exportCSVReport' },
+    { report: JSON.stringify(report) },
+    { page },
+    { size },
+  ],
+});
+
 export const getReportCSVQuery = name => ({
   api: 'report',
   params: [

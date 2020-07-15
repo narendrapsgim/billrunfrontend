@@ -15,9 +15,11 @@ import {
 } from '@/common/Util';
 import {
   buildRequestUrl,
+  openWindowWithPost
 } from '../../common/Api';
 import {
   getReportCSVQuery,
+  getReportCSV
  } from '../../common/ApiQueries';
 import { showSuccess, showDanger } from '@/actions/alertsActions';
 import {
@@ -366,7 +368,11 @@ class ReportSetup extends Component {
   }
 
   isExportEnable = () => {
-    const { itemId, item, itemSource } = this.props;
+    const { itemId } = this.props;
+    const { type = false } = this.props.location.query;
+    if (type === 'predefined') {
+      return true;
+    }
     // don't allow to export new unserved report
     if (!itemId || itemId === '') {
       return false;
@@ -384,8 +390,16 @@ class ReportSetup extends Component {
 
   onClickExportCSV = () => {
     const { item } = this.props;
-    const csvQuery = getReportCSVQuery(item.get('key', ''));
-    window.open(buildRequestUrl(csvQuery));
+    const { type = false } = this.props.location.query;
+    if (type === 'predefined') {
+      // export csv report
+      const csvQuery = getReportCSV({report: item, page: 0, size: 99999});
+      openWindowWithPost(csvQuery);
+    } else {
+      // export csv report by name 
+      const csvQuery = getReportCSVQuery(item.get('key', ''));
+      window.open(buildRequestUrl(csvQuery));
+    }
   }
 
   onPageChange = (page) => {

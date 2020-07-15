@@ -191,6 +191,28 @@ const promiseTimeout = (ms, promise, timeOutMessage = 'Request timeout') => new 
   },
 );
 
+export const openWindowWithPost = query => {
+  const url = `${getConfig(['env','serverApiUrl'], '')}${buildApiString(query)}`;
+  const data = query.params;
+  const form = document.createElement("form");
+  form.target = "_blank";
+  form.method = "POST";
+  form.action = url;
+  form.style.display = "none";
+  data.forEach((currentValue) => {
+    const key = Object.keys(currentValue)[0];
+    let input = document.createElement("input");
+    input.type = "hidden";
+    input.name = key;
+    input.value = currentValue[key];
+    form.appendChild(input);
+  });
+
+  document.body.appendChild(form);
+  form.submit();
+  document.body.removeChild(form);
+}
+
 export const buildRequestUrl = query => `${getConfig(['env','serverApiUrl'], '')}${buildApiString(query)}${buildQueryString(query.params)}`;
 
 // Send Http request

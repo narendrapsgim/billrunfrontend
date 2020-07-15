@@ -21,11 +21,13 @@ import { validateGeneratePaymentFile } from "@/actions/paymentFilesActions";
 import { gotEntity } from '@/actions/entityActions';
 import { setPageTitle } from '@/actions/guiStateActions/pageActions';
 import { getFieldName } from "@/common/Util";
+import { reportBillsFieldsSelector} from '@/selectors/reportSelectors';
 
 class PaymentFiles extends Component {
 
   static propTypes = {
     paymentFiles: PropTypes.instanceOf(List),
+    reportBillsFileds: PropTypes.instanceOf(List),
     paymentGatewayOptions: PropTypes.array,
     fileTypeOptionsOptions: PropTypes.instanceOf(Map),
     isRunningPaymentFiles: PropTypes.number,
@@ -37,6 +39,7 @@ class PaymentFiles extends Component {
 
   static defaultProps = {
     paymentFiles: List(),
+    reportBillsFileds: List(),
     paymentGatewayOptions: [],
     fileTypeOptionsOptions: Map(),
     isRunningPaymentFiles: 0,
@@ -168,16 +171,19 @@ class PaymentFiles extends Component {
   getLabel = (key) => getFieldName(key, "payment_files", titleCase(key));
 
   getPredefinedReportConfiguration = (line) => {
-    const keyCreationTime = uuid.v4()
+    const { reportBillsFileds } = this.props;
+    const { paymentGateway } = this.state;
+    const keyCreationTime = uuid.v4();
+    const entity = "bills";
     let report = {
       key: `File name: ${line.get('file_name', '')}`,
-      entity: "bills",
+      entity: entity,
       type: 0,
       columns: [
-        { key: keyCreationTime, field_name: "urt", label: "Creation Time", op: "", entity: "bills"},
+        { key: keyCreationTime, field_name: "urt", label: "Creation Time", op: "", entity: entity},
       ],
       conditions: [
-        { field: "generated_pg_file_log", op: "in", value: line.get('stamp', ''), type: "string", entity: "bills" }
+        { field: "generated_pg_file_log", op: "in", value: line.get('stamp', ''), type: "string", entity: entity }
       ],
       sorts: [
         { "field": keyCreationTime, "op": -1 },
@@ -187,10 +193,18 @@ class PaymentFiles extends Component {
       ],
     };
 
-    // TODO:: Need to add addition field to columns array
-    // const test_col = {...};
-    // report.columns.push(test_col);
-
+    //add addition field to columns array
+    reportBillsFileds.forEach((reportBillsFiled) => {
+      if(!reportBillsFiled.get('payment_gateway', false) || reportBillsFiled.get('payment_gateway') === paymentGateway){
+        let column = {
+          'key': uuid.v4(),
+          'field_name': reportBillsFiled.get('field_name', ''),
+          'label': reportBillsFiled.get('title', ''),
+          'entity': entity
+        };
+        report.columns.push(column);
+      }
+    });
     return report;
   }
 
@@ -437,6 +451,7 @@ const mapStateToProps = (state, props) => ({
   paymentGatewayOptions: paymentGatewayOptionsSelector(state, props) || undefined,
   fileTypeOptionsOptions: fileTypeOptionsOptionsSelector(state, props) || undefined,
   isRunningPaymentFiles: isRunningPaymentFilesSelector(state, props) || undefined,
+  reportBillsFileds: reportBillsFieldsSelector(state, props) || undefined,
 });
 
 export default withRouter(connect(mapStateToProps)(PaymentFiles));
