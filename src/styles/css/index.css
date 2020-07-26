@@ -127,12 +127,20 @@ fieldset[disabled] .btn {
 .text-center { text-align: center !important; }
 
 .not-top-border { border-top: none!important; }
+.not-left-border { border-left: none!important; }
 
 .line-actions {
   z-index: 9999;
   position: fixed;
   right: 40px;
   margin-top: -5px;
+}
+
+.input-group-space {
+  background: #fff;
+  border-top: none;
+  border-bottom: navajowhite;
+  border-left: none;
 }
 /* ~Props */
 
