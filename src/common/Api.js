@@ -60,6 +60,7 @@ const buildApiString = (params = {}) => {
     case 'savePPIncludes':
       return `/admin/${params.api}`;
     case 'paymentgateways':
+    case 'custompaymentgateway':
     case 'billrun':
       return `/${params.api}/${params.action}`;
     default:
