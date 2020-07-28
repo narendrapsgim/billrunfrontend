@@ -199,17 +199,14 @@ class PaymentFiles extends Component {
         { key: uuid.v4(), field_name: "txid", label: "BillRun Transaction ID", op: "", entity: entity},
         { key: uuid.v4(), field_name: "amount", label: "Original Absolute Due Amount", op: "", entity: entity},
         { key: uuid.v4(), field_name: "rejected", label: "Rejected Payment?", op: "", entity: entity},
-        { key: uuid.v4(), field_name: "rejection", label: "Rejection Transaction?", op: "", entity: entity},
         { key: uuid.v4(), field_name: "waiting_for_confirmation", label: "Waiting For Confirmation?", op: "", entity: entity},
-        { key: uuid.v4(), field_name: "invoice_id", label: "Invoice ID", op: "", entity: entity},
         { key: uuid.v4(), field_name: "type", label: "Type", op: "", entity: entity},
-        { key: uuid.v4(), field_name: "left_to_pay", label: "Bill Unpaid Amount", op: "", entity: entity},
-        { key: uuid.v4(), field_name: "paid", label: "Status", op: "", entity: entity},
         { key: uuid.v4(), field_name: "generated_pg_file_log", label: "Payment Gateway File ID", op: "", entity: entity},
         { key: uuid.v4(), field_name: "due", label: "Due Amount (Sum)", op: "", entity: entity},
       ],
       conditions: [
-        { field: "generated_pg_file_log", op: "in", value: line.get('stamp', ''), type: "string", entity: entity }
+        { field: "generated_pg_file_log", op: "in", value: line.get('stamp', ''), type: "string", entity: entity },
+        { field: "rejection", op: "ne", value: true, type: "boolean", entity: "bills" },
       ],
       sorts: [
         { "field": keyCreationTime, "op": -1 },
