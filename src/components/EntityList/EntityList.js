@@ -67,6 +67,7 @@ class EntityList extends Component {
     router: PropTypes.shape({
       push: PropTypes.func.isRequired,
     }).isRequired,
+    onListRefresh: PropTypes.func,
     dispatch: PropTypes.func.isRequired,
     listActions: PropTypes.arrayOf(PropTypes.object),
     refreshString: PropTypes.string,
@@ -97,6 +98,7 @@ class EntityList extends Component {
     refreshString: '',
     actions: [],
     listActions: null,
+    onListRefresh: null,
   }
 
   state = {
@@ -166,6 +168,9 @@ class EntityList extends Component {
     const { collection } = this.props;
     this.fetchItems(this.props);
     this.props.dispatch(clearRevisions(collection));
+    if (this.props.onListRefresh) {
+      this.props.onListRefresh();
+    }
   }
 
   onClickImport = () => {
@@ -369,6 +374,9 @@ class EntityList extends Component {
 
   renderFilter = () => {
     const { filter, filterFields } = this.props;
+    if (filterFields.length === 0) {
+      return null;
+    }
     return (
       <Filter filter={filter} fields={filterFields} onFilter={this.onFilter}>
         { this.renderStateFilter() }
