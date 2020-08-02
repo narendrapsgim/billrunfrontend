@@ -23,7 +23,7 @@ class EntityFields extends Component {
     ]).isRequired,
     fields: PropTypes.instanceOf(Immutable.List),
     errors: PropTypes.instanceOf(Immutable.Map),
-    highlightPramas: PropTypes.instanceOf(Immutable.List),
+    highlightParams: PropTypes.instanceOf(Immutable.List),
     fieldsFilter: PropTypes.func,
     editable: PropTypes.bool,
     isPlaysEnabled: PropTypes.bool,
@@ -36,7 +36,7 @@ class EntityFields extends Component {
     entity: Immutable.Map(),
     fields: Immutable.List(),
     errors: Immutable.Map(),
-    highlightPramas: null,
+    highlightParams: null,
     fieldsFilter: null,
     editable: true,
     isPlaysEnabled: false,
@@ -68,7 +68,6 @@ class EntityFields extends Component {
           const isWrongType = Immutable.is(entity.getIn(levelsArray, Immutable.List()), Immutable.List());
           if (isAlreadyUpdated && isPresentInEntity && isWrongType) {
             updated_levels.push(laterString);
-            console.log('update level: ', levelsArray);
             this.props.onChangeField(levelsArray, Immutable.Map());
     }
         });
@@ -88,8 +87,8 @@ class EntityFields extends Component {
       : entity.get('play', '') !== oldEntity.get('play', '');
     if (shouldResetFields) {
       fields.forEach((field) => {
-        const shoudPlayBeDisplayd = this.filterPlayFields(field);
-        if (!shoudPlayBeDisplayd) {
+        const shouldPlaysBeDisplayed = this.filterPlayFields(field);
+        if (!shouldPlaysBeDisplayed) {
           this.props.onRemoveField(field.get('field_name', '').split('.'));
         }
       });
@@ -97,7 +96,7 @@ class EntityFields extends Component {
   }
 
   getParamsOptions = () => {
-    const { fields, fieldsFilter, highlightPramas } = this.props;
+    const { fields, fieldsFilter, highlightParams } = this.props;
     const fieldFilterFunction = fieldsFilter !== null ? fieldsFilter : this.filterPrintableFields;
     return fields
       .filter(fieldFilterFunction)
@@ -108,7 +107,7 @@ class EntityFields extends Component {
       }))
       .sortBy(field => field.label)
       .sortBy(field =>
-        (highlightPramas !== null && highlightPramas.includes(`params.${field.value}`) ? 0 : 1)
+        (highlightParams !== null && highlightParams.includes(`params.${field.value}`) ? 0 : 1)
       )
   }
 
@@ -145,13 +144,13 @@ class EntityFields extends Component {
 
   renderField = (field, key) => {
     const { entity, editable, onChangeField, onRemoveField, errors } = this.props;
-    const isFieldEditabe = editable && field.get('editable', false);
+    const isFieldEditable = editable && field.get('editable', false);
     return (
       <EntityField
         key={`key_${field.get('field_name', key)}`}
         field={field}
         entity={entity}
-        editable={isFieldEditabe}
+        editable={isFieldEditable}
         onChange={onChangeField}
         onRemove={onRemoveField}
         error={errors.get(field.get('field_name', ''), false)}
@@ -170,10 +169,10 @@ class EntityFields extends Component {
   }
 
   renderAddParamButton = (options) => {
-    const { highlightPramas } = this.props;
-    const highlightAll = highlightPramas === null;
+    const { highlightParams } = this.props;
+    const highlightAll = highlightParams === null;
     const menuItems = options.map((option) => {
-      const highlight = highlightAll || highlightPramas.includes(`params.${option.value}`);
+      const highlight = highlightAll || highlightParams.includes(`params.${option.value}`);
       const menuItemClass = classNames({
         'disable-label': !highlight,
       });
@@ -193,12 +192,12 @@ class EntityFields extends Component {
 
   render() {
     const { editable } = this.props;
-    const entityfields = this.renderFields();
+    const entityFields = this.renderFields();
     const paramsOptions = this.getParamsOptions();
-    if (!entityfields.isEmpty() || !paramsOptions.isEmpty()) {
+    if (!entityFields.isEmpty() || !paramsOptions.isEmpty()) {
       return (
         <div className="EntityFields">
-          { entityfields }
+          { entityFields }
           { (!paramsOptions.isEmpty() && editable) && this.renderAddParamButton(paramsOptions) }
         </div>
       );
