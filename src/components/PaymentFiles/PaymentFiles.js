@@ -233,7 +233,7 @@ class PaymentFiles extends Component {
 
   goToReport = (data) => {
     this.props.dispatch(gotEntity('reports', this.getPredefinedReportConfiguration(data)));
-    this.props.dispatch(setPageTitle('Payment Files Report'));
+    this.props.dispatch(setPageTitle('Transactions Request File Report'));
     this.props.router.push({
       pathname: 'reports/report',
       query: {
@@ -315,7 +315,7 @@ class PaymentFiles extends Component {
     if (isRunningPaymentFiles > 0) {
       return `${isRunningPaymentFiles} files is running...`;
     }
-    return "Generate Payment File";
+    return "Generate Transactions Request File";
   };
 
   fixDetailsFields = (field) => this.fixGeneratePaymentFileFields(field);
@@ -342,8 +342,8 @@ class PaymentFiles extends Component {
   onClickGenerateNewFile = () => {
     const fields = this.getGenerateNewFileFields();
     const config = {
-      title: "Generate Payment File",
-      labelOk: "Generate Payment File",
+      title: "Generate Transactions Request File",
+      labelOk: "Generate",
       onOk: this.onGenerateNewFileClickOK,
     };
     const item = Map({ fields, values: Map() });
@@ -400,7 +400,7 @@ class PaymentFiles extends Component {
         <div className='pull-right'>
           {
             <WithTooltip helpText={this.getGeneratePaymentFileTooltipText()}>
-              <CreateButton onClick={this.onClickGenerateNewFile} buttonStyle={{}} action='' label='Generate Payment File' disabled={!showGeneratePaymentFile} />
+              <CreateButton onClick={this.onClickGenerateNewFile} buttonStyle={{}} action='' label='Generate Transactions Request File' disabled={!showGeneratePaymentFile} />
             </WithTooltip>
           }
         </div>
