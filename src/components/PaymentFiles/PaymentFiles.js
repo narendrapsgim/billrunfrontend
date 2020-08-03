@@ -264,15 +264,15 @@ class PaymentFiles extends Component {
   getDetailsFields = () => [
     { field_name: 'stamp' },
     { field_name: 'creation_time', type: 'datetime' },
-    { field_name: 'parameters_string' },
+    { field_name: 'parameters_string', multiple: true },
     { field_name: 'transactions' },
     { field_name: 'start_process_time', type: 'datetime' },
     { field_name: 'process_time', type: 'datetime' },
     { field_name: 'file_name' },
     { field_name: 'created_by' },
-    { field_name: 'errors', type: 'multiple' },
-    { field_name: 'warnings', type: 'multiple' },
-    { field_name: 'info', type: 'multiple' },
+    { field_name: 'errors', multiple: true },
+    { field_name: 'warnings', multiple: true },
+    { field_name: 'info', multiple: true },
   ];
 
   getTableFields = () => [
