@@ -154,7 +154,7 @@
     "parent": "account_receivables"
   },
   "custom-payment-files": {
-    "title": "Custom Payment files",
+    "title": "Transactions Request File",
     "icon": "",
     "route": "custom-payment-files",
     "show": true,

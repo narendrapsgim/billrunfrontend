@@ -233,7 +233,7 @@ class PaymentFiles extends Component {
 
   goToReport = (data) => {
     this.props.dispatch(gotEntity('reports', this.getPredefinedReportConfiguration(data)));
-    this.props.dispatch(setPageTitle('Payment Files Report'));
+    this.props.dispatch(setPageTitle('Transactions Request File Report'));
     this.props.router.push({
       pathname: 'reports/report',
       query: {
@@ -264,15 +264,15 @@ class PaymentFiles extends Component {
   getDetailsFields = () => [
     { field_name: 'stamp' },
     { field_name: 'creation_time', type: 'datetime' },
-    { field_name: 'parameters_string' },
+    { field_name: 'parameters_string', multiple: true },
     { field_name: 'transactions' },
     { field_name: 'start_process_time', type: 'datetime' },
     { field_name: 'process_time', type: 'datetime' },
     { field_name: 'file_name' },
     { field_name: 'created_by' },
-    { field_name: 'errors', type: 'multiple' },
-    { field_name: 'warnings', type: 'multiple' },
-    { field_name: 'info', type: 'multiple' },
+    { field_name: 'errors', multiple: true },
+    { field_name: 'warnings', multiple: true },
+    { field_name: 'info', multiple: true },
   ];
 
   getTableFields = () => [
@@ -315,7 +315,7 @@ class PaymentFiles extends Component {
     if (isRunningPaymentFiles > 0) {
       return `${isRunningPaymentFiles} files is running...`;
     }
-    return "Generate Payment File";
+    return "Generate Transactions Request File";
   };
 
   fixDetailsFields = (field) => this.fixGeneratePaymentFileFields(field);
@@ -342,8 +342,8 @@ class PaymentFiles extends Component {
   onClickGenerateNewFile = () => {
     const fields = this.getGenerateNewFileFields();
     const config = {
-      title: "Generate Payment File",
-      labelOk: "Generate Payment File",
+      title: "Generate Transactions Request File",
+      labelOk: "Generate",
       onOk: this.onGenerateNewFileClickOK,
     };
     const item = Map({ fields, values: Map() });
@@ -400,7 +400,7 @@ class PaymentFiles extends Component {
         <div className='pull-right'>
           {
             <WithTooltip helpText={this.getGeneratePaymentFileTooltipText()}>
-              <CreateButton onClick={this.onClickGenerateNewFile} buttonStyle={{}} action='' label='Generate Payment File' disabled={!showGeneratePaymentFile} />
+              <CreateButton onClick={this.onClickGenerateNewFile} buttonStyle={{}} action='' label='Generate Transactions Request File' disabled={!showGeneratePaymentFile} />
             </WithTooltip>
           }
         </div>
