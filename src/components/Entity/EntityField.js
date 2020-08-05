@@ -146,7 +146,6 @@ class EntityField extends Component {
   getFieldValue = () => {
     const {
       entity,
-      editable,
       fieldPath,
       isFieldTags,
       isFieldBoolean,
@@ -184,7 +183,7 @@ class EntityField extends Component {
       return (booleanValue === '') ? booleanValue : [true, 1, 'true'].includes(booleanValue);
     }
     const fieldVal = entity.getIn(fieldPath, []);
-    if (isFieldTags && editable) {
+    if (isFieldTags) {
       return Immutable.List.isList(fieldVal) ? fieldVal.toArray() : fieldVal;
     }
     return (Array.isArray(fieldVal) || Immutable.List.isList(fieldVal)) ? fieldVal.join(',') : fieldVal;
@@ -284,7 +283,7 @@ class EntityField extends Component {
         />
       );
     }
-    if (isFieldSelect && editable) {
+    if (isFieldSelect) {
       const multi = field.get('multiple', false);
       const options = this.getFieldOptios(field);
       return (
@@ -295,10 +294,11 @@ class EntityField extends Component {
           onChange={this.onChangeSelect}
           options={options}
           disabled={disabled}
+          editable={editable}
         />
       );
     }
-    if (isFieldTags && editable) {
+    if (isFieldTags) {
       return (
         <Field
           fieldType="tags"
@@ -307,6 +307,7 @@ class EntityField extends Component {
           addOnPaste
           pasteSplit={this.pasteSplit}
           disabled={disabled}
+          editable={editable}
           inputProps={{fieldType: field.get('type', undefined)}}
         />
       );
