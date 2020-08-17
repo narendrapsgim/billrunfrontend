@@ -353,7 +353,7 @@ export default {
       { id: 'original_txid', type: 'string', title: 'Original BillRun Transaction ID' },
       { id: 'rejection_code', type: 'string', title: 'Rejection Code' },
       { id: 'denial.transaction_date', type: 'datetime', title: 'Denied Transaction Date' },
-      { id: 'denial.amount', type: 'number', title: 'Denied Amount' },
+      { id: 'denied_amount', type: 'number', title: 'Denied Amount' },
       { id: 'denial.is_payments', type: 'boolean', title: 'Is Denied Payments' },
       { id: 'denial.credit_date', type: 'datetime', title: 'Denial Credit Date' },
       { id: 'denial.credit_date', type: 'string', title: 'Card Type' },
