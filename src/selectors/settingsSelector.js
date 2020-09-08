@@ -164,6 +164,17 @@ const selectFielteredFields = (inputProssesors) => {
   return options.toList();
 };
 
+const selectCalculatedFields = (inputProssesors) => {
+  let options = Immutable.Set();
+  inputProssesors.forEach((inputProssesor) => {
+    const filteredFields = inputProssesor
+      .getIn(['processor', 'calculated_fields'], Immutable.List())
+      .map(field => field.get('target_field', ''));
+    options = options.concat(filteredFields);
+  });
+  return options.toList();
+};
+
 const selectRatingParams = (inputProssesors) => {
   let options = Immutable.Set();
   inputProssesors.forEach((inputProssesor) => {
@@ -222,6 +233,11 @@ export const inputProssesorUsageTypesOptionsSelector = createSelector(
 export const inputProssesorfilteredFieldsSelector = createSelector(
   getInputProssesors,
   selectFielteredFields,
+);
+
+export const inputProssesorCalculatedFieldsSelector = createSelector(
+  getInputProssesors,
+  selectCalculatedFields,
 );
 
 export const inputProssesorRatingParamsSelector = createSelector(
