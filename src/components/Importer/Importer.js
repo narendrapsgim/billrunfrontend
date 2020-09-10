@@ -15,10 +15,11 @@ import {
   updateImporterValue,
   deleteImporterValue,
   sendImport,
+  addNewImporterMap,
+  updateImporterMap,
+  deleteImporterMap,
 } from '@/actions/importerActions';
 import {
-  saveSettings,
-  updateSetting,
   getSettings,
 } from '@/actions/settingsActions';
 import { showDanger } from '@/actions/alertsActions';
@@ -397,21 +398,11 @@ class Importer extends Component {
     }
   }
 
-  saveMapper = (mappers, successMessasge = 'Mapper was saved', errorMessasge = 'Error saving mapper') => {
-    this.props.dispatch(updateSetting('import', 'mapping', mappers));
-    const messages = { success: successMessasge, error: errorMessasge };
-    this.props.dispatch(saveSettings('import.mapping', messages));
-  }
-
   removeMapper = () => {
-    const { item, savedMappers } = this.props;
+    const { item } = this.props;
     const mapperName = item.get('mapperName', '');
-    this.saveMapper(
-      savedMappers.filter(mapper => mapper.get('label', '') !== mapperName),
-      `Mapper '${mapperName}' was removed`
-    );
+    this.props.dispatch(deleteImporterMap(mapperName));
     this.props.dispatch(updateImporterValue('mapperName', ''));
-
   }
 
   onSaveMapping = (label) => {
@@ -423,18 +414,15 @@ class Importer extends Component {
     const updater = item.get('updater', Immutable.Map());
     const multiFieldAction = item.get('multiFieldAction', Immutable.Map());
     const newMap = Immutable.Map({ label, map, updater, linker, multiFieldAction });
-
     if (selectedMapperName === '' || index === -1) { // save new or update in case label not found
       if(index !== -1) {
-        this.props.dispatch(showDanger(`Mapper with name "${label}" already exists`));
-        return;
+        return this.props.dispatch(showDanger(`Mapper with name "${label}" already exists`));
       }
-      this.saveMapper(savedMappers.push(newMap), `Mapper '${label}' was saved`);
-      this.props.dispatch(updateImporterValue('mapperName', label));
+      this.props.dispatch(addNewImporterMap(newMap));
     } else { // update existing
-      this.saveMapper(savedMappers.set(index, newMap), `Mapper '${label}' was updated`);
-      this.props.dispatch(updateImporterValue('mapperName', label));
+      this.props.dispatch(updateImporterMap(newMap, index));
     }
+    this.props.dispatch(updateImporterValue('mapperName', label));
   }
 
   onSelectMapping = (name = '') => {
