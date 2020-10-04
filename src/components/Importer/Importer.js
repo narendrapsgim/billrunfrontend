@@ -15,10 +15,11 @@ import {
   updateImporterValue,
   deleteImporterValue,
   sendImport,
+  addNewImporterMap,
+  updateImporterMap,
+  deleteImporterMap,
 } from '@/actions/importerActions';
 import {
-  saveSettings,
-  updateSetting,
   getSettings,
 } from '@/actions/settingsActions';
 import { showDanger } from '@/actions/alertsActions';
@@ -184,7 +185,7 @@ class Importer extends Component {
     const entity = item.get('entity', '');
     const operation = item.get('operation', 'create');
     const rows = (item.get('importType', '') === 'manual_mapping')
-      ? this.alterData(this.getFormatedRows())
+      ? this.alterData(this.getFormattedRows())
       : item;
     if (rows.size > 0 && entity !== '') {
       this.setState({ status: 'progress' });
@@ -411,21 +412,11 @@ class Importer extends Component {
     }
   }
 
-  saveMapper = (mappers, successMessasge = 'Mapper was saved', errorMessasge = 'Error saving mapper') => {
-    this.props.dispatch(updateSetting('import', 'mapping', mappers));
-    const messages = { success: successMessasge, error: errorMessasge };
-    this.props.dispatch(saveSettings('import.mapping', messages));
-  }
-
   removeMapper = () => {
-    const { item, savedMappers } = this.props;
+    const { item } = this.props;
     const mapperName = item.get('mapperName', '');
-    this.saveMapper(
-      savedMappers.filter(mapper => mapper.get('label', '') !== mapperName),
-      `Mapper '${mapperName}' was removed`
-    );
+    this.props.dispatch(deleteImporterMap(mapperName));
     this.props.dispatch(updateImporterValue('mapperName', ''));
-
   }
 
   onSaveMapping = (label) => {
@@ -437,18 +428,15 @@ class Importer extends Component {
     const updater = item.get('updater', Immutable.Map());
     const multiFieldAction = item.get('multiFieldAction', Immutable.Map());
     const newMap = Immutable.Map({ label, map, updater, linker, multiFieldAction });
-
     if (selectedMapperName === '' || index === -1) { // save new or update in case label not found
       if(index !== -1) {
-        this.props.dispatch(showDanger(`Mapper with name "${label}" already exists`));
-        return;
+        return this.props.dispatch(showDanger(`Mapper with name "${label}" already exists`));
       }
-      this.saveMapper(savedMappers.push(newMap), `Mapper '${label}' was saved`);
-      this.props.dispatch(updateImporterValue('mapperName', label));
+      this.props.dispatch(addNewImporterMap(newMap));
     } else { // update existing
-      this.saveMapper(savedMappers.set(index, newMap), `Mapper '${label}' was updated`);
-      this.props.dispatch(updateImporterValue('mapperName', label));
+      this.props.dispatch(updateImporterMap(newMap, index));
     }
+    this.props.dispatch(updateImporterValue('mapperName', label));
   }
 
   onSelectMapping = (name = '') => {
@@ -478,7 +466,7 @@ class Importer extends Component {
     return importerStep.okAction || this.onNextStep;
   }
 
-  getFormatedRows = (limit = -1) => {
+  getFormattedRows = (limit = -1) => {
     const {
       item,
       predefinedValues,
@@ -661,7 +649,7 @@ class Importer extends Component {
         <StepValidate
           entity={entity}
           fields={importFields}
-          rows={this.alterData(this.getFormatedRows())}
+          rows={this.alterData(this.getFormattedRows())}
           selectedMapper={mapperName === '' ? null : mapperName }
           defaultMappedName={item.get('fileName', '') === '' ? undefined : item.get('fileName')}
           saveMapper={this.onSaveMapping}
