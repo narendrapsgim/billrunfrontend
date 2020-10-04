@@ -2,6 +2,7 @@ import Immutable from 'immutable';
 import { actions } from '@/actions/settingsActions';
 import { ADD_USAGET_MAPPING } from '@/actions/inputProcessorActions';
 import { LOGOUT } from '@/actions/userActions';
+import { parseGotPlugins } from '@/actions/pluginActions';
 import { convertImporterMapperFromDb } from '@/actions/importerActions';
 import { getConfig } from '@/common/Util';
 
@@ -63,6 +64,9 @@ export default function (state = defaultState, action) {
           }
           if (setting.name === 'taxation.vat' && data !== '') {
             data *= 100;
+          }
+          if (setting.name === 'plugins' && Immutable.List.isList(data)) {
+            data = parseGotPlugins(data);
           }
           stateWithMutations.setIn(setting.name.split('.'), data);
         });

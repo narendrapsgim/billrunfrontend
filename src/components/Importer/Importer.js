@@ -31,8 +31,13 @@ import {
 import { itemSelector } from '@/selectors/entitySelector';
 import {
   isPlaysEnabledSelector,
+  usageTypesDataSelector,
+  propertyTypeSelector,
 } from '@/selectors/settingsSelector';
-import { getConfig } from '@/common/Util';
+import {
+  getConfig,
+  getProductConvertedRates,
+} from '@/common/Util';
 
 
 class Importer extends Component {
@@ -51,6 +56,8 @@ class Importer extends Component {
     typeSelectOptions: PropTypes.array,
     showPlay: PropTypes.bool,
     restartString: PropTypes.string,
+    usageTypesData: PropTypes.instanceOf(Immutable.List),
+    propertyTypes: PropTypes.instanceOf(Immutable.List),
     onFinish: PropTypes.func,
     dispatch: PropTypes.func.isRequired,
   }
@@ -85,6 +92,8 @@ class Importer extends Component {
     typeSelectOptions: [],
     showPlay: false,
     onFinish: null,
+    usageTypesData: Immutable.List(),
+    propertyTypes: Immutable.List(),
   };
 
   state = {
@@ -198,7 +207,7 @@ class Importer extends Component {
   }
 
   combineRateLines = (combinedRate, rateLine, index) => {
-    const { importFields, item } = this.props;
+    const { importFields, item, propertyTypes, usageTypesData } = this.props;
     const multiValueFields = importFields
       .filter(importField => importField.multiple)
       .map(importField => importField.value);
@@ -309,6 +318,11 @@ class Importer extends Component {
           }
         }
       });
+      // convert Price and Interval by unit
+      const convertedRates = getProductConvertedRates(propertyTypes, usageTypesData, combinedRateWithMutations, true);
+      if (!convertedRates.isEmpty()) {
+        combinedRateWithMutations.set('rates', convertedRates);
+      }
       // push all rows number that build combined revision
       let rowNumber = combinedRateWithMutations.get('__CSVROW__', Immutable.List());
       if (!Immutable.List.isList(rowNumber)) {
@@ -700,6 +714,8 @@ const mapStateToProps = (state, props) => {
     savedMappers: importMapperSelector(state, props, 'importer'),
     typeSelectOptions: importTypesOptionsSelector(state, props, 'importer'),
     showPlay: isPlaysEnabled && allowedEntitiesForPlays.includes(entity),
+    usageTypesData: usageTypesDataSelector(state, props),
+    propertyTypes: propertyTypeSelector(state, props),
   });
 };
 
