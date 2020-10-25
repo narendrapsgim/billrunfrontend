@@ -744,6 +744,7 @@ const getAdditionInputProcessorlineKeyOptions = () => {
   const options = [
     { value: 'type', label: 'Type' },
     { value: 'usaget', label: 'Usage Type' },
+    { value: 'connection_type', label: 'Connection Type' },
     { value: 'usagev', label: 'Activity Volume' },
     { value: 'file', label: 'File name' },
     ...getFieldsWithPreFunctions().map(formatSelectOptions),
@@ -766,6 +767,7 @@ const getAdditionInputProcessorComputedlineKeyOptions = (state, props) => {
   const options = [
     { value: 'type', label: 'Type' },
     { value: 'usaget', label: 'Usage Type' },
+    { value: 'connection_type', label: 'Connection Type' },
     { value: 'file', label: 'File name' },
   ];
   if (props.computedLineKey && props.computedLineKey.get('type', 'regex') === 'regex') {

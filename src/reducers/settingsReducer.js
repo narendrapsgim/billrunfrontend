@@ -4,7 +4,6 @@ import { ADD_USAGET_MAPPING } from '@/actions/inputProcessorActions';
 import { LOGOUT } from '@/actions/userActions';
 import { convertImporterMapperFromDb } from '@/actions/importerActions';
 import { parseGotPlugins } from '@/actions/pluginActions';
-import { convertImporterMapperFromDb } from '@/actions/importerActions';
 import { getConfig } from '@/common/Util';
 
 
