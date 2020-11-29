@@ -578,11 +578,11 @@ export const getAvailableFields = (settings, additionalFields = []) => {
     .map(field => (Immutable.Map({ value: field, label: field })))
     .sortBy(field => field.get('value', ''));
   const computedFields = settings
-  .getIn(['processor', 'calculated_fields'], Immutable.List())
-  .map(field => field.get('target_field', ''))
+    .getIn(['processor', 'calculated_fields'], Immutable.List())
+    .map(field => field.get('target_field', ''))
     .map(field => (Immutable.Map({ value: field, label: field })))
     .sortBy(field => field.get('value', ''));
-  return fields.concat(computedFields.concat(Immutable.fromJS(additionalFields)));
+  return Immutable.List([...fields, ...computedFields, ...Immutable.fromJS(additionalFields)])
 };
 
 export const escapeRegExp = text =>
